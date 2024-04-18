@@ -1,8 +1,0 @@
-name=playdate-project
-author=<your-team-name-here>
-description=Amazing game!! (WIP)
-bundleID=com.yourteamnamehere.playdateproject
-version=0.0.1
-buildNumber=1
-pdxversion=20400
-buildtime=766792388
