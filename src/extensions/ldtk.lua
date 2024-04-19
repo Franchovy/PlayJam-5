@@ -18,3 +18,34 @@ function LDtk.loadAllLayersAsSprites(levelName)
         end
     end
 end
+
+function LDtk.loadAllEntitiesAsSprites(levelName)
+    for index, entity in ipairs(LDtk.get_entities(levelName)) do
+        if not _G[entity.name] then
+            error("No sprite class for entity with name: " .. entity.name)
+        end
+
+        print("Name: " .. entity.name)
+
+        local sprite = _G[entity.name]()
+        sprite:moveTo(entity.position.x, entity.position.y)
+        sprite:setCenter(entity.center.x, entity.center.y)
+        sprite:setZIndex(entity.zIndex)
+        sprite:add()
+
+        --[[if entity.name=="Player" then
+			if entity.fields.EntranceDirection == direction then
+				player.sprite:add()
+				player.init( entity )
+			end
+		else
+			local entity_image = LDtk.generate_image_from_entity(entity)
+			if entity_image then
+				local new_deco_sprite = playdate.graphics.sprite.new( entity_image )
+				new_deco_sprite:moveTo( entity.position.x, entity.position.y )
+				new_deco_sprite:setCenter(0,0)
+				new_deco_sprite:add()
+			end
+		end]]
+    end
+end
