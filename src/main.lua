@@ -20,8 +20,13 @@ manager:hook()
 
 LDtk.load(assets.levels.test)
 
--- Open Menu
-manager:enter(Menu())
+-- Open Menu (& save reference)
+
+manager.scenes = {
+  menu = Menu()
+}
+
+manager:enter(manager.scenes.menu)
 
 -- Play Music
 
@@ -30,9 +35,9 @@ local fileplayer <const> = playdate.sound.fileplayer.new("assets/music/digit")
 assert(fileplayer:play(0))
 
 function playdate.update()
-    -- Update Scenes using Scene Manager
-    manager:emit('update')
+  -- Update Scenes using Scene Manager
+  manager:emit('update')
 
-    -- Update sprites
-    playdate.graphics.sprite.update()
+  -- Update sprites
+  playdate.graphics.sprite.update()
 end

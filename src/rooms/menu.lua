@@ -4,8 +4,14 @@ class("Menu").extends(Room)
 
 local imageBackground <const> = gfx.image.new("assets/images/menu")
 local spriteBackground = gfx.sprite.new(imageBackground)
+local sceneManager
 
 function Menu:enter(previous, ...)
+    -- Set sceneManager reference
+    sceneManager = self.manager
+
+    -- Add background image
+
     spriteBackground:add()
     spriteBackground:setCenter(0, 0)
     spriteBackground:moveTo(0, 0)
@@ -25,5 +31,6 @@ function Menu:draw()
 end
 
 function Menu:AButtonDown()
-    self.manager:enter(Game())
+    sceneManager.scenes.currentGame = Game()
+    sceneManager:enter(sceneManager.scenes.currentGame)
 end
