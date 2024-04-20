@@ -19,7 +19,7 @@ function Player:init()
     self.yVelocity = 0
     self.gravity = 1.0
     self.maxSpeed = 2
-    self.jumpVelocity = -6
+    self.jumpVelocity = -10
     self.drag = 0.1
     self.minimumAirSpeed = 0.5
 
@@ -93,10 +93,6 @@ function Player:handleMovementAndCollisions()
                 self.touchingWall = true
             end
         end
-    end
-
-    if(self.y > 200) then
-      self.touchingGround = true
     end
 
     if(self.touchingGround) then
