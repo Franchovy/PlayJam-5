@@ -7,6 +7,7 @@ import "rooms"
 
 TAGS = {
   Player = 1,
+  Ladder = 2,
   Ability = 3
 }
 

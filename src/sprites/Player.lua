@@ -29,19 +29,27 @@ function Player:init()
     self.touchingGround = false
     self.touchingWall = false
     self.touchingCeiling = false
+    self.inFrontOfLadder = false
+    self.isClimbingLadder = false
 
     -- abilities
     self.canMoveLeft = false
     self.canMoveRight = true
     self.canPressA = false
     self.canPressB = false
+
 end
 
 function Player:collisionResponse(other)
+  self.inFrontOfLadder = false
   if other:getTag() == TAGS.Ability then
     return gfx.sprite.kCollisionTypeOverlap
-  end
+  elseif other:getTag() == TAGS.Ladder then
+    self.inFrontOfLadder = true
+    return gfx.sprite.kCollisionTypeOverlap
+  else
     return gfx.sprite.kCollisionTypeSlide
+  end
 end
 
 function Player:update()
@@ -137,7 +145,22 @@ function Player:handleGroundInput()
 end
 
 function Player:handleAirInput()
-    if pd.buttonJustReleased(pd.kButtonA) then
+    if self.inFrontOfLadder then
+      local climbing = false
+      if pd.buttonIsPressed(pd.kButtonUp) then
+        climbing = true
+        self.yVelocity = -self.maxSpeed
+      elseif pd.buttonIsPressed(pd.kButtonDown) then
+        climbing = true
+        self.yVelocity = self.maxSpeed
+      end
+      if climbing then
+        self.isClimbingLadder = true
+        return
+      end
+    end
+
+    if pd.buttonJustReleased(pd.kButtonA) and not self.isClimbingLadder then
       self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then

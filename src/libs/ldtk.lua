@@ -670,7 +670,7 @@ function _.process_level_data(level_data)
                         tiles_list[id] = 1 + (ch - cy - 1) * cw + (cw - cx - 1)
                     end
                 else
-                    tiles_list[id] = 1 + 16 -- tile_data.t -- Hard-coding the tile size cause... I don't know
+                    tiles_list[id] = 1 + tile_data.t
                 end
             end
 
