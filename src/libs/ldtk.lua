@@ -202,8 +202,13 @@ function LDtk.load(ldtk_file, use_lua_levels)
     -- we list the level names (the complete list needs to be ready before calling LDtk.load_level())
     for level_index, level_data in ipairs(data.levels) do
         _level_names[level_data.iid] = level_data.identifier
-        _level_rects[level_data.identifier] = { x = level_data.worldX, y = level_data.worldY, width = level_data.pxWid, height =
-        level_data.pxHei }
+        _level_rects[level_data.identifier] = {
+            x = level_data.worldX,
+            y = level_data.worldY,
+            width = level_data.pxWid,
+            height =
+                level_data.pxHei
+        }
     end
 
     -- we load the levels
@@ -447,7 +452,7 @@ function LDtk.generate_image_from_tileset_rect(tileset_rect)
     for y = 0, y_count - 1 do
         for x = 0, x_count - 1 do
             cells:getImage(1 + (tileset_rect.x // cell_width) + x, 1 + (tileset_rect.y // cell_height) + y):draw(
-            x * cell_width, y * cell_height)
+                x * cell_width, y * cell_height)
         end
     end
     playdate.graphics.unlockFocus()
@@ -542,7 +547,7 @@ function _.convert_relative_folder(filepath)
 
     if ldtk_folder_end < 0 then
         error("LDtk Importer Error: Cannot access the following path because it is outside the project folder: " ..
-        filepath)
+            filepath)
     end
 
     local absolute_path
@@ -665,7 +670,7 @@ function _.process_level_data(level_data)
                         tiles_list[id] = 1 + (ch - cy - 1) * cw + (cw - cx - 1)
                     end
                 else
-                    tiles_list[id] = 1 + tile_data.t
+                    tiles_list[id] = 1 + 16 -- tile_data.t -- Hard-coding the tile size cause... I don't know
                 end
             end
 
@@ -754,12 +759,12 @@ function _.load_tileset_imagetable(path, flipped)
     if not image then
         if flipped then
             error(
-            "LDtk Importer Error: cannot load tileset " ..
-            image_filepath .. ". Tileset requires a flipped version of the image: flipped-filename-table-w-h.png", 3)
+                "LDtk Importer Error: cannot load tileset " ..
+                image_filepath .. ". Tileset requires a flipped version of the image: flipped-filename-table-w-h.png", 3)
         else
             error(
-            "LDtk Importer Error: cannot load tileset " ..
-            image_filepath .. ". Filename should have a image table format: name-table-w-h.png", 3)
+                "LDtk Importer Error: cannot load tileset " ..
+                image_filepath .. ". Filename should have a image table format: name-table-w-h.png", 3)
         end
 
         return nil
