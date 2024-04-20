@@ -16,7 +16,7 @@ function Player:init()
     self.yVelocity = 0
     self.gravity = 1.0
     self.maxSpeed = 2
-    self.jumpVelocity = -16
+    self.jumpVelocity = -10
     self.drag = 0.1
     self.minimumAirSpeed = 0.5
 
@@ -27,7 +27,6 @@ function Player:init()
     self.touchingWall = false
     self.touchingCeiling = false
     self.inFrontOfLadder = false
-    self.isClimbingLadder = false
 
     -- abilities
     self.canMoveLeft = false
@@ -50,6 +49,7 @@ function Player:update()
 
     self:updateJumpBuffer()
     self:handleState()
+    self:handleLadders()
     self:handleMovementAndCollisions()
 end
 
@@ -129,6 +129,16 @@ function Player:handleMovementAndCollisions()
     end
 end
 
+function Player:handleLadders()
+    if self.inFrontOfLadder then
+        if pd.buttonIsPressed(pd.kButtonUp) then
+            self.yVelocity = -self.maxSpeed
+        elseif pd.buttonIsPressed(pd.kButtonDown) then
+            self.yVelocity = self.maxSpeed
+        end
+    end
+end
+
 -- Input Helper Functions
 function Player:handleGroundInput()
     if self:playerJumped() and self.canPressA then
@@ -143,22 +153,7 @@ function Player:handleGroundInput()
 end
 
 function Player:handleAirInput()
-    if self.inFrontOfLadder then
-        local climbing = false
-        if pd.buttonIsPressed(pd.kButtonUp) then
-            climbing = true
-            self.yVelocity = -self.maxSpeed
-        elseif pd.buttonIsPressed(pd.kButtonDown) then
-            climbing = true
-            self.yVelocity = self.maxSpeed
-        end
-        if climbing then
-            self.isClimbingLadder = true
-            return
-        end
-    end
-
-    if pd.buttonJustReleased(pd.kButtonA) and not self.isClimbingLadder then
+    if pd.buttonJustReleased(pd.kButtonA) and not self.inFrontOfLadder then
         self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then
