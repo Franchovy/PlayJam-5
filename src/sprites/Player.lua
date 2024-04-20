@@ -15,4 +15,8 @@ function Player:update()
     if playdate.buttonIsPressed(playdate.kButtonRight) then
         self:moveBy(5, 0)
     end
+
+    if playdate.buttonIsPressed(playdate.kButtonLeft) then
+        self:moveBy(-5, 0)
+    end
 end

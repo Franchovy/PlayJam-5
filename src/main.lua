@@ -24,7 +24,7 @@ end
 
 LDtk.load(assets.levels.test)
 
-local levelName = "Level_0"
+local levelName = "Level_1"
 
 LDtk.loadAllLayersAsSprites(levelName)
 LDtk.loadAllEntitiesAsSprites(levelName)
