@@ -51,6 +51,7 @@ end
 function Game:levelComplete()
     level = level + 1
     if level >= maxLevels then
+      level = 0
       goToMainMenu()
     else
       restartLevel()
