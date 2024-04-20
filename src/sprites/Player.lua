@@ -1,6 +1,14 @@
 local gfx <const> = playdate.graphics
 local pd <const> = playdate
 
+local STATES = {
+    Ground = 1,
+    Ladder = 2,
+    Air = 3
+}
+
+local maxSpeed = 5
+
 class("Player").extends(AnimatedSprite)
 
 function Player:init()
@@ -12,30 +20,10 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self.xVelocity = 0
-    self.yVelocity = 0
-    self.gravity = 1.0
-    self.maxSpeed = 2
-    self.jumpVelocity = -10
-    self.drag = 0.1
-    self.minimumAirSpeed = 0.5
-
-    self.jumpBufferAmount = 5
-    self.jumpBuffer = 0
-
-    self.touchingGround = false
-    self.touchingWall = false
-    self.touchingCeiling = false
-    self.inFrontOfLadder = false
-
-    -- abilities
-    self.canMoveLeft = false
-    self.canMoveRight = true
-    self.canPressA = false
-    self.canPressB = false
+    self.state = STATES.Ground
 end
 
-function Player:collisionResponse(other)
+function Player:collisionResponse()
     local tag = other:getTag()
     if tag == TAGS.Ability or tag == TAGS.Door or tag == TAGS.Ladder then
         return gfx.sprite.kCollisionTypeOverlap
@@ -45,163 +33,29 @@ function Player:collisionResponse(other)
 end
 
 function Player:update()
-    self:updateAnimation()
+    local velocityX = 0
+    local velocityY = 0
 
-    self:updateJumpBuffer()
-    self:handleState()
-    self:handleLadders()
-    self:handleMovementAndCollisions()
-end
+    if self.state == STATES.Ground then
+        velocityY = 0
 
-function Player:handleState()
-    if self.currentState == "idle" then
-        self:applyGravity()
-        self:handleGroundInput()
-    elseif self.currentState == "run" then
-        self:applyGravity()
-        self:handleGroundInput()
-    elseif self.currentState == "jump" then
-        if self.touchingGround then
-            self:changeToIdleState()
-        end
-        self:applyGravity()
-        self:applyDrag(self.drag)
-        self:handleAirInput()
-    end
-end
-
-function Player:updateJumpBuffer()
-    self.jumpBuffer -= 1
-    if self.jumpBuffer <= 0 then
-        self.jumpBuffer = 0
-    end
-    if pd.buttonJustPressed(pd.kButtonA) then
-        self.jumpBuffer = self.jumpBufferAmount
-    end
-end
-
-function Player:playerJumped()
-    return self.jumpBuffer > 0
-end
-
-function Player:handleMovementAndCollisions()
-    local _, _, collisions, length = self:moveWithCollisions(self.x + self.xVelocity, self.y + self.yVelocity)
-
-    self.touchingGround = false
-    self.touchingCeiling = false
-    self.touchingWall = false
-    self.inFrontOfLadder = false
-
-    for i = 1, length do
-        local collision = collisions[i]
-        local collisionType = collision.type
-        local collisionObject = collision.other
-        local collisionTag = collisionObject:getTag()
-        if collisionType == gfx.sprite.kCollisionTypeSlide then
-            if collision.normal.y == -1 then
-                self.touchingGround = true
-            elseif collision.normal.y == 1 then
-                self.touchingCeiling = true
-            end
-
-            if collision.normal.x ~= 0 then
-                self.touchingWall = true
-            end
-        elseif collisionType == gfx.sprite.kCollisionTypeOverlap then
-            if collisionTag == TAGS.Ability then
-                collisionObject:pickUp(self)
-            elseif collisionTag == TAGS.Door then
-                Manager.emit(EVENTS.LevelComplete)
-            elseif collisionTag == TAGS.Ladder then
-                self.inFrontOfLadder = true
-            end
+        if self:isMovingLeft() then
+            velocityX = -maxSpeed
+        elseif self:isMovingRight() then
+            velocityX = maxSpeed
         end
     end
 
-    if (self.touchingGround) then
-        self.gravity = 1
-    end
+    local targetX, targetY = self.x + velocityX, self.y + velocityY
+    local actualX, actualY, collisions, length = self:checkCollisions(targetX, targetY)
 
-    if self.xVelocity < 0 then
-        self.globalFlip = 1
-    elseif self.xVelocity > 0 then
-        self.globalFlip = 0
-    end
+    self:moveTo(actualX, actualY)
 end
 
-function Player:handleLadders()
-    if self.inFrontOfLadder then
-        if pd.buttonIsPressed(pd.kButtonUp) then
-            self.yVelocity = -self.maxSpeed
-        elseif pd.buttonIsPressed(pd.kButtonDown) then
-            self.yVelocity = self.maxSpeed
-        end
-    end
+function Player:isMovingRight()
+    return playdate.buttonIsPressed(playdate.kButtonRight)
 end
 
--- Input Helper Functions
-function Player:handleGroundInput()
-    if self:playerJumped() and self.canPressA then
-        self:changeToJumpState()
-    elseif pd.buttonIsPressed(pd.kButtonLeft) and self.canMoveLeft then
-        self:changeToRunState("left")
-    elseif pd.buttonIsPressed(pd.kButtonRight) and self.canMoveRight then
-        self:changeToRunState("right")
-    elseif self.touchingGround then
-        self:changeToIdleState()
-    end
-end
-
-function Player:handleAirInput()
-    if pd.buttonJustReleased(pd.kButtonA) and not self.inFrontOfLadder then
-        self.gravity = 1.3
-    end
-    if pd.buttonIsPressed(pd.kButtonLeft) then
-        self.xVelocity = -self.maxSpeed
-    elseif pd.buttonIsPressed(pd.kButtonRight) then
-        self.xVelocity = self.maxSpeed
-    end
-end
-
--- State transitions
-function Player:changeToIdleState()
-    self.xVelocity = 0
-    self:changeState("idle")
-end
-
-function Player:changeToRunState(direction)
-    if direction == "left" then
-        self.xVelocity = -self.maxSpeed
-        self.globalFlip = 1
-    elseif direction == "right" then
-        self.xVelocity = self.maxSpeed
-        self.globalFlip = 0
-    end
-    self:changeState("run")
-end
-
-function Player:changeToJumpState()
-    self.yVelocity = self.jumpVelocity
-    self.jumpBuffer = 0
-    self:changeState("jump")
-end
-
--- Physics Helper Functions
-function Player:applyGravity()
-    self.yVelocity += self.gravity
-    if self.touchingGround or self.touchingCeiling then
-        self.yVelocity = 0
-    end
-end
-
-function Player:applyDrag(amount)
-    if self.xVelocity > 0 then
-        self.xVelocity -= amount
-    elseif self.xVelocity < 0 then
-        self.xVelocity += amount
-    end
-
-    if math.abs(self.xVelocity) < self.minimumAirSpeed or self.touchingWall then
-        self.xVelocity = 0
-    end
+function Player:isMovingLeft()
+    return playdate.buttonIsPressed(playdate.kButtonLeft)
 end
