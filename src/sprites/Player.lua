@@ -4,7 +4,7 @@ local pd <const> = playdate
 class("Player").extends(AnimatedSprite)
 
 function Player:init()
-    local playerImageTable = gfx.imagetable.new("sprites/player-table-32-32")
+    local playerImageTable = gfx.imagetable.new("assets/images/player-table-32-32")
     Player.super.init(self, playerImageTable)
 
     self:addState("idle", 1, 1)
