@@ -12,14 +12,11 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self:moveTo(100, 70)
-    self:setCollideRect(2, 2, 28, 30)
-
     self.xVelocity = 0
     self.yVelocity = 0
     self.gravity = 1.0
     self.maxSpeed = 2
-    self.jumpVelocity = -10
+    self.jumpVelocity = -16
     self.drag = 0.1
     self.minimumAirSpeed = 0.5
 
@@ -37,19 +34,15 @@ function Player:init()
     self.canMoveRight = true
     self.canPressA = false
     self.canPressB = false
-
 end
 
 function Player:collisionResponse(other)
-  self.inFrontOfLadder = false
-  if other:getTag() == TAGS.Ability then
-    return gfx.sprite.kCollisionTypeOverlap
-  elseif other:getTag() == TAGS.Ladder then
-    self.inFrontOfLadder = true
-    return gfx.sprite.kCollisionTypeOverlap
-  else
-    return gfx.sprite.kCollisionTypeSlide
-  end
+    local tag = other:getTag()
+    if tag == TAGS.Ability or tag == TAGS.Door or tag == TAGS.Ladder then
+        return gfx.sprite.kCollisionTypeOverlap
+    else
+        return gfx.sprite.kCollisionTypeSlide
+    end
 end
 
 function Player:update()
@@ -97,8 +90,9 @@ function Player:handleMovementAndCollisions()
     self.touchingGround = false
     self.touchingCeiling = false
     self.touchingWall = false
+    self.inFrontOfLadder = false
 
-    for i=1,length do
+    for i = 1, length do
         local collision = collisions[i]
         local collisionType = collision.type
         local collisionObject = collision.other
@@ -113,14 +107,19 @@ function Player:handleMovementAndCollisions()
             if collision.normal.x ~= 0 then
                 self.touchingWall = true
             end
-        end
-        if collisionTag == TAGS.Ability then
-            collisionObject:pickUp(self)
+        elseif collisionType == gfx.sprite.kCollisionTypeOverlap then
+            if collisionTag == TAGS.Ability then
+                collisionObject:pickUp(self)
+            elseif collisionTag == TAGS.Door then
+                Manager.emit(EVENTS.LevelComplete)
+            elseif collisionTag == TAGS.Ladder then
+                self.inFrontOfLadder = true
+            end
         end
     end
 
-    if(self.touchingGround) then
-      self.gravity = 1
+    if (self.touchingGround) then
+        self.gravity = 1
     end
 
     if self.xVelocity < 0 then
@@ -128,7 +127,6 @@ function Player:handleMovementAndCollisions()
     elseif self.xVelocity > 0 then
         self.globalFlip = 0
     end
-
 end
 
 -- Input Helper Functions
@@ -146,22 +144,22 @@ end
 
 function Player:handleAirInput()
     if self.inFrontOfLadder then
-      local climbing = false
-      if pd.buttonIsPressed(pd.kButtonUp) then
-        climbing = true
-        self.yVelocity = -self.maxSpeed
-      elseif pd.buttonIsPressed(pd.kButtonDown) then
-        climbing = true
-        self.yVelocity = self.maxSpeed
-      end
-      if climbing then
-        self.isClimbingLadder = true
-        return
-      end
+        local climbing = false
+        if pd.buttonIsPressed(pd.kButtonUp) then
+            climbing = true
+            self.yVelocity = -self.maxSpeed
+        elseif pd.buttonIsPressed(pd.kButtonDown) then
+            climbing = true
+            self.yVelocity = self.maxSpeed
+        end
+        if climbing then
+            self.isClimbingLadder = true
+            return
+        end
     end
 
     if pd.buttonJustReleased(pd.kButtonA) and not self.isClimbingLadder then
-      self.gravity = 1.3
+        self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then
         self.xVelocity = -self.maxSpeed
