@@ -479,9 +479,9 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [32,192],
-							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["A"]
+								"params": ["Up"]
 							}] }],
 							"__worldX": -416,
 							"__worldY": 192
