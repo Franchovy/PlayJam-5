@@ -11,7 +11,8 @@ local function restartLevel()
     sceneManager:enter(sceneManager.scenes.currentGame)
 end
 
-local levelName <const> = "Level_0"
+local level = 0
+local maxLevels = 2
 
 function Game:enter(previous, ...)
     -- Set local reference to sceneManager
@@ -19,7 +20,7 @@ function Game:enter(previous, ...)
     sceneManager = self.manager
 
     -- Load level
-
+    local levelName = "Level_"..level
     LDtk.loadAllLayersAsSprites(levelName)
     LDtk.loadAllEntitiesAsSprites(levelName)
 
@@ -48,5 +49,10 @@ function Game:draw()
 end
 
 function Game:levelComplete()
-    sceneManager:enter(sceneManager.scenes.menu)
+    level = level + 1
+    if level >= maxLevels then
+      goToMainMenu()
+    else
+      restartLevel()
+    end
 end
