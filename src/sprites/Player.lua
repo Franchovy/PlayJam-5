@@ -10,6 +10,7 @@ function Player:init()
     self:addState("idle", 1, 1)
     self:addState("run", 1, 1)
     self:addState("jump", 1, 1)
+    self:addState("climb", 1, 1)
     self:playAnimation()
 
     self:moveTo(100, 70)
@@ -33,6 +34,8 @@ function Player:init()
     self.isClimbingLadder = false
 
     -- abilities
+    self.canClimbUp = true
+    self.canClimbDown = true
     self.canMoveLeft = false
     self.canMoveRight = true
     self.canPressA = false
@@ -74,6 +77,8 @@ function Player:handleState()
         self:applyGravity()
         self:applyDrag(self.drag)
         self:handleAirInput()
+    elseif self.currentState == "climb" then
+        self:handleLadderInput()
     end
 end
 
@@ -133,7 +138,9 @@ end
 
 -- Input Helper Functions
 function Player:handleGroundInput()
-    if self:playerJumped() and self.canPressA then
+    if self.inFrontOfLadder and pd.buttonJustPressed(pd.kButtonUp) then
+        self:changeToClimbState()
+    elseif self:playerJumped() and self.canPressA then
         self:changeToJumpState()
     elseif pd.buttonIsPressed(pd.kButtonLeft) and self.canMoveLeft then
         self:changeToRunState("left")
@@ -144,23 +151,22 @@ function Player:handleGroundInput()
     end
 end
 
-function Player:handleAirInput()
-    if self.inFrontOfLadder then
-      local climbing = false
-      if pd.buttonIsPressed(pd.kButtonUp) then
-        climbing = true
-        self.yVelocity = -self.maxSpeed
-      elseif pd.buttonIsPressed(pd.kButtonDown) then
-        climbing = true
-        self.yVelocity = self.maxSpeed
-      end
-      if climbing then
-        self.isClimbingLadder = true
+function Player:handleLadderInput()
+  print("ladder")
+    if self.touchingGround and pd.buttonJustReleased(pd.kButtonDown) then
+    print("climbing to ground")
+        self:changeToIdleState()
         return
-      end
     end
+    if pd.buttonIsPressed(pd.kButtonUp) and self.canClimbUp then
+        self.yVelocity = -self.maxSpeed
+    elseif pd.buttonIsPressed(pd.kButtonDown) and self.canClimbDown then
+        self.yVelocity = self.maxSpeed
+    end
+end
 
-    if pd.buttonJustReleased(pd.kButtonA) and not self.isClimbingLadder then
+function Player:handleAirInput()
+    if pd.buttonJustReleased(pd.kButtonA) then
       self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then
@@ -185,6 +191,12 @@ function Player:changeToRunState(direction)
         self.globalFlip = 0
     end
     self:changeState("run")
+end
+
+function Player:changeToClimbState()
+  print("change to climb state")
+    self.isClimbingLadder = true
+    self:changeState("climb")
 end
 
 function Player:changeToJumpState()
