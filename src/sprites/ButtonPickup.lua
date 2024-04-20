@@ -27,6 +27,8 @@ function ButtonPickup:pickUp(player)
     player.canPressA = true
   elseif self.abilityName == "B" then
     player.canPressB = true
+  elseif self.abilityName == "Up" then
+    player.canMoveUp = true
   end
 
   self.fields.pickedUp = true

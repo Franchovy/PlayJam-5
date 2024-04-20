@@ -31,6 +31,6 @@ function Menu:draw()
 end
 
 function Menu:AButtonDown()
-    sceneManager.scenes.currentGame = Game()
+    sceneManager.scenes.currentGame = Game(0)
     sceneManager:enter(sceneManager.scenes.currentGame)
 end

@@ -31,6 +31,7 @@ function Player:init()
     -- abilities
     self.canMoveLeft = false
     self.canMoveRight = true
+    self.canMoveUp = false
     self.canPressA = false
     self.canPressB = false
 end
@@ -131,7 +132,7 @@ end
 
 function Player:handleLadders()
     if self.inFrontOfLadder then
-        if pd.buttonIsPressed(pd.kButtonUp) then
+        if pd.buttonIsPressed(pd.kButtonUp) and self.canMoveUp then
             self.yVelocity = -self.maxSpeed
         elseif pd.buttonIsPressed(pd.kButtonDown) then
             self.yVelocity = self.maxSpeed
