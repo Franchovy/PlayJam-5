@@ -1253,11 +1253,30 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [32,192],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
+							"__worldX": -416,
+							"__worldY": 480
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [10,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "b602f680-fec0-11ee-adbd-b5227eb3739a",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [320,192],
 							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Up"]
 							}] }],
-							"__worldX": -416,
+							"__worldX": -128,
 							"__worldY": 480
 						}
 					]
