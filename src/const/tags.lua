@@ -3,4 +3,5 @@ TAGS = {
     Door = 2,
     Ability = 3,
     Ladder = 4,
+    Wall = 5
 }

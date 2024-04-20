@@ -37,10 +37,10 @@ end
 
 function Player:collisionResponse(other)
     local tag = other:getTag()
-    if tag == TAGS.Ability or tag == TAGS.Door or tag == TAGS.Ladder then
-        return gfx.sprite.kCollisionTypeOverlap
-    else
+    if tag == TAGS.Wall then
         return gfx.sprite.kCollisionTypeSlide
+    else
+        return gfx.sprite.kCollisionTypeOverlap
     end
 end
 
