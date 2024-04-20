@@ -4,7 +4,7 @@ local pd <const> = playdate
 class("Player").extends(AnimatedSprite)
 
 function Player:init()
-    local playerImageTable = gfx.imagetable.new("sprites/player-table-32-32")
+    local playerImageTable = gfx.imagetable.new("assets/images/player-table-32-32")
     Player.super.init(self, playerImageTable)
 
     self:addState("idle", 1, 1)
@@ -19,7 +19,7 @@ function Player:init()
     self.yVelocity = 0
     self.gravity = 1.0
     self.maxSpeed = 2
-    self.jumpVelocity = -6
+    self.jumpVelocity = -10
     self.drag = 0.1
     self.minimumAirSpeed = 0.5
 
@@ -29,6 +29,10 @@ function Player:init()
     self.touchingGround = false
     self.touchingWall = false
     self.touchingCeiling = false
+end
+
+function Player:collisionResponse(other)
+    return gfx.sprite.kCollisionTypeSlide
 end
 
 function Player:update()
@@ -89,10 +93,6 @@ function Player:handleMovementAndCollisions()
                 self.touchingWall = true
             end
         end
-    end
-
-    if(self.y > 200) then
-      self.touchingGround = true
     end
 
     if(self.touchingGround) then

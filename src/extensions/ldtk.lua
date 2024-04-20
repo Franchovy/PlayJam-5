@@ -11,7 +11,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
             sprite:setZIndex(layer.zIndex)
             sprite:add()
 
-            local emptyTiles = LDtk.get_empty_tileIDs()
+            local emptyTiles = LDtk.get_empty_tileIDs(levelName, "Solid", layerName)
             if emptyTiles then
                 playdate.graphics.sprite.addWallSprites(tilemap, emptyTiles)
             end
