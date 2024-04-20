@@ -1,3 +1,3 @@
-import "sprites/Enemy"
-import "sprites/Object"
+import "sprites/Door"
 import "sprites/Player"
+import "sprites/ButtonPickup"

@@ -12,9 +12,6 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self:moveTo(100, 100)
-    self:setCollideRect(2, 2, 28, 30)
-
     self.xVelocity = 0
     self.yVelocity = 0
     self.gravity = 1.0
@@ -29,10 +26,23 @@ function Player:init()
     self.touchingGround = false
     self.touchingWall = false
     self.touchingCeiling = false
+    self.inFrontOfLadder = false
+
+    -- abilities
+    self.canMoveLeft = false
+    self.canMoveRight = true
+    self.canMoveUp = false
+    self.canPressA = false
+    self.canPressB = false
 end
 
 function Player:collisionResponse(other)
-    return gfx.sprite.kCollisionTypeSlide
+    local tag = other:getTag()
+    if tag == TAGS.Wall then
+        return gfx.sprite.kCollisionTypeSlide
+    else
+        return gfx.sprite.kCollisionTypeOverlap
+    end
 end
 
 function Player:update()
@@ -40,6 +50,7 @@ function Player:update()
 
     self:updateJumpBuffer()
     self:handleState()
+    self:handleLadders()
     self:handleMovementAndCollisions()
 end
 
@@ -78,10 +89,15 @@ function Player:handleMovementAndCollisions()
     local _, _, collisions, length = self:moveWithCollisions(self.x + self.xVelocity, self.y + self.yVelocity)
 
     self.touchingGround = false
+    self.touchingCeiling = false
+    self.touchingWall = false
+    self.inFrontOfLadder = false
 
-    for i=1,length do
+    for i = 1, length do
         local collision = collisions[i]
         local collisionType = collision.type
+        local collisionObject = collision.other
+        local collisionTag = collisionObject:getTag()
         if collisionType == gfx.sprite.kCollisionTypeSlide then
             if collision.normal.y == -1 then
                 self.touchingGround = true
@@ -92,11 +108,19 @@ function Player:handleMovementAndCollisions()
             if collision.normal.x ~= 0 then
                 self.touchingWall = true
             end
+        elseif collisionType == gfx.sprite.kCollisionTypeOverlap then
+            if collisionTag == TAGS.Ability then
+                collisionObject:pickUp(self)
+            elseif collisionTag == TAGS.Door then
+                Manager.emit(EVENTS.LevelComplete)
+            elseif collisionTag == TAGS.Ladder then
+                self.inFrontOfLadder = true
+            end
         end
     end
 
-    if(self.touchingGround) then
-      self.gravity = 1
+    if (self.touchingGround) then
+        self.gravity = 1
     end
 
     if self.xVelocity < 0 then
@@ -106,13 +130,23 @@ function Player:handleMovementAndCollisions()
     end
 end
 
+function Player:handleLadders()
+    if self.inFrontOfLadder then
+        if pd.buttonIsPressed(pd.kButtonUp) and self.canMoveUp then
+            self.yVelocity = -self.maxSpeed
+        elseif pd.buttonIsPressed(pd.kButtonDown) then
+            self.yVelocity = self.maxSpeed
+        end
+    end
+end
+
 -- Input Helper Functions
 function Player:handleGroundInput()
-    if self:playerJumped() then
+    if self:playerJumped() and self.canPressA then
         self:changeToJumpState()
-    elseif pd.buttonIsPressed(pd.kButtonLeft) then
+    elseif pd.buttonIsPressed(pd.kButtonLeft) and self.canMoveLeft then
         self:changeToRunState("left")
-    elseif pd.buttonIsPressed(pd.kButtonRight) then
+    elseif pd.buttonIsPressed(pd.kButtonRight) and self.canMoveRight then
         self:changeToRunState("right")
     elseif self.touchingGround then
         self:changeToIdleState()
@@ -120,8 +154,8 @@ function Player:handleGroundInput()
 end
 
 function Player:handleAirInput()
-    if pd.buttonJustReleased(pd.kButtonA) then
-      self.gravity = 1.3
+    if pd.buttonJustReleased(pd.kButtonA) and not self.inFrontOfLadder then
+        self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then
         self.xVelocity = -self.maxSpeed
