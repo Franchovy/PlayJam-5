@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 41,
+	"nextUid": 47,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -72,6 +72,87 @@
 			"autoRuleGroups": [],
 			"autoSourceLayerDefUid": null,
 			"tilesetDefUid": null,
+			"tilePivotX": 0,
+			"tilePivotY": 0,
+			"biomeFieldUid": null
+		},
+		{
+			"__type": "IntGrid",
+			"identifier": "Ladders",
+			"type": "IntGrid",
+			"uid": 41,
+			"doc": null,
+			"uiColor": null,
+			"gridSize": 32,
+			"guideGridWid": 0,
+			"guideGridHei": 0,
+			"displayOpacity": 1,
+			"inactiveOpacity": 1,
+			"hideInList": false,
+			"hideFieldsWhenInactive": false,
+			"canSelectWhenInactive": true,
+			"renderInWorldView": true,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"parallaxFactorX": 0,
+			"parallaxFactorY": 0,
+			"parallaxScaling": true,
+			"requiredTags": [],
+			"excludedTags": [],
+			"autoTilesKilledByOtherLayerUid": null,
+			"uiFilterTags": [],
+			"useAsyncRender": false,
+			"intGridValues": [{ "value": 1, "identifier": null, "color": "#000000", "tile": null, "groupUid": 0 }],
+			"intGridValuesGroups": [],
+			"autoRuleGroups": [
+				{
+					"uid": 43,
+					"name": "Rules for #1",
+					"color": null,
+					"icon": null,
+					"active": true,
+					"isOptional": false,
+					"rules": [
+						{
+							"uid": 44,
+							"active": true,
+							"size": 1,
+							"tileRectsIds": [[0]],
+							"alpha": 1,
+							"chance": 1,
+							"breakOnMatch": true,
+							"pattern": [1],
+							"flipX": false,
+							"flipY": false,
+							"xModulo": 1,
+							"yModulo": 1,
+							"xOffset": 0,
+							"yOffset": 0,
+							"tileXOffset": 0,
+							"tileYOffset": 0,
+							"tileRandomXMin": 0,
+							"tileRandomXMax": 0,
+							"tileRandomYMin": 0,
+							"tileRandomYMax": 0,
+							"checker": "None",
+							"tileMode": "Single",
+							"pivotX": 0,
+							"pivotY": 0,
+							"outOfBoundsValue": 1,
+							"invalidated": false,
+							"perlinActive": false,
+							"perlinSeed": 6101357,
+							"perlinScale": 0.2,
+							"perlinOctaves": 2
+						}
+					],
+					"usesWizard": true,
+					"requiredBiomeValues": [],
+					"biomeRequirementMode": 0
+				}
+			],
+			"autoSourceLayerDefUid": null,
+			"tilesetDefUid": 42,
 			"tilePivotX": 0,
 			"tilePivotY": 0,
 			"biomeFieldUid": null
@@ -490,6 +571,25 @@
 				"opaqueTiles": "111111111111101111111111",
 				"averageColors": "faaafbbbfaaafcccf999fbbbfbbbf777faaafaaaf999f999fdddfaaafaaafbbbf999fbbbf999fbbbf777faaafcccfaaa"
 			}
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "Ladder",
+			"uid": 42,
+			"relPath": "../images/ladder.png",
+			"embedAtlas": null,
+			"pxWid": 32,
+			"pxHei": 32,
+			"tileGridSize": 32,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": 46,
+			"enumTags": [{ "enumValueId": "Ladder", "tileIds": [0] }],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "b000" }
 		}
 	], "enums": [
 		{ "identifier": "TileEnum", "uid": 3, "values": [{ "id": "Solid", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
@@ -501,7 +601,8 @@
 			{ "id": "A", "tileRect": null, "color": 7552569 },
 			{ "id": "B", "tileRect": null, "color": 4073265 },
 			{ "id": "Crank", "tileRect": null, "color": 16690740 }
-		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "LadderEnum", "uid": 46, "values": [{ "id": "Ladder", "tileRect": null, "color": 2359551 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
@@ -605,8 +706,56 @@
 							}] }],
 							"__worldX": -320,
 							"__worldY": 96
+						},
+						{
+							"__identifier": "Door",
+							"__grid": [10,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "c5fcb030-fec0-11ee-9cff-c54100d31bd1",
+							"width": 32,
+							"height": 32,
+							"defUid": 39,
+							"px": [320,128],
+							"fieldInstances": [],
+							"__worldX": -128,
+							"__worldY": 128
 						}
 					]
+				},
+				{
+					"__identifier": "Ladders",
+					"__type": "IntGrid",
+					"__cWid": 13,
+					"__cHei": 8,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": 42,
+					"__tilesetRelPath": "../images/ladder.png",
+					"iid": "2572f890-fec0-11ee-9cff-59bd6348f6d9",
+					"levelId": 25,
+					"layerDefUid": 41,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+					],
+					"autoLayerTiles": [
+						{ "px": [256,160], "src": [0,0], "f": 0, "t": 0, "d": [44,73], "a": 1 },
+						{ "px": [256,192], "src": [0,0], "f": 0, "t": 0, "d": [44,86], "a": 1 }
+					],
+					"seed": 8480484,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": []
 				},
 				{
 					"__identifier": "Walls",
@@ -629,7 +778,7 @@
 					"intGridCsv": [
 						1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,
 						0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,1,0,1,0,0,0,0,
-						0,0,0,1,1,1,1,0,1,0,0,0,0,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1
+						0,0,0,0,1,1,1,0,1,0,0,0,0,0,0,0,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
 					"autoLayerTiles": [
 						{ "px": [0,0], "src": [0,0], "f": 0, "t": null, "d": [35,0], "a": 1 },
@@ -646,12 +795,10 @@
 						{ "px": [160,128], "src": [0,0], "f": 0, "t": null, "d": [35,57], "a": 1 },
 						{ "px": [352,128], "src": [0,0], "f": 0, "t": null, "d": [35,63], "a": 1 },
 						{ "px": [0,160], "src": [0,0], "f": 0, "t": null, "d": [35,65], "a": 1 },
-						{ "px": [256,160], "src": [0,0], "f": 0, "t": null, "d": [35,73], "a": 1 },
 						{ "px": [288,160], "src": [0,0], "f": 0, "t": null, "d": [35,74], "a": 1 },
 						{ "px": [320,160], "src": [0,0], "f": 0, "t": null, "d": [35,75], "a": 1 },
 						{ "px": [352,160], "src": [0,0], "f": 0, "t": null, "d": [35,76], "a": 1 },
 						{ "px": [0,192], "src": [0,0], "f": 0, "t": null, "d": [35,78], "a": 1 },
-						{ "px": [256,192], "src": [0,0], "f": 0, "t": null, "d": [35,86], "a": 1 },
 						{ "px": [288,192], "src": [0,0], "f": 0, "t": null, "d": [35,87], "a": 1 },
 						{ "px": [320,192], "src": [0,0], "f": 0, "t": null, "d": [35,88], "a": 1 },
 						{ "px": [352,192], "src": [0,0], "f": 0, "t": null, "d": [35,89], "a": 1 },

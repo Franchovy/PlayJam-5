@@ -9,8 +9,8 @@ function ButtonPickup:init(x, y, entity)
   end
 
   self.abilityName = self.fields.button
- 
-  local abilityImage = gfx.image.new("assets/images/"..self.abilityName)
+
+  local abilityImage = gfx.image.new("assets/images/" .. self.abilityName)
   assert(abilityImage)
   self:setImage(abilityImage)
   self:setCenter(0, 0)
@@ -22,16 +22,16 @@ function ButtonPickup:init(x, y, entity)
 end
 
 function ButtonPickup:pickUp(player)
-    if self.abilityName == "Left" then
-      player.canMoveLeft = true
-    elseif self.abilityName == "Right" then
-      player.canMoveRight = true
-    elseif self.abilityName == "A" then
-      player.canPressA = true
-    elseif self.abilityName == "B" then
-      player.canPressB = true
-    end
+  if self.abilityName == "Left" then
+    player.canMoveLeft = true
+  elseif self.abilityName == "Right" then
+    player.canMoveRight = true
+  elseif self.abilityName == "A" then
+    player.canPressA = true
+  elseif self.abilityName == "B" then
+    player.canPressB = true
+  end
 
-    self.fields.pickedUp = true
-    self:remove()
+  self.fields.pickedUp = true
+  self:remove()
 end
