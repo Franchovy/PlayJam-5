@@ -11,23 +11,23 @@ local function restartLevel()
     sceneManager:enter(sceneManager.scenes.currentGame)
 end
 
-
 function Game:init(lvl)
   self.level = lvl
+  self.startingItem = self:startingItemForLevel(lvl)
 end
 
 function Game:enter(previous, ...)
     -- Set local reference to sceneManager
 
     sceneManager = self.manager
-  --
     -- Load level
     local levelName = "Level_"..self.level
     LDtk.loadAllLayersAsSprites(levelName)
-    LDtk.loadAllEntitiesAsSprites(levelName)
+    LDtk.loadAllEntitiesAsSprites(levelName, self.startingItem)
+
+    AbilityPanel(self.startingItem)
 
     -- Menu items
-
     systemMenu:addMenuItem("main menu", goToMainMenu)
     systemMenu:addMenuItem("restart", restartLevel)
 end
@@ -58,7 +58,19 @@ function Game:levelComplete()
       self.level = 0
       goToMainMenu()
     else
-      sceneManager.scenes.currentGame = Game(self.level)
+      sceneManager.scenes.currentGame = Game(self.level, self.startingItem)
       sceneManager:enter(sceneManager.scenes.currentGame)
     end
+end
+
+-- wow, this is inelegant!
+function Game:startingItemForLevel(level)
+  if level == 0 then
+    return "right"
+  elseif level == 1 then
+    return "right"
+  elseif level == 2 then
+    return "left"
+  end
+  return "right"
 end

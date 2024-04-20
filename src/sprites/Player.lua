@@ -3,8 +3,9 @@ local pd <const> = playdate
 
 class("Player").extends(AnimatedSprite)
 
-function Player:init()
+function Player:init(startingItem)
     local playerImageTable = gfx.imagetable.new("assets/images/player-table-32-32")
+  print(startingItem)
     Player.super.init(self, playerImageTable)
 
     self:addState("idle", 1, 1)
@@ -29,11 +30,11 @@ function Player:init()
     self.inFrontOfLadder = false
 
     -- abilities
-    self.canMoveLeft = false
-    self.canMoveRight = true
-    self.canMoveUp = false
-    self.canPressA = false
-    self.canPressB = false
+    self.canMoveLeft = startingItem == "left";
+    self.canMoveRight = startingItem == "right";
+    self.canMoveUp = startingItem == "up";
+    self.canPressA = startingItem == "a";
+    self.canPressB = startingItem == "b";
 end
 
 function Player:collisionResponse(other)
