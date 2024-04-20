@@ -95,6 +95,10 @@ function Player:handleMovementAndCollisions()
       self.touchingGround = true
     end
 
+    if(self.touchingGround) then
+      self.gravity = 1
+    end
+
     if self.xVelocity < 0 then
         self.globalFlip = 1
     elseif self.xVelocity > 0 then
@@ -110,15 +114,16 @@ function Player:handleGroundInput()
         self:changeToRunState("left")
     elseif pd.buttonIsPressed(pd.kButtonRight) then
         self:changeToRunState("right")
-    else
+    elseif self.touchingGround then
         self:changeToIdleState()
     end
 end
 
 function Player:handleAirInput()
-    if self:playerJumped() then
-        self:changeToJumpState()
-    elseif pd.buttonIsPressed(pd.kButtonLeft) then
+    if pd.buttonJustReleased(pd.kButtonA) then
+      self.gravity = 1.3
+    end
+    if pd.buttonIsPressed(pd.kButtonLeft) then
         self.xVelocity = -self.maxSpeed
     elseif pd.buttonIsPressed(pd.kButtonRight) then
         self.xVelocity = self.maxSpeed
@@ -145,10 +150,6 @@ end
 function Player:changeToJumpState()
     self.yVelocity = self.jumpVelocity
     self.jumpBuffer = 0
-    self:changeState("jump")
-end
-
-function Player:changeToFallState()
     self:changeState("jump")
 end
 
