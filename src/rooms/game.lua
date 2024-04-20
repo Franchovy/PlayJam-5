@@ -46,3 +46,7 @@ end
 function Game:draw()
     -- draw the level
 end
+
+function Game:levelComplete()
+    sceneManager:enter(sceneManager.scenes.menu)
+end

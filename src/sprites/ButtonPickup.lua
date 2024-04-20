@@ -14,11 +14,8 @@ function ButtonPickup:init(entity)
   local abilityImage = gfx.image.new("assets/images/" .. self.abilityName)
   assert(abilityImage)
   self:setImage(abilityImage)
-  self:setCenter(0, 0)
-  self:add()
 
   self:setTag(TAGS.Ability)
-  self:setCollideRect(0, 0, self:getSize())
 end
 
 function ButtonPickup:pickUp(player)

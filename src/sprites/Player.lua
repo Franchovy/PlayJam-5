@@ -12,8 +12,6 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self:setCollideRect(2, 2, 28, 30)
-
     self.xVelocity = 0
     self.yVelocity = 0
     self.gravity = 1.0
@@ -37,7 +35,8 @@ function Player:init()
 end
 
 function Player:collisionResponse(other)
-    if other:getTag() == TAGS.Ability then
+    local tag = other:getTag()
+    if tag == TAGS.Ability or tag == TAGS.Door then
         return gfx.sprite.kCollisionTypeOverlap
     end
     return gfx.sprite.kCollisionTypeSlide
@@ -104,9 +103,12 @@ function Player:handleMovementAndCollisions()
             if collision.normal.x ~= 0 then
                 self.touchingWall = true
             end
-        end
-        if collisionTag == TAGS.Ability then
-            collisionObject:pickUp(self)
+        elseif collisionType == gfx.sprite.kCollisionTypeOverlap then
+            if collisionTag == TAGS.Ability then
+                collisionObject:pickUp(self)
+            elseif collisionTag == TAGS.Door then
+                Manager.emit(EVENTS.LevelComplete)
+            end
         end
     end
 

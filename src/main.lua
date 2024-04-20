@@ -1,15 +1,10 @@
+import "const"
 import "assets"
 import "libs"
 import "playdate"
 import "extensions"
-import "sprites"
 import "rooms"
-
-TAGS = {
-  Player = 1,
-  Ability = 3
-}
-
+import "sprites"
 
 -- Set up Scene Manager (Roomy)
 
@@ -36,7 +31,7 @@ assert(fileplayer:play(0))
 
 function playdate.update()
   -- Update Scenes using Scene Manager
-  manager:emit('update')
+  manager:emit(EVENTS.Update)
 
   -- Update sprites
   playdate.graphics.sprite.update()
