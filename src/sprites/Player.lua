@@ -12,12 +12,12 @@ local maxSpeed = 5
 class("Player").extends(AnimatedSprite)
 
 function Player:init()
-    local playerImageTable = gfx.imagetable.new("assets/images/player-table-32-32")
+    local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
-    self:addState("idle", 1, 1)
-    self:addState("run", 1, 1)
-    self:addState("jump", 1, 1)
+    self:addState("idle", 1, 4, { tickStep = 2 }).asDefault()
+    self:addState("run", 5, 6, { tickStep = 2 })
+    self:addState("jump", 7, 11, { tickStep = 2 })
     self:playAnimation()
 
     self.state = STATES.Ground
@@ -50,6 +50,8 @@ function Player:update()
     local actualX, actualY, collisions, length = self:checkCollisions(targetX, targetY)
 
     self:moveTo(actualX, actualY)
+
+    self:updateAnimation()
 end
 
 function Player:isMovingRight()
