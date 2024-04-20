@@ -3,12 +3,6 @@ local gfx <const> = pd.graphics
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 local kCollisionTypeOverlap <const> = pd.graphics.sprite.kCollisionTypeOverlap
 
-local STATES = {
-    Ground = 1,
-    Ladder = 2,
-    Air = 3
-}
-
 local ANIMATION_STATES = {
     Idle = 1,
     Moving = 2,
@@ -104,13 +98,13 @@ end
 -- Animation Handling
 
 function Player:updateAnimationState()
-    if self.state == STATES.Ground or self.state == STATES.Ladder then
+    if self.onGround or self.onLadder then
         if math.abs(velocityX) > 0 then
             self:changeState(ANIMATION_STATES.Moving)
         else
             self:changeState(ANIMATION_STATES.Idle)
         end
-    elseif self.state == STATES.Air then
+    else
         self:changeState(ANIMATION_STATES.Jumping)
     end
 end
