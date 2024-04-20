@@ -12,7 +12,7 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self:moveTo(100, 100)
+    self:moveTo(100, 70)
     self:setCollideRect(2, 2, 28, 30)
 
     self.xVelocity = 0
@@ -29,9 +29,18 @@ function Player:init()
     self.touchingGround = false
     self.touchingWall = false
     self.touchingCeiling = false
+
+    -- abilities
+    self.canMoveLeft = false
+    self.canMoveRight = true
+    self.canPressA = false
+    self.canPressB = false
 end
 
 function Player:collisionResponse(other)
+  if other:getTag() == TAGS.Ability then
+    return gfx.sprite.kCollisionTypeOverlap
+  end
     return gfx.sprite.kCollisionTypeSlide
 end
 
@@ -78,10 +87,14 @@ function Player:handleMovementAndCollisions()
     local _, _, collisions, length = self:moveWithCollisions(self.x + self.xVelocity, self.y + self.yVelocity)
 
     self.touchingGround = false
+    self.touchingCeiling = false
+    self.touchingWall = false
 
     for i=1,length do
         local collision = collisions[i]
         local collisionType = collision.type
+        local collisionObject = collision.other
+        local collisionTag = collisionObject:getTag()
         if collisionType == gfx.sprite.kCollisionTypeSlide then
             if collision.normal.y == -1 then
                 self.touchingGround = true
@@ -92,6 +105,9 @@ function Player:handleMovementAndCollisions()
             if collision.normal.x ~= 0 then
                 self.touchingWall = true
             end
+        end
+        if collisionTag == TAGS.Ability then
+            collisionObject:pickUp(self)
         end
     end
 
@@ -104,15 +120,16 @@ function Player:handleMovementAndCollisions()
     elseif self.xVelocity > 0 then
         self.globalFlip = 0
     end
+
 end
 
 -- Input Helper Functions
 function Player:handleGroundInput()
-    if self:playerJumped() then
+    if self:playerJumped() and self.canPressA then
         self:changeToJumpState()
-    elseif pd.buttonIsPressed(pd.kButtonLeft) then
+    elseif pd.buttonIsPressed(pd.kButtonLeft) and self.canMoveLeft then
         self:changeToRunState("left")
-    elseif pd.buttonIsPressed(pd.kButtonRight) then
+    elseif pd.buttonIsPressed(pd.kButtonRight) and self.canMoveRight then
         self:changeToRunState("right")
     elseif self.touchingGround then
         self:changeToIdleState()

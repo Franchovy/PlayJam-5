@@ -5,6 +5,11 @@ import "extensions"
 import "sprites"
 import "rooms"
 
+TAGS = {
+  Player = 1,
+  Ability = 3
+}
+
 
 -- Set up Scene Manager (Roomy)
 
