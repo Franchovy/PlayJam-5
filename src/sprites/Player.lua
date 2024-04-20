@@ -4,12 +4,15 @@ local pd <const> = playdate
 class("Player").extends(AnimatedSprite)
 
 function Player:init()
-    Player.super.init(self)
-    print("Created player!")
+    local playerImageTable = gfx.imagetable.new("sprites/player-table-32-32")
+    Player.super.init(self, playerImageTable)
 
-    local image = gfx.image.new(32, 32)
-    image:clear(gfx.kColorBlack)
-    self:setImage(image)
+    self:addState("idle", 1, 1)
+    self:addState("run", 1, 1)
+    self:addState("jump", 1, 1)
+    self:playAnimation()
+
+    self:moveTo(100, 100)
     self:setCollideRect(2, 2, 28, 30)
 
     self.xVelocity = 0
@@ -29,6 +32,8 @@ function Player:init()
 end
 
 function Player:update()
+    self:updateAnimation()
+
     self:updateJumpBuffer()
     self:handleState()
     self:handleMovementAndCollisions()
@@ -48,11 +53,6 @@ function Player:handleState()
         self:applyGravity()
         self:applyDrag(self.drag)
         self:handleAirInput()
-    elseif self.currentState == "dash" then
-        self:applyDrag(self.dashDrag)
-        if math.abs(self.xVelocity) <= self.dashMinimumSpeed then
-            self:changeToFallState()
-        end
     end
 end
 
@@ -91,6 +91,10 @@ function Player:handleMovementAndCollisions()
         end
     end
 
+    if(self.y > 200) then
+      self.touchingGround = true
+    end
+
     if self.xVelocity < 0 then
         self.globalFlip = 1
     elseif self.xVelocity > 0 then
@@ -102,8 +106,6 @@ end
 function Player:handleGroundInput()
     if self:playerJumped() then
         self:changeToJumpState()
-    elseif pd.buttonJustPressed(pd.kButtonB) and self.dashAvailable and self.dashAbility then
-        self:changeToDashState()
     elseif pd.buttonIsPressed(pd.kButtonLeft) then
         self:changeToRunState("left")
     elseif pd.buttonIsPressed(pd.kButtonRight) then
