@@ -12,14 +12,13 @@ function Player:init()
     self:addState("jump", 1, 1)
     self:playAnimation()
 
-    self:moveTo(100, 70)
     self:setCollideRect(2, 2, 28, 30)
 
     self.xVelocity = 0
     self.yVelocity = 0
     self.gravity = 1.0
     self.maxSpeed = 2
-    self.jumpVelocity = -10
+    self.jumpVelocity = -16
     self.drag = 0.1
     self.minimumAirSpeed = 0.5
 
@@ -38,9 +37,9 @@ function Player:init()
 end
 
 function Player:collisionResponse(other)
-  if other:getTag() == TAGS.Ability then
-    return gfx.sprite.kCollisionTypeOverlap
-  end
+    if other:getTag() == TAGS.Ability then
+        return gfx.sprite.kCollisionTypeOverlap
+    end
     return gfx.sprite.kCollisionTypeSlide
 end
 
@@ -90,7 +89,7 @@ function Player:handleMovementAndCollisions()
     self.touchingCeiling = false
     self.touchingWall = false
 
-    for i=1,length do
+    for i = 1, length do
         local collision = collisions[i]
         local collisionType = collision.type
         local collisionObject = collision.other
@@ -111,8 +110,8 @@ function Player:handleMovementAndCollisions()
         end
     end
 
-    if(self.touchingGround) then
-      self.gravity = 1
+    if (self.touchingGround) then
+        self.gravity = 1
     end
 
     if self.xVelocity < 0 then
@@ -120,7 +119,6 @@ function Player:handleMovementAndCollisions()
     elseif self.xVelocity > 0 then
         self.globalFlip = 0
     end
-
 end
 
 -- Input Helper Functions
@@ -138,7 +136,7 @@ end
 
 function Player:handleAirInput()
     if pd.buttonJustReleased(pd.kButtonA) then
-      self.gravity = 1.3
+        self.gravity = 1.3
     end
     if pd.buttonIsPressed(pd.kButtonLeft) then
         self.xVelocity = -self.maxSpeed
