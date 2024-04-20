@@ -1,6 +1,7 @@
-name=playdate-project
-author=<your-team-name-here>
-description=Amazing game!! (WIP)
-bundleID=com.yourteamnamehere.playdateproject
+name=HatPack
+author=TeamNameHere
+description=Hat Pack is a game about... we don't know yet!
+bundleID=io.franchovy.hatpack
 version=0.0.1
 buildNumber=1
+imagePath=assets
