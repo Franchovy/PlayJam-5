@@ -31,6 +31,10 @@ function Player:init()
     self.touchingCeiling = false
 end
 
+function Player:collisionResponse(other)
+    return gfx.sprite.kCollisionTypeSlide
+end
+
 function Player:update()
     self:updateAnimation()
 
