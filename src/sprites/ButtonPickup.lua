@@ -3,7 +3,8 @@ local gfx <const> = playdate.graphics;
 class('ButtonPickup').extends(gfx.sprite)
 
 function ButtonPickup:init(x, y, entity)
-  self.fields = entity.fields
+  self.fields = table.deepcopy(entity.fields)
+
   if self.fields.pickedUp then
     return
   end
