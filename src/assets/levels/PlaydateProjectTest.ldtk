@@ -263,7 +263,7 @@
 					"rules": [
 						{
 							"uid": 57,
-							"active": true,
+							"active": false,
 							"size": 1,
 							"tileRectsIds": [[4]],
 							"alpha": 1,
