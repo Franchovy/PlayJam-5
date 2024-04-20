@@ -322,7 +322,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "ObjectEnum",
+					"identifier": "type",
 					"doc": null,
 					"__type": "Array<LocalEnum.ObjectEnum>",
 					"uid": 40,
@@ -361,7 +361,7 @@
 			]
 		},
 		{
-			"identifier": "Object",
+			"identifier": "ButtonPickup",
 			"uid": 21,
 			"tags": [],
 			"exportToToc": false,
@@ -395,7 +395,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "ObjectEnum",
+					"identifier": "button",
 					"doc": null,
 					"__type": "LocalEnum.ObjectEnum",
 					"uid": 38,
@@ -432,41 +432,6 @@
 					"tilesetUid": null
 				}
 			]
-		},
-		{
-			"identifier": "Enemy",
-			"uid": 22,
-			"tags": [],
-			"exportToToc": false,
-			"allowOutOfBounds": false,
-			"doc": null,
-			"width": 32,
-			"height": 32,
-			"resizableX": false,
-			"resizableY": false,
-			"minWidth": null,
-			"maxWidth": null,
-			"minHeight": null,
-			"maxHeight": null,
-			"keepAspectRatio": false,
-			"tileOpacity": 1,
-			"fillOpacity": 1,
-			"lineOpacity": 1,
-			"hollow": false,
-			"color": "#FF1E2A",
-			"renderMode": "Rectangle",
-			"showName": true,
-			"tilesetId": null,
-			"tileRenderMode": "FitInside",
-			"tileRect": null,
-			"uiTileRect": null,
-			"nineSliceBorders": [],
-			"maxCount": 0,
-			"limitScope": "PerLevel",
-			"limitBehavior": "MoveLastOne",
-			"pivotX": 0,
-			"pivotY": 0,
-			"fieldDefs": []
 		},
 		{
 			"identifier": "Door",
@@ -585,23 +550,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Door",
-							"__grid": [10,4],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D77643",
-							"iid": "8c0ed6b0-fec0-11ee-8ae4-1b9f9853472d",
-							"width": 32,
-							"height": 32,
-							"defUid": 39,
-							"px": [320,128],
-							"fieldInstances": [],
-							"__worldX": -128,
-							"__worldY": 128
-						},
-						{
-							"__identifier": "Object",
+							"__identifier": "ButtonPickup",
 							"__grid": [1,6],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -612,15 +561,15 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [32,192],
-							"fieldInstances": [{ "__identifier": "ObjectEnum", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Right"]
+								"params": ["A"]
 							}] }],
 							"__worldX": -416,
 							"__worldY": 192
 						},
 						{
-							"__identifier": "Object",
+							"__identifier": "ButtonPickup",
 							"__grid": [7,6],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -631,9 +580,9 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [224,192],
-							"fieldInstances": [{ "__identifier": "ObjectEnum", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["A"]
+								"params": ["Left"]
 							}] }],
 							"__worldX": -224,
 							"__worldY": 192
@@ -650,7 +599,7 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [128,96],
-							"fieldInstances": [{ "__identifier": "ObjectEnum", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Left"]
 							}] }],

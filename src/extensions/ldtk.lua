@@ -25,8 +25,7 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             error("No sprite class for entity with name: " .. entity.name)
         end
 
-        local sprite = _G[entity.name]()
-        sprite:moveTo(entity.position.x, entity.position.y)
+        local sprite = _G[entity.name](entity.position.x, entity.position.y, entity)
         sprite:setCenter(entity.center.x, entity.center.y)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
