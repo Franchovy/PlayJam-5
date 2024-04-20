@@ -3,32 +3,31 @@ import "libs"
 import "playdate"
 import "extensions"
 import "sprites"
+import "rooms"
 
--- If your LDtk world is saved in multiple files (in this case you see a .ldtkl file for each level in your structure) you need to manually load the levels.
--- LDtk.load_level( "TheFirstLevel" )
--- LDtk.release_level( "TheFirstLevel" )
 
--- Entities
+-- Set up Scene Manager (Roomy)
 
---[[
-LDtk.get_entities() -- will give you all the entities setup in a level including all their custom fields.
+local manager = Manager()
+manager:hook()
 
-for index, entity in ipairs(LDtk.get_entities("TheFirstLevel")) do
-    if entity.name == "Player" then
-        player.sprite:add()
-        player.init(entity)
-    end
-end
---]]
-
+-- Pre-load levels data
 
 LDtk.load(assets.levels.test)
 
-local levelName = "Level_1"
+-- Open Menu
+manager:enter(Menu())
 
-LDtk.loadAllLayersAsSprites(levelName)
-LDtk.loadAllEntitiesAsSprites(levelName)
+-- Play Music
+
+local fileplayer <const> = playdate.sound.fileplayer.new("assets/music/digit")
+
+assert(fileplayer:play(0))
 
 function playdate.update()
+    -- Update Scenes using Scene Manager
+    manager:emit('update')
+
+    -- Update sprites
     playdate.graphics.sprite.update()
 end
