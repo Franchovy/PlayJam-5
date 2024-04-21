@@ -16,16 +16,17 @@ local STATE = {
     OnLadderTop = 4,
     OnLadder = 5
 }
-
 -- debug
 local debugReverseState = {}
 for k, v in pairs(STATE) do debugReverseState[v] = k end
 
-local maxSpeed = 4.5
-local maxSpeedVertical = 3.5
-local gravity = 1.3
-local maxFallSpeed = 2.5
-local jumpSpeed = 9.5
+local maxSpeed <const> = 4.5
+local maxSpeedVertical <const> = 3.5
+local gravity <const> = 1.6
+local maxFallSpeed <const> = 7.5
+local jumpSpeed <const> = 7.5
+local jumpSpeedReleased <const> = 3.5
+local jumpHoldTimeInTicks <const> = 4
 
 -- Setup
 
@@ -56,12 +57,15 @@ end
 
 local velocityX = 0
 local velocityY = 0
+local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 
 function Player:update()
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X
+
     velocityX = 0
+
     self:handleHorizontalMovement()
 
     -- Velocity Y
@@ -70,18 +74,24 @@ function Player:update()
         velocityY = 0
     end
 
+    if self.state == STATE.OnLadderTop or self.state == STATE.OnGround then
+        jumpTimeLeftInTicks = jumpHoldTimeInTicks
+    elseif self.state == STATE.OnLadder or self.state == STATE.InAir then
+        jumpTimeLeftInTicks = 0
+    end
+
     if self.state == STATE.OnLadder then
         self:handleUpMovement()
         self:handleDownMovement()
     elseif self.state == STATE.OnLadderTop then
-        self:handleJump()
+        self:handleJumpStart()
         self:handleDownMovement()
     elseif self.state == STATE.OnGround then
-        self:handleJump()
+        self:handleJumpStart()
     elseif self.state == STATE.InAir then
         self:handleGravity()
     elseif self.state == STATE.Jumping then
-        self:handleGravity()
+        self:handleJump()
     end
 
     -- Collision Handling
@@ -125,11 +135,11 @@ function Player:update()
         self.state = STATE.OnLadderTop
     elseif onGround then
         self.state = STATE.OnGround
+    elseif self.state == STATE.Jumping then
+        self.state = STATE.Jumping
     else
         self.state = STATE.InAir
     end
-
-    print(debugReverseState[self.state])
 
     -- Movement
 
@@ -155,13 +165,43 @@ function Player:updateAnimationState()
     end
 end
 
--- Movement Handlers
+-- Movement Handlers --
 
-function Player:handleJump()
+-- Jump
+
+function Player:handleJumpStart()
     if self:isJumping() then
         velocityY = -jumpSpeed
+        jumpTimeLeftInTicks -= 1
+
+        self.state = STATE.Jumping
     end
 end
+
+function Player:handleJump()
+    if self:isJumping() and jumpTimeLeftInTicks > 0 then
+        -- Hold Jump
+        velocityY = -jumpSpeed
+        jumpTimeLeftInTicks -= 1
+    elseif jumpTimeLeftInTicks > 0 then
+        -- Released Jump
+        velocityY = -jumpSpeedReleased
+        jumpTimeLeftInTicks = 0
+    end
+
+    if jumpTimeLeftInTicks == 0 then
+        -- Jump End
+        self.state = STATE.InAir
+    end
+end
+
+-- Gravity
+
+function Player:handleGravity()
+    velocityY = math.min(velocityY + gravity, maxFallSpeed)
+end
+
+-- Directional
 
 function Player:handleHorizontalMovement()
     if self:isMovingLeft() then
@@ -181,10 +221,6 @@ function Player:handleDownMovement()
     if self:isMovingDown() then
         velocityY = maxSpeedVertical
     end
-end
-
-function Player:handleGravity()
-    velocityY = math.min(velocityY + gravity, maxFallSpeed)
 end
 
 -- Input Handlers
