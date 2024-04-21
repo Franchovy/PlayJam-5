@@ -33,7 +33,7 @@
 	"imageExportMode": "None",
 	"exportLevelBg": true,
 	"pngFilePattern": null,
-	"backupOnSave": true,
+	"backupOnSave": false,
 	"backupLimit": 10,
 	"backupRelPath": null,
 	"levelNamePattern": "Level_%idx",
@@ -970,9 +970,9 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [32,160],
-							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["A"]
+								"params": ["Right"]
 							}] }],
 							"__worldX": -416,
 							"__worldY": 128
@@ -1528,7 +1528,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1787,7 +1787,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2016,7 +2016,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2267,7 +2267,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2313,39 +2313,11 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-						0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
-						0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					],
-					"autoLayerTiles": [
-						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
-						{ "px": [384,0], "src": [32,32], "f": 0, "t": 6, "d": [47,12], "a": 1 },
-						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
-						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
-						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
-						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
-						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
-						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
-						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
-						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
-						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
-						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
-						{ "px": [0,192], "src": [32,32], "f": 0, "t": 6, "d": [47,78], "a": 1 },
-						{ "px": [384,192], "src": [32,32], "f": 0, "t": 6, "d": [47,90], "a": 1 },
-						{ "px": [0,224], "src": [32,32], "f": 0, "t": 6, "d": [47,91], "a": 1 },
-						{ "px": [32,224], "src": [32,32], "f": 0, "t": 6, "d": [47,92], "a": 1 },
-						{ "px": [64,224], "src": [32,32], "f": 0, "t": 6, "d": [47,93], "a": 1 },
-						{ "px": [96,224], "src": [32,32], "f": 0, "t": 6, "d": [47,94], "a": 1 },
-						{ "px": [128,224], "src": [32,32], "f": 0, "t": 6, "d": [47,95], "a": 1 },
-						{ "px": [160,224], "src": [32,32], "f": 0, "t": 6, "d": [47,96], "a": 1 },
-						{ "px": [192,224], "src": [32,32], "f": 0, "t": 6, "d": [47,97], "a": 1 },
-						{ "px": [224,224], "src": [32,32], "f": 0, "t": 6, "d": [47,98], "a": 1 },
-						{ "px": [256,224], "src": [32,32], "f": 0, "t": 6, "d": [47,99], "a": 1 },
-						{ "px": [288,224], "src": [32,32], "f": 0, "t": 6, "d": [47,100], "a": 1 },
-						{ "px": [320,224], "src": [32,32], "f": 0, "t": 6, "d": [47,101], "a": 1 },
-						{ "px": [352,224], "src": [32,32], "f": 0, "t": 6, "d": [47,102], "a": 1 },
-						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 }
-					],
+					"autoLayerTiles": [],
 					"seed": 8186395,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
@@ -2402,7 +2374,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2509,7 +2481,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2616,7 +2588,7 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",

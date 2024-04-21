@@ -161,12 +161,13 @@ function Player:update()
             end
         elseif tag == TAGS.Ability then
             Manager.emitEvent(EVENTS.Pickup, other)
+
             if self.abilityCount == 3 then
                 table.remove(self.keys, 1)
-            else
-                self.abilityCount = self.abilityCount + 1
             end
-            self.keys[self.abilityCount] = other.abilityName
+
+            table.insert(self.keys, other.abilityName)
+            self.abilityCount = #self.keys
         elseif tag == TAGS.Door then
             Manager.emitEvent(EVENTS.LevelComplete)
         end
