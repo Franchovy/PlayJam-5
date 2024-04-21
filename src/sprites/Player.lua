@@ -61,6 +61,8 @@ function Player:init(entity)
     end
 
     self.abilityCount = #self.keys
+
+    Manager.emitEvent(EVENTS.LoadItems, table.unpack(startingKeys))
 end
 
 function Player:collisionResponse(other)

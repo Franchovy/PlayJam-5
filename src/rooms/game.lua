@@ -24,7 +24,12 @@ function Game:enter(previous, ...)
     sceneManager = self.manager
     sceneManager.scenes.currentGame = self
 
+    -- Load Ability Panel
+
+    self.abilityPanel = AbilityPanel()
+
     -- Load level
+
     local levelName = "Level_" .. self.level
     local hintCrank = LDtk.loadAllLayersAsSprites(levelName)
     playdate.timer.new(1500, function()
@@ -35,8 +40,6 @@ function Game:enter(previous, ...)
     end)
 
     LDtk.loadAllEntitiesAsSprites(levelName)
-
-    self.abilityPanel = AbilityPanel()
 
     -- Menu items
     systemMenu:addMenuItem("main menu", goToMainMenu)
@@ -93,6 +96,10 @@ function Game:levelComplete()
             playdate.datastore.write({ LEVEL = self.level })
         end
     end
+end
+
+function Game:loadItems(item1, item2, item3)
+    self.abilityPanel:setItems(item1, item2, item3)
 end
 
 function Game:cleanUp()

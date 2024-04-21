@@ -4,12 +4,19 @@ local gmt <const> = pd.geometry
 
 class("AbilityPanel").extends(pd.graphics.sprite)
 
-local imageUp <const> = gfx.image.new("assets/images/Up")
-local imageDown <const> = gfx.image.new("assets/images/Down")
-local imageLeft <const> = gfx.image.new("assets/images/Left")
-local imageRight <const> = gfx.image.new("assets/images/Right")
-local imageA <const> = gfx.image.new("assets/images/A")
 local imagePanel <const> = gfx.image.new("assets/images/panel")
+local emptyImage <const> = gfx.image.new(1, 1)
+
+local imageForKey = {
+  [KEYNAMES.Up] = gfx.image.new("assets/images/Up"),
+  [KEYNAMES.Down] = gfx.image.new("assets/images/Down"),
+  [KEYNAMES.Left] = gfx.image.new("assets/images/Left"),
+  [KEYNAMES.Right] = gfx.image.new("assets/images/Right"),
+  [KEYNAMES.A] = gfx.image.new("assets/images/A"),
+  [KEYNAMES.B] = gfx.image.new("assets/images/B")
+}
+
+local items = {}
 
 local spriteOne = gfx.sprite.new()
 local spriteTwo = gfx.sprite.new()
@@ -45,7 +52,6 @@ function AbilityPanel:init()
   spriteThree:setZIndex(100)
   spriteThree:add()
 
-  spriteOne:setImage(self:imageForItem("right"))
   self.abilitiesCount = 1
   self:setZIndex(99)
 end
@@ -95,58 +101,58 @@ end
 
 function AbilityPanel:addItem(item)
   if self.abilitiesCount == 3 then
-    spriteOne:setImage(spriteTwo:getImage())
-    spriteTwo:setImage(spriteThree:getImage())
-    spriteThree:setImage(self:imageForItem(item))
+    table.remove(items, 1)
+    table.insert(items, item)
+
+    self:updateItemImages()
   else
-    self.abilitiesCount = self.abilitiesCount + 1
+    table.insert(items, item)
 
-    local image = self:imageForItem(item)
-    if self.abilitiesCount == 1 then
-      spriteOne:setImage(image)
-    elseif self.abilitiesCount == 2 then
-      spriteTwo:setImage(image)
-    elseif self.abilitiesCount == 3 then
-      spriteThree:setImage(image)
-    end
-  end
-end
-
-function AbilityPanel:imageForItem(item)
-  item = string.lower(item)
-  if item == "up" then
-    return imageUp
-  elseif item == "down" then
-    return imageDown
-  elseif item == "left" then
-    return imageLeft
-  elseif item == "right" then
-    return imageRight
-  elseif item == "a" then
-    return imageA
+    self:updateItemsCount()
+    self:updateItemImages()
   end
 end
 
 function AbilityPanel:cleanUp()
-  local emptyImage = gfx.image.new(1, 1)
-  spriteOne:setImage(emptyImage)
-  spriteTwo:setImage(emptyImage)
-  spriteThree:setImage(emptyImage)
+  self:setItems()
+
   self:remove()
 end
 
 function AbilityPanel:removeRightMost()
   if self.abilitiesCount == 1 then
-    return
-  end
-
-  local emptyImage = gfx.image.new(1, 1)
-
-  if self.abilitiesCount == 2 then
-    spriteTwo:setImage(emptyImage)
+    item[1] = nil
+  elseif self.abilitiesCount == 2 then
+    item[2] = nil
   elseif self.abilitiesCount == 3 then
-    spriteThree:setImage(emptyImage)
+    item[3] = nil
   end
 
-  self.abilitiesCount = self.abilitiesCount - 1;
+  self:updateItemsCount()
+  self:updateItemImages()
+end
+
+function AbilityPanel:setItems(item1, item2, item3)
+  items[1] = item1
+  items[2] = item2
+  items[3] = item3
+
+  self:updateItemsCount()
+  self:updateItemImages()
+end
+
+function AbilityPanel:updateItemsCount()
+  self.abilitiesCount = #items
+end
+
+function AbilityPanel:updateItemImages()
+  if items[1] then
+    spriteOne:setImage(imageForKey[items[1]] or emptyImage)
+  end
+  if items[2] then
+    spriteTwo:setImage(imageForKey[items[2]] or emptyImage)
+  end
+  if items[3] then
+    spriteThree:setImage(imageForKey[items[3]] or emptyImage)
+  end
 end

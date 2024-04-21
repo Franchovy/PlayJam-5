@@ -2,5 +2,6 @@ EVENTS = {
     Update = 'update',
     LevelComplete = 'levelComplete',
     Pickup = 'pickup',
-    CrankDrop = 'crankDrop'
+    CrankDrop = 'crankDrop',
+    LoadItems = 'loadItems'
 }
