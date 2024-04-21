@@ -24,16 +24,12 @@ manager.scenes = {
 
 manager:enter(manager.scenes.menu)
 
--- Play Music
-
-local fileplayer <const> = playdate.sound.fileplayer.new("assets/music/digit")
-
-assert(fileplayer:play(0))
-
 function playdate.update()
+  -- Update sprites
+  playdate.graphics.sprite.update()
+  playdate.timer.updateTimers()
+
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
 
-  -- Update sprites
-  playdate.graphics.sprite.update()
 end

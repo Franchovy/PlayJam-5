@@ -134,3 +134,20 @@ function AbilityPanel:cleanUp()
   spriteThree:setImage(emptyImage)
   self:remove()
 end
+
+function AbilityPanel:removeRightMost()
+  if self.abilitiesCount == 1 then
+    return
+  end
+
+  local emptyImage = gfx.image.new(1, 1)
+
+  if self.abilitiesCount == 2 then
+    spriteTwo:setImage(emptyImage)
+  elseif self.abilitiesCount == 3 then
+    spriteThree:setImage(emptyImage)
+  end
+
+  self.abilitiesCount = self.abilitiesCount - 1;
+
+end

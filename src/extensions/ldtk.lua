@@ -3,6 +3,7 @@ local gfx <const> = pd.graphics
 -- Add all layers as tilemaps
 
 function LDtk.loadAllLayersAsSprites(levelName)
+    local hintCrank = LDtk.get_custom_data(levelName, "HintCrank")
     for layerName, layer in pairs(LDtk.get_layers(levelName)) do
         if layer.tiles then
             local tilemap = LDtk.create_tilemap(levelName, layerName)
@@ -33,6 +34,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
             end
         end
     end
+    return hintCrank
 end
 
 function LDtk.loadAllEntitiesAsSprites(levelName)
