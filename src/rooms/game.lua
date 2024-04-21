@@ -50,3 +50,7 @@ end
 function Game:levelComplete()
     sceneManager:enter(sceneManager.scenes.menu)
 end
+
+function Game:pickup(object)
+    object:remove()
+end

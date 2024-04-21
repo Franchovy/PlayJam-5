@@ -16,9 +16,15 @@ local STATE = {
     OnLadderTop = 4,
     OnLadder = 5
 }
--- debug
-local debugReverseState = {}
-for k, v in pairs(STATE) do debugReverseState[v] = k end
+
+KEYS = {
+    [KEYNAMES.Up] = pd.kButtonUp,
+    [KEYNAMES.Down] = pd.kButtonDown,
+    [KEYNAMES.Left] = pd.kButtonLeft,
+    [KEYNAMES.Right] = pd.kButtonRight,
+    [KEYNAMES.A] = pd.kButtonA,
+    [KEYNAMES.B] = pd.kButtonB
+}
 
 local maxSpeed <const> = 4.5
 local maxSpeedVertical <const> = 3.5
@@ -42,6 +48,7 @@ function Player:init()
     self:playAnimation()
 
     self.state = STATE.OnGround
+    self.keys = { [KEYNAMES.Right] = true }
 end
 
 function Player:collisionResponse(other)
@@ -128,6 +135,9 @@ function Player:update()
 
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
+        elseif tag == TAGS.Ability then
+            Manager.emitEvent(EVENTS.Pickup, other)
+            self.keys[other.abilityName] = true
         end
     end
 
@@ -252,22 +262,32 @@ end
 
 -- Input Handlers
 
+function Player:isShowingInventory()
+    return self:isKeyPressedGated(KEYNAMES.B)
+end
+
 function Player:isJumping()
-    return playdate.buttonIsPressed(playdate.kButtonA)
+    return self:isKeyPressedGated(KEYNAMES.A)
 end
 
 function Player:isMovingRight()
-    return playdate.buttonIsPressed(playdate.kButtonRight)
+    return self:isKeyPressedGated(KEYNAMES.Right)
 end
 
 function Player:isMovingLeft()
-    return playdate.buttonIsPressed(playdate.kButtonLeft)
+    return self:isKeyPressedGated(KEYNAMES.Left)
 end
 
 function Player:isMovingUp()
-    return playdate.buttonIsPressed(playdate.kButtonUp)
+    return self:isKeyPressedGated(KEYNAMES.Up)
 end
 
 function Player:isMovingDown()
-    return playdate.buttonIsPressed(playdate.kButtonDown)
+    return self:isKeyPressedGated(KEYNAMES.Down)
+end
+
+-- Generic gated input handler
+
+function Player:isKeyPressedGated(key)
+    return self.keys[key] and pd.buttonIsPressed(KEYS[key])
 end

@@ -1,4 +1,5 @@
 EVENTS = {
     Update = 'update',
-    LevelComplete = 'levelComplete'
+    LevelComplete = 'levelComplete',
+    Pickup = 'pickup'
 }

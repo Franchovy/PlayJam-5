@@ -16,15 +16,9 @@ function Manager.init(self, ...)
     sceneManager = self
 end
 
--- Static emit function (Manager.emit) using latest-created sceneManager
+-- Static emit function using latest-created sceneManager
 
-local emitSwizzled = Manager.emit
-function Manager.emit(manager, eventName)
-    -- Single arg format, static call
-    if not eventName then
-        eventName = manager
-        manager = sceneManager
-    end
-    assert(manager)
-    emitSwizzled(manager, eventName)
+function Manager.emitEvent(eventName, ...)
+    assert(sceneManager)
+    Manager.emit(sceneManager, eventName, ...)
 end
