@@ -1,5 +1,6 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
+local gmt <const> = pd.geometry
 
 class("AbilityPanel").extends(pd.graphics.sprite)
 
@@ -14,18 +15,33 @@ local spriteOne = gfx.sprite.new()
 local spriteTwo = gfx.sprite.new()
 local spriteThree = gfx.sprite.new()
 
+local panelHiddenY <const> = -60
+local buttonHiddenY <const> = -60
+local panelShownY <const> = 0
+local buttonShownY <const> = 12
+
+local buttonOneX <const> = 16
+local buttonOnePointsShow = gmt.polygon.new(buttonOneX, buttonHiddenY, buttonOneX, buttonShownY)
+local buttonOnePointsHide = gmt.polygon.new(buttonOneX, buttonShownY, buttonOneX, buttonHiddenY)
+local buttonTwoX <const> = 48
+local buttonTwoPointsShow = gmt.polygon.new(buttonTwoX, buttonHiddenY, buttonTwoX, buttonShownY)
+local buttonTwoPointsHide = gmt.polygon.new(buttonTwoX, buttonShownY, buttonTwoX, buttonHiddenY)
+local buttonThreeX <const> = 80
+local buttonThreePointsShow = gmt.polygon.new(buttonThreeX, buttonHiddenY, buttonThreeX, buttonShownY)
+local buttonThreePointsHide = gmt.polygon.new(buttonThreeX, buttonShownY, buttonThreeX, buttonHiddenY)
 
 function AbilityPanel:init()
     AbilityPanel.super.init(self, imagePanel)
+    self:moveTo(0, panelHiddenY)
     self:add()
 
-    spriteOne:moveTo(16, 12)
+    spriteOne:moveTo(16, buttonHiddenY)
     spriteOne:setZIndex(100)
     spriteOne:add()
-    spriteTwo:moveTo(48, 12)
+    spriteTwo:moveTo(48, buttonHiddenY)
     spriteTwo:setZIndex(100)
     spriteTwo:add()
-    spriteThree:moveTo(80, 12)
+    spriteThree:moveTo(80, buttonHiddenY)
     spriteThree:setZIndex(100)
     spriteThree:add()
 
@@ -47,6 +63,34 @@ function AbilityPanel:shake(shakeTime, shakeMagnitude)
     shakeTimer.timerEndedCallback = function()
         self:moveTo(self.original_x, self.original_y)
     end
+end
+
+function AbilityPanel:gameUpdate()
+  if pd.buttonJustPressed(pd.kButtonB) then
+    self:animate(true)
+  elseif pd.buttonJustReleased(pd.kButtonB) then
+    self:animate(false)
+  end
+end
+
+function AbilityPanel:animate(show)
+  local easing = pd.easingFunctions.inBack
+  local duration = 250
+
+  if show then
+    local panelPoints = gmt.polygon.new(0, panelHiddenY, 0, panelShownY)
+    self:setAnimator(gfx.animator.new(duration, panelPoints, easing))
+    spriteOne:setAnimator(gfx.animator.new(duration, buttonOnePointsShow, easing))
+    spriteTwo:setAnimator(gfx.animator.new(duration, buttonTwoPointsShow, easing))
+    spriteThree:setAnimator(gfx.animator.new(duration, buttonThreePointsShow, easing))
+  else
+    local delay = 150
+    local panelPoints = gmt.polygon.new(0, panelShownY , 0, panelHiddenY)
+    self:setAnimator(gfx.animator.new(duration, panelPoints, easing, delay))
+    spriteOne:setAnimator(gfx.animator.new(duration, buttonOnePointsHide, easing, delay))
+    spriteTwo:setAnimator(gfx.animator.new(duration, buttonTwoPointsHide, easing, delay))
+    spriteThree:setAnimator(gfx.animator.new(duration, buttonThreePointsHide, easing, delay))
+  end
 end
 
 function AbilityPanel:addItem(item)

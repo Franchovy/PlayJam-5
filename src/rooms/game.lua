@@ -33,6 +33,7 @@ end
 
 function Game:update(dt)
     -- update entities
+    self.abilityPanel:gameUpdate()
 end
 
 function Game:leave(next, ...)
