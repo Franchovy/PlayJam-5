@@ -16,14 +16,15 @@ function LDtk.loadAllLayersAsSprites(levelName)
             -- TODO: 2 loops? could improve ldtk code
             local solidTiles = LDtk.get_empty_tileIDs(levelName, "Solid", layerName)
             if solidTiles then
-                gfx.sprite.addWallSprites(tilemap, solidTiles)
+                ipairs(gfx.sprite.addWallSprites(tilemap, solidTiles))
             end
 
             local ladderTiles = LDtk.get_empty_tileIDs(levelName, "Ladder", layerName)
             if ladderTiles then
                 local ladderSprites = gfx.sprite.addWallSprites(tilemap, ladderTiles)
                 for _, lsprite in ipairs(ladderSprites) do
-                  lsprite:setTag(TAGS.Ladder)
+                    lsprite:setTag(TAGS.Ladder)
+                    lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, 32, 32 + LADDER_TOP_ADJUSTMENT)
                 end
             end
         end

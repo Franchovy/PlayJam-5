@@ -54,15 +54,17 @@ function Player:update()
     self:handleHorizontalMovement()
 
     -- Velocity Y
+
+    velocityY = 0
     if self.onGround then
-        velocityY = 0
-
         self:handleJump()
-    elseif self.onLadder then
-        velocityY = 0
+    end
 
+    if self.onLadder then
         self:handleVerticalMovement()
-    else
+    end
+
+    if not (self.onGround) and not (self.onLadder) then
         self:handleGravity()
     end
 
@@ -72,17 +74,32 @@ function Player:update()
     local actualX, actualY, collisions, length = self:checkCollisions(targetX, targetY)
 
     local onGround = false
+    local onLadder = false
 
     for _, collisionData in pairs(collisions) do
         local other = collisionData.other
+        local tag = other:getTag()
         local type = collisionData.type
         local normal = collisionData.normal
+        local position = collisionData.touch
 
-        if type == kCollisionTypeSlide and normal.y == -1 then
-            onGround = true
+        if (type == kCollisionTypeSlide and normal.y == -1) then
+            self.onGround = true
+        end
+
+        if tag == TAGS.Ladder then
+            onLadder = true
+
+            -- Adjust for glitchy top bit of ladder for smooth standing on block
+            --[[local otherTop = other.y - other.height
+            if otherTop - 1 < self.y and otherTop + 5 > self.y then
+                actualY = otherTop
+                onGround = true
+            end--]]
         end
     end
 
+    self.onLadder = onLadder
     self.onGround = onGround
 
     -- Movement
@@ -130,6 +147,8 @@ function Player:handleVerticalMovement()
         velocityY = -maxSpeedVertical
     elseif self:isMovingDown() then
         velocityY = maxSpeedVertical
+    else
+        velocityY = 0
     end
 end
 
