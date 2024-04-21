@@ -16,6 +16,7 @@ function Game:init(lvl)
   self.startingItem = self:startingItemForLevel(lvl)
 end
 
+
 function Game:enter(previous, ...)
     -- Set local reference to sceneManager
 
@@ -23,9 +24,9 @@ function Game:enter(previous, ...)
     -- Load level
     local levelName = "Level_"..self.level
     LDtk.loadAllLayersAsSprites(levelName)
-    LDtk.loadAllEntitiesAsSprites(levelName, self.startingItem)
+    LDtk.loadAllEntitiesAsSprites(self, levelName, self.startingItem)
 
-    AbilityPanel(self.startingItem)
+    self.abilityPanel = AbilityPanel(self.startingItem)
 
     -- Menu items
     systemMenu:addMenuItem("main menu", goToMainMenu)
@@ -73,4 +74,8 @@ function Game:startingItemForLevel(level)
     return "left"
   end
   return "right"
+end
+
+function Game:itemPickedUp(item)
+  self.abilityPanel:addItem(item)
 end

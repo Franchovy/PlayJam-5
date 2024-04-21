@@ -2,8 +2,9 @@ local gfx <const> = playdate.graphics;
 
 class('ButtonPickup').extends(gfx.sprite)
 
-function ButtonPickup:init(entity)
+function ButtonPickup:init(game, entity)
   self.fields = table.deepcopy(entity.fields)
+  self.game = game
 
   if self.fields.pickedUp then
     return
@@ -30,6 +31,7 @@ function ButtonPickup:pickUp(player)
   elseif self.abilityName == "Up" then
     player.canMoveUp = true
   end
+  self.game:itemPickedUp(self.abilityName)
 
   self.fields.pickedUp = true
   self:remove()
