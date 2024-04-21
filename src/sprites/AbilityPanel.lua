@@ -146,13 +146,7 @@ function AbilityPanel:updateItemsCount()
 end
 
 function AbilityPanel:updateItemImages()
-  if items[1] then
-    spriteOne:setImage(imageForKey[items[1]] or emptyImage)
-  end
-  if items[2] then
-    spriteTwo:setImage(imageForKey[items[2]] or emptyImage)
-  end
-  if items[3] then
-    spriteThree:setImage(imageForKey[items[3]] or emptyImage)
-  end
+  spriteOne:setImage(items[1] and imageForKey[items[1]] or emptyImage)
+  spriteTwo:setImage(items[2] and imageForKey[items[2]] or emptyImage)
+  spriteThree:setImage(items[3] and imageForKey[items[3]] or emptyImage)
 end
