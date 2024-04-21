@@ -18,7 +18,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
             if solidTiles then
                 local stiles = gfx.sprite.addWallSprites(tilemap, solidTiles)
                 for _, lsprite in ipairs(stiles) do
-                  lsprite:setTag(TAGS.Wall)
+                    lsprite:setTag(TAGS.Wall)
                 end
             end
 
@@ -26,25 +26,27 @@ function LDtk.loadAllLayersAsSprites(levelName)
             if ladderTiles then
                 local ladderSprites = gfx.sprite.addWallSprites(tilemap, ladderTiles)
                 for _, lsprite in ipairs(ladderSprites) do
-                  lsprite:setTag(TAGS.Ladder)
+                    lsprite:setTag(TAGS.Ladder)
+                    lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, 32,
+                        32 + LADDER_TOP_ADJUSTMENT + LADDER_BOTTOM_ADJUSTMENT)
                 end
             end
         end
     end
 end
 
-function LDtk.loadAllEntitiesAsSprites(game, levelName, startingItem)
+function LDtk.loadAllEntitiesAsSprites(levelName, startingItem)
     for _, entity in ipairs(LDtk.get_entities(levelName)) do
         if not _G[entity.name] then
             error("No sprite class for entity with name: " .. entity.name)
         end
 
         local sprite
-    -- wow I'm a good programmer
+        -- wow I'm a good programmer
         if entity.name == "Player" then
-          sprite = Player(startingItem)
+            sprite = Player(startingItem)
         else
-          sprite = _G[entity.name](game, entity)
+            sprite = _G[entity.name](entity)
         end
 
         sprite:moveTo(entity.position.x, entity.position.y)
