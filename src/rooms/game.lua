@@ -64,11 +64,10 @@ function Game:levelComplete()
 end
 
 function Game:cleanUp()
-    self.abilityPanel:destroy()
+    self.abilityPanel:cleanUp()
 end
 
 function Game:pickup(object)
-    object:remove()
-
     self.abilityPanel:addItem(object.abilityName)
+    object:remove()
 end

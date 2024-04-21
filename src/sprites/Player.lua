@@ -48,7 +48,8 @@ function Player:init()
 
 
     self.state = STATE.OnGround
-    self.keys = { [KEYNAMES.Right] = true }
+    self.keys = { [1] = KEYNAMES.Right }
+    self.abilityCount = 1
 end
 
 function Player:collisionResponse(other)
@@ -137,7 +138,12 @@ function Player:update()
             end
         elseif tag == TAGS.Ability then
             Manager.emitEvent(EVENTS.Pickup, other)
-            self.keys[other.abilityName] = true
+            if self.abilityCount == 3 then
+              table.remove(self.keys, 1)
+            else
+              self.abilityCount = self.abilityCount + 1
+            end
+            self.keys[self.abilityCount] = other.abilityName
         elseif tag == TAGS.Door then
             Manager.emitEvent(EVENTS.LevelComplete)
         end
@@ -161,7 +167,7 @@ function Player:update()
 
     -- Animation Handling
 
-    self:updateAnimationState(self.state, statePrevious)
+    self:updateAnimationState(self.state)
     self:updateAnimation()
 end
 
@@ -169,7 +175,7 @@ end
 
 local flip
 
-function Player:updateAnimationState(stateCurrent, statePrevious)
+function Player:updateAnimationState(stateCurrent)
     local animationState
 
     -- Idle/moving (on ground)
@@ -291,5 +297,10 @@ end
 -- Generic gated input handler
 
 function Player:isKeyPressedGated(key)
-    return self.keys[key] and pd.buttonIsPressed(KEYS[key])
+  for _, abilityName in ipairs(self.keys) do
+      if abilityName == key then
+        return pd.buttonIsPressed(abilityName)
+      end
+  end
+  return false
 end

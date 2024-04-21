@@ -13,8 +13,6 @@ local imagePanel <const> = gfx.image.new("assets/images/panel")
 local spriteOne = gfx.sprite.new()
 local spriteTwo = gfx.sprite.new()
 local spriteThree = gfx.sprite.new()
-local spriteFour = gfx.sprite.new()
-local spriteFive = gfx.sprite.new()
 
 
 function AbilityPanel:init()
@@ -30,12 +28,6 @@ function AbilityPanel:init()
     spriteThree:moveTo(80, 12)
     spriteThree:setZIndex(100)
     spriteThree:add()
-    spriteFour:moveTo(102, 12) 
-    spriteFour:setZIndex(100)
-    spriteFour:add()
-    spriteFive:moveTo(120, 12)
-    spriteFive:setZIndex(100)
-    spriteFive:add()
 
     spriteOne:setImage(self:imageForItem("right"))
     self.abilitiesCount = 1
@@ -58,19 +50,21 @@ function AbilityPanel:shake(shakeTime, shakeMagnitude)
 end
 
 function AbilityPanel:addItem(item)
-  self.abilitiesCount = self.abilitiesCount + 1
+  if self.abilitiesCount == 3 then
+    spriteOne:setImage(spriteTwo:getImage())
+    spriteTwo:setImage(spriteThree:getImage())
+    spriteThree:setImage(self:imageForItem(item))
+  else
+    self.abilitiesCount = self.abilitiesCount + 1
 
-  local image = self:imageForItem(item);
-  if self.abilitiesCount == 1 then
-    spriteOne:setImage(image)
-  elseif self.abilitiesCount == 2 then
-    spriteTwo:setImage(image)
-  elseif self.abilitiesCount == 3 then
-    spriteThree:setImage(image)
-  elseif self.abilitiesCount == 4 then
-    spriteFour:setImage(image)
-  elseif self.abilitiesCount == 5 then
-    spriteFive:setImage(image)
+    local image = self:imageForItem(item)
+    if self.abilitiesCount == 1 then
+      spriteOne:setImage(image)
+    elseif self.abilitiesCount == 2 then
+      spriteTwo:setImage(image)
+    elseif self.abilitiesCount == 3 then
+      spriteThree:setImage(image)
+    end
   end
 end
 
@@ -89,12 +83,10 @@ function AbilityPanel:imageForItem(item)
   end
 end
 
-function AbilityPanel:destroy()
-  local emptyImage =gfx.image.new(1, 1)
+function AbilityPanel:cleanUp()
+  local emptyImage = gfx.image.new(1, 1)
   spriteOne:setImage(emptyImage)
   spriteTwo:setImage(emptyImage)
   spriteThree:setImage(emptyImage)
-  spriteFour:setImage(emptyImage)
-  spriteFive:setImage(emptyImage)
   self:remove()
 end
