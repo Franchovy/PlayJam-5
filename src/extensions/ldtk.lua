@@ -28,8 +28,8 @@ function LDtk.loadAllLayersAsSprites(levelName)
                 local ladderSprites = gfx.sprite.addWallSprites(tilemap, ladderTiles)
                 for _, lsprite in ipairs(ladderSprites) do
                     lsprite:setTag(TAGS.Ladder)
-                    lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, 32,
-                        32 + LADDER_TOP_ADJUSTMENT + LADDER_BOTTOM_ADJUSTMENT)
+                    lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, lsprite.width,
+                        lsprite.height + LADDER_TOP_ADJUSTMENT + LADDER_BOTTOM_ADJUSTMENT)
                 end
             end
         end
@@ -45,7 +45,15 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
 
         local sprite = _G[entity.name](entity)
         sprite:moveTo(entity.position.x, entity.position.y)
-        sprite:setCollideRect(0, 0, entity.size.width, entity.size.height)
+
+        -- another hack, oh boy
+        if entity.name == "Player" then
+            -- Reduce hitbox sizes
+            local trimWidth, trimTop = 6, 8
+            sprite:setCollideRect(trimWidth, trimTop, sprite.width - trimWidth * 2, sprite.height - trimTop)
+        else
+            sprite:setCollideRect(0, 0, entity.size.width, entity.size.height)
+        end
         sprite:setCenter(entity.center.x, entity.center.y)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
