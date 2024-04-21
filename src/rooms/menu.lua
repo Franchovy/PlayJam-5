@@ -3,7 +3,7 @@ local gfx <const> = pd.graphics
 
 class("Menu").extends(Room)
 
-local imageBackground <const> = gfx.image.new("assets/images/menu")
+local imageBackground <const> = gfx.image.new("assets/images/menu2")
 local spriteBackground = gfx.sprite.new(imageBackground)
 local sceneManager
 local fileplayer
@@ -45,11 +45,16 @@ end
 
 function Menu:AButtonDown()
     local data = playdate.datastore.read()
-    if data then 
-      sceneManager:enter(Game(data.LEVEL))
+    if data then
+      sceneManager.scenes.currentGame = Game(data.LEVEL)
     else
-      sceneManager:enter(Game(0))
+      sceneManager.scenes.currentGame = Game(0)
     end
+    sceneManager:enter(sceneManager.scenes.currentGame)
+end
+
+function Menu:rightButtonDown()
+  sceneManager:enter(LevelSelect())
 end
 
 function Menu:BButtonDown()
