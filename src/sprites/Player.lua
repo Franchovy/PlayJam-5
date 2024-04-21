@@ -138,6 +138,8 @@ function Player:update()
         elseif tag == TAGS.Ability then
             Manager.emitEvent(EVENTS.Pickup, other)
             self.keys[other.abilityName] = true
+        elseif tag == TAGS.Door then
+            Manager.emitEvent(EVENTS.LevelComplete)
         end
     end
 
