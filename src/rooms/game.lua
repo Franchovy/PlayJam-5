@@ -45,7 +45,6 @@ function Game:update(dt)
     -- update entities
     self.abilityPanel:gameUpdate()
     if self.hintCrank then
-      pd.ui.crankIndicator.draw()
     end
 end
 
