@@ -3,6 +3,9 @@ class("Game").extends(Room)
 local sceneManager
 local systemMenu <const> = playdate.getSystemMenu()
 
+SuperFilePlayer.loadFiles("assets/music/1", "assets/music/2", "assets/music/3", "assets/music/4")
+SuperFilePlayer.setPlayConfig(4, 4, 2, 2)
+
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
@@ -20,6 +23,8 @@ function Game:enter(previous, ...)
     -- Set local reference to sceneManager
 
     sceneManager = self.manager
+    sceneManager.scenes.currentGame = self
+
     -- Load level
     local levelName = "Level_" .. self.level
     LDtk.loadAllLayersAsSprites(levelName)
@@ -30,6 +35,11 @@ function Game:enter(previous, ...)
     -- Menu items
     systemMenu:addMenuItem("main menu", goToMainMenu)
     systemMenu:addMenuItem("restart", restartLevel)
+
+    -- Music
+    if previous.super.className == "Menu" then
+        SuperFilePlayer.play()
+    end
 end
 
 function Game:update(dt)
@@ -44,6 +54,11 @@ function Game:leave(next, ...)
 
     -- Remove currentGame reference from manager
     sceneManager.scenes.currentGame = nil
+
+    -- Music
+    if next.super.className == "Menu" then
+        SuperFilePlayer.stop()
+    end
 end
 
 function Game:draw()

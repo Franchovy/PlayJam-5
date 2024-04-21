@@ -6,31 +6,21 @@ local fileplayer <const> = playdate.sound.fileplayer
 
 SuperFilePlayer = {
     fileplayers = {},
-    playConfig = {}
+    playConfig = {},
 }
 
-local loops = {}
+local currentFilePlayer
 
 local function finishedCallback(fileplayer, i)
-    print("Loop: " .. i)
+    local nextIndex = #SuperFilePlayer.fileplayers < i + 1 and 1 or i + 1
 
-    if loops[i] then
-        loops[i] += 1
-    else
-        loops[i] = 1
-    end
-
-    if loops[i] == SuperFilePlayer.playConfig[i].repeatCount then
-        local nextIndex = #SuperFilePlayer.fileplayers > i + 1 and i + 1 or 1
-        print("Next fileplayer: " .. nextIndex)
-        SuperFilePlayer.fileplayers[nextIndex]:play()
-        loops[i] = 0
-    end
+    currentFilePlayer = SuperFilePlayer.fileplayers[nextIndex]
+    currentFilePlayer:play(SuperFilePlayer.playConfig[i].repeatCount)
 end
 
 function SuperFilePlayer.loadFiles(...)
-    for i, file in ipairs({ ... }) do
-        local fileplayer = fileplayer.new(file)
+    for i, path in ipairs({ ... }) do
+        local fileplayer = assert(fileplayer.new(path), "No sound file found in " .. path)
         fileplayer:setFinishCallback(finishedCallback, i)
 
         SuperFilePlayer.fileplayers[i] = fileplayer
@@ -51,5 +41,14 @@ function SuperFilePlayer.play()
     assert(#SuperFilePlayer.fileplayers > 0, "No files to play.")
     assert(#SuperFilePlayer.fileplayers == #SuperFilePlayer.playConfig, "Invalid Config Files.")
 
-    SuperFilePlayer.fileplayers[1]:play(SuperFilePlayer.playConfig[1].repeatCount)
+    currentFilePlayer = SuperFilePlayer.fileplayers[1]
+    currentFilePlayer:play(SuperFilePlayer.playConfig[1].repeatCount)
+end
+
+function SuperFilePlayer.stop()
+    if currentFilePlayer then
+        currentFilePlayer:stopWithoutCallback()
+    end
+
+    currentFilePlayer = nil
 end
