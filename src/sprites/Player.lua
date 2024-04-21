@@ -16,6 +16,10 @@ local STATE = {
     OnLadder = 5
 }
 
+-- debug
+local debugStateReverse = {}
+for k, state in pairs(STATE) do debugStateReverse[state] = k end
+
 KEYS = {
     [KEYNAMES.Up] = pd.kButtonUp,
     [KEYNAMES.Down] = pd.kButtonDown,
@@ -185,6 +189,8 @@ function Player:update()
         self.state = STATE.InAir
     end
 
+    print(debugStateReverse[self.state])
+
     -- Movement
 
     self:moveTo(actualX, actualY)
@@ -320,7 +326,13 @@ end
 
 -- Generic gated input handler
 
+local shouldSkipKeyGate = true
 function Player:isKeyPressedGated(key)
+    --debug
+    if shouldSkipKeyGate then
+        return pd.buttonIsPressed(key)
+    end
+
     for _, abilityName in ipairs(self.keys) do
         if abilityName == key then
             return pd.buttonIsPressed(abilityName)
