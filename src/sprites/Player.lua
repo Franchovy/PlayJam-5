@@ -87,12 +87,12 @@ function Player:dropLastItem()
     end
 
     self.isDroppingItem = true
-    table.remove(self.keys, self.abilityCount)
+    local removed = table.remove(self.keys, self.abilityCount)
     self.abilityCount = self.abilityCount - 1;
     Manager.emitEvent(EVENTS.CrankDrop)
 
     local dropOffPoints = gmt.polygon.new(self.x+15, self.y+15, self.x+30, self.y+240)
-    local sprite = gfx.sprite.new(gfx.image.new("assets/images/A"))
+    local sprite = gfx.sprite.new(gfx.image.new("assets/images/"..removed))
     sprite:setZIndex(100)
     sprite:add()
     sprite:setAnimator(gfx.animator.new(800, dropOffPoints, pd.easingFunctions.inBack))
