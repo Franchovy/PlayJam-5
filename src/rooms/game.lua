@@ -89,7 +89,7 @@ function Game:levelComplete()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
 
-        if saveData < self.level then
+        if saveData.LEVEL < self.level then
             playdate.datastore.write({ LEVEL = self.level })
         end
     end
