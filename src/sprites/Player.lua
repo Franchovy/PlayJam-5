@@ -95,10 +95,21 @@ function Player:dropLastItem()
 end
 
 function Player:update()
+    -- Crank
+
     local _, acceleratedChange = pd.getCrankChange()
     if acceleratedChange > 75 and not self.isDroppingItem then
         self:dropLastItem()
     end
+
+    -- Show panel on B
+
+    if self:isShowingInventory() then
+        Manager.emitEvent(EVENTS.ShowPanel, true)
+    else
+        Manager.emitEvent(EVENTS.ShowPanel, false)
+    end
+
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X

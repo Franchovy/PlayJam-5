@@ -2,6 +2,7 @@ class("Game").extends(Room)
 
 local sceneManager
 local systemMenu <const> = playdate.getSystemMenu()
+local forceShowPanel = false
 
 SuperFilePlayer.loadFiles("assets/music/1", "assets/music/2", "assets/music/3", "assets/music/4")
 SuperFilePlayer.setPlayConfig(4, 4, 2, 2)
@@ -49,11 +50,19 @@ function Game:enter(previous, ...)
     if previous.super.className == "Menu" then
         SuperFilePlayer.play()
     end
+
+    -- Show ability Panel (3s)
+
+    self.abilityPanel:animate(true)
+    forceShowPanel = true
+    playdate.timer.performAfterDelay(3000, function()
+        forceShowPanel = false
+        self.abilityPanel:animate(false)
+    end)
 end
 
 function Game:update(dt)
     -- update entities
-    self.abilityPanel:gameUpdate()
     if self.hintCrank then
         playdate.ui.crankIndicator:draw()
     end
@@ -113,4 +122,12 @@ end
 
 function Game:crankDrop()
     self.abilityPanel:removeRightMost()
+end
+
+function Game:showPanel(isShowing)
+    if forceShowPanel then
+        return
+    end
+
+    self.abilityPanel:animate(isShowing)
 end

@@ -71,15 +71,14 @@ function AbilityPanel:shake(shakeTime, shakeMagnitude)
   end
 end
 
-function AbilityPanel:gameUpdate()
-  if pd.buttonJustPressed(pd.kButtonB) then
-    self:animate(true)
-  elseif pd.buttonJustReleased(pd.kButtonB) then
-    self:animate(false)
-  end
-end
-
+local isShowing = false
 function AbilityPanel:animate(show)
+  if isShowing == show then
+    return
+  end
+
+  isShowing = show
+
   local easing = pd.easingFunctions.inBack
   local duration = 250
 
