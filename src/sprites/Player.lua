@@ -189,8 +189,6 @@ function Player:update()
         self.state = STATE.InAir
     end
 
-    print(debugStateReverse[self.state])
-
     -- Movement
 
     self:moveTo(actualX, actualY)
@@ -326,7 +324,7 @@ end
 
 -- Generic gated input handler
 
-local shouldSkipKeyGate = true
+local shouldSkipKeyGate = false
 function Player:isKeyPressedGated(key)
     --debug
     if shouldSkipKeyGate then

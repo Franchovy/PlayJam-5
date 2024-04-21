@@ -580,7 +580,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -888,9 +891,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": true, "__tile": null, "defUid": 60, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
 				"id": "V_Bool",
-				"params": [ true ]
+				"params": [ false ]
 			}] }],
 			"layerInstances": [
 				{
@@ -1528,7 +1531,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1787,7 +1793,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -1814,33 +1823,8 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Player",
-							"__grid": [4,6],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#275FFC",
-							"iid": "2a11c9a0-fec0-11ee-8235-8f036a56c9d8",
-							"width": 32,
-							"height": 32,
-							"defUid": 19,
-							"px": [128,192],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "Up", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
-								"id": "V_String",
-								"params": ["B"]
-							}, {
-								"id": "V_String",
-								"params": ["Up"]
-							}, {
-								"id": "V_String",
-								"params": ["Right"]
-							} ] }],
-							"__worldX": -320,
-							"__worldY": 800
-						},
-						{
 							"__identifier": "Door",
-							"__grid": [2,6],
+							"__grid": [2,5],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1849,10 +1833,48 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 39,
-							"px": [64,192],
+							"px": [64,160],
 							"fieldInstances": [],
 							"__worldX": -384,
-							"__worldY": 800
+							"__worldY": 768
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [3,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "3a9933d0-fec0-11ee-8235-037739d9b244",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [96,64],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
+							"__worldX": -352,
+							"__worldY": 672
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [11,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "a4ac9c20-fec0-11ee-842f-21a14e2deec5",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [352,64],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["A"]
+							}] }],
+							"__worldX": -96,
+							"__worldY": 672
 						},
 						{
 							"__identifier": "ButtonPickup",
@@ -1861,7 +1883,7 @@
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#15F1D3",
-							"iid": "38a468b0-fec0-11ee-8235-9d8a34d1465c",
+							"iid": "b66f4570-fec0-11ee-842f-ab15bf19e809",
 							"width": 32,
 							"height": 32,
 							"defUid": 21,
@@ -1874,23 +1896,45 @@
 							"__worldY": 672
 						},
 						{
+							"__identifier": "Player",
+							"__grid": [5,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "2a11c9a0-fec0-11ee-8235-8f036a56c9d8",
+							"width": 32,
+							"height": 32,
+							"defUid": 19,
+							"px": [160,192],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Up", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["Up"]
+							}, {
+								"id": "V_String",
+								"params": ["Right"]
+							} ] }],
+							"__worldX": -288,
+							"__worldY": 800
+						},
+						{
 							"__identifier": "ButtonPickup",
-							"__grid": [2,2],
+							"__grid": [10,6],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#15F1D3",
-							"iid": "3a9933d0-fec0-11ee-8235-037739d9b244",
+							"iid": "cbf8e1d0-fec0-11ee-842f-17f0b69ea71f",
 							"width": 32,
 							"height": 32,
 							"defUid": 21,
-							"px": [64,64],
-							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"px": [320,192],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "B", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Down"]
+								"params": ["B"]
 							}] }],
-							"__worldX": -384,
-							"__worldY": 672
+							"__worldX": -128,
+							"__worldY": 800
 						}
 					]
 				},
@@ -1914,8 +1958,8 @@
 					"optionalRules": [],
 					"intGridCsv": [
 						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-						0,0,0,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,0,0,0,0,0,2,0,0,0,0,0,1,1,0,0,0,0,
-						0,2,0,0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+						0,0,0,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,0,0,0,0,0,0,2,0,1,0,0,0,1,0,0,0,0,
+						0,0,2,0,1,1,1,0,1,1,1,1,0,0,0,2,0,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0
 					],
 					"autoLayerTiles": [
 						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
@@ -1930,18 +1974,23 @@
 						{ "px": [96,96], "src": [32,32], "f": 0, "t": 6, "d": [47,42], "a": 1 },
 						{ "px": [128,96], "src": [32,32], "f": 0, "t": 6, "d": [47,43], "a": 1 },
 						{ "px": [160,96], "src": [32,32], "f": 0, "t": 6, "d": [47,44], "a": 1 },
-						{ "px": [224,96], "src": [32,32], "f": 0, "t": 6, "d": [47,46], "a": 1 },
+						{ "px": [192,96], "src": [32,32], "f": 0, "t": 6, "d": [47,45], "a": 1 },
 						{ "px": [256,96], "src": [32,32], "f": 0, "t": 6, "d": [47,47], "a": 1 },
 						{ "px": [288,96], "src": [32,32], "f": 0, "t": 6, "d": [47,48], "a": 1 },
 						{ "px": [320,96], "src": [32,32], "f": 0, "t": 6, "d": [47,49], "a": 1 },
 						{ "px": [352,96], "src": [32,32], "f": 0, "t": 6, "d": [47,50], "a": 1 },
 						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
 						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
-						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
+						{ "px": [288,128], "src": [32,32], "f": 0, "t": 6, "d": [47,61], "a": 1 },
 						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
-						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
+						{ "px": [288,160], "src": [32,32], "f": 0, "t": 6, "d": [47,74], "a": 1 },
+						{ "px": [320,160], "src": [32,32], "f": 0, "t": 6, "d": [47,75], "a": 1 },
+						{ "px": [352,160], "src": [32,32], "f": 0, "t": 6, "d": [47,76], "a": 1 },
 						{ "px": [0,192], "src": [32,32], "f": 0, "t": 6, "d": [47,78], "a": 1 },
-						{ "px": [384,192], "src": [32,32], "f": 0, "t": 6, "d": [47,90], "a": 1 },
+						{ "px": [32,192], "src": [32,32], "f": 0, "t": 6, "d": [47,79], "a": 1 },
+						{ "px": [64,192], "src": [32,32], "f": 0, "t": 6, "d": [47,80], "a": 1 },
+						{ "px": [96,192], "src": [32,32], "f": 0, "t": 6, "d": [47,81], "a": 1 },
+						{ "px": [352,192], "src": [32,32], "f": 0, "t": 6, "d": [47,89], "a": 1 },
 						{ "px": [0,224], "src": [32,32], "f": 0, "t": 6, "d": [47,91], "a": 1 },
 						{ "px": [32,224], "src": [32,32], "f": 0, "t": 6, "d": [47,92], "a": 1 },
 						{ "px": [64,224], "src": [32,32], "f": 0, "t": 6, "d": [47,93], "a": 1 },
@@ -1954,11 +2003,10 @@
 						{ "px": [288,224], "src": [32,32], "f": 0, "t": 6, "d": [47,100], "a": 1 },
 						{ "px": [320,224], "src": [32,32], "f": 0, "t": 6, "d": [47,101], "a": 1 },
 						{ "px": [352,224], "src": [32,32], "f": 0, "t": 6, "d": [47,102], "a": 1 },
-						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 },
-						{ "px": [192,96], "src": [0,0], "f": 0, "t": 0, "d": [49,45], "a": 1 },
-						{ "px": [192,128], "src": [0,0], "f": 0, "t": 0, "d": [49,58], "a": 1 },
-						{ "px": [192,160], "src": [0,0], "f": 0, "t": 0, "d": [49,71], "a": 1 },
-						{ "px": [192,192], "src": [0,0], "f": 0, "t": 0, "d": [49,84], "a": 1 }
+						{ "px": [224,96], "src": [0,0], "f": 0, "t": 0, "d": [49,46], "a": 1 },
+						{ "px": [224,128], "src": [0,0], "f": 0, "t": 0, "d": [49,59], "a": 1 },
+						{ "px": [224,160], "src": [0,0], "f": 0, "t": 0, "d": [49,72], "a": 1 },
+						{ "px": [224,192], "src": [0,0], "f": 0, "t": 0, "d": [49,85], "a": 1 }
 					],
 					"seed": 7645208,
 					"overrideTilesetUid": null,
@@ -2016,7 +2064,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2059,37 +2110,18 @@
 							"__worldY": 800
 						},
 						{
-							"__identifier": "ButtonPickup",
-							"__grid": [9,3],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#15F1D3",
-							"iid": "3393c220-fec0-11ee-8235-dd31176a04c3",
-							"width": 32,
-							"height": 32,
-							"defUid": 21,
-							"px": [288,96],
-							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Left"]
-							}] }],
-							"__worldX": 320,
-							"__worldY": 704
-						},
-						{
 							"__identifier": "Player",
-							"__grid": [3,2],
+							"__grid": [7,6],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#275FFC",
-							"iid": "3d9e19f0-fec0-11ee-8235-fb01c1db5046",
+							"iid": "63991f20-fec0-11ee-833e-b70815361a6c",
 							"width": 32,
 							"height": 32,
 							"defUid": 19,
-							"px": [96,64],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"px": [224,192],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "Right", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["B"]
 							}, {
@@ -2097,48 +2129,67 @@
 								"params": ["Right"]
 							}, {
 								"id": "V_String",
-								"params": ["A"]
+								"params": ["Up"]
 							} ] }],
-							"__worldX": 128,
-							"__worldY": 672
+							"__worldX": 256,
+							"__worldY": 800
 						},
 						{
 							"__identifier": "ButtonPickup",
-							"__grid": [8,6],
+							"__grid": [6,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#15F1D3",
-							"iid": "61dd6dc0-fec0-11ee-8235-b535e87956a8",
+							"iid": "b33d4e20-fec0-11ee-833e-d7adfa4fc25b",
 							"width": 32,
 							"height": 32,
 							"defUid": 21,
-							"px": [256,192],
+							"px": [192,32],
 							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Down"]
 							}] }],
-							"__worldX": 288,
-							"__worldY": 800
+							"__worldX": 224,
+							"__worldY": 640
 						},
 						{
 							"__identifier": "ButtonPickup",
-							"__grid": [10,6],
+							"__grid": [9,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#15F1D3",
-							"iid": "620986d0-fec0-11ee-8235-3b411fe014b9",
+							"iid": "b4340a30-fec0-11ee-833e-0b384d43d826",
 							"width": 32,
 							"height": 32,
 							"defUid": 21,
-							"px": [320,192],
-							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"px": [288,32],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Up"]
+								"params": ["Left"]
 							}] }],
-							"__worldX": 352,
-							"__worldY": 800
+							"__worldX": 320,
+							"__worldY": 640
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [11,1],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "b542bb10-fec0-11ee-833e-cbaaab8d6573",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [352,32],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
+							"__worldX": 384,
+							"__worldY": 640
 						}
 					]
 				},
@@ -2161,9 +2212,9 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-						0,0,0,1,1,2,2,1,1,1,2,1,0,0,0,0,1,1,0,0,0,0,1,2,1,1,1,1,0,1,1,0,0,0,0,
-						1,2,0,0,0,0,0,1,1,0,0,0,0,1,2,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,1,1,
+						2,1,1,1,1,2,2,1,1,1,0,0,0,2,0,0,1,1,0,0,0,0,1,0,0,0,2,0,0,1,1,0,0,0,0,
+						1,0,0,0,2,0,0,1,1,0,0,0,0,1,0,0,0,2,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
 					"autoLayerTiles": [
 						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
@@ -2171,19 +2222,20 @@
 						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
 						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
 						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
+						{ "px": [160,64], "src": [32,32], "f": 0, "t": 6, "d": [47,31], "a": 1 },
+						{ "px": [192,64], "src": [32,32], "f": 0, "t": 6, "d": [47,32], "a": 1 },
+						{ "px": [224,64], "src": [32,32], "f": 0, "t": 6, "d": [47,33], "a": 1 },
+						{ "px": [256,64], "src": [32,32], "f": 0, "t": 6, "d": [47,34], "a": 1 },
+						{ "px": [320,64], "src": [32,32], "f": 0, "t": 6, "d": [47,36], "a": 1 },
+						{ "px": [352,64], "src": [32,32], "f": 0, "t": 6, "d": [47,37], "a": 1 },
 						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
 						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
 						{ "px": [96,96], "src": [32,32], "f": 0, "t": 6, "d": [47,42], "a": 1 },
 						{ "px": [128,96], "src": [32,32], "f": 0, "t": 6, "d": [47,43], "a": 1 },
 						{ "px": [160,96], "src": [32,32], "f": 0, "t": 6, "d": [47,44], "a": 1 },
-						{ "px": [224,96], "src": [32,32], "f": 0, "t": 6, "d": [47,46], "a": 1 },
 						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
 						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
 						{ "px": [160,128], "src": [32,32], "f": 0, "t": 6, "d": [47,57], "a": 1 },
-						{ "px": [224,128], "src": [32,32], "f": 0, "t": 6, "d": [47,59], "a": 1 },
-						{ "px": [256,128], "src": [32,32], "f": 0, "t": 6, "d": [47,60], "a": 1 },
-						{ "px": [288,128], "src": [32,32], "f": 0, "t": 6, "d": [47,61], "a": 1 },
-						{ "px": [320,128], "src": [32,32], "f": 0, "t": 6, "d": [47,62], "a": 1 },
 						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
 						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
 						{ "px": [160,160], "src": [32,32], "f": 0, "t": 6, "d": [47,70], "a": 1 },
@@ -2204,12 +2256,13 @@
 						{ "px": [320,224], "src": [32,32], "f": 0, "t": 6, "d": [47,101], "a": 1 },
 						{ "px": [352,224], "src": [32,32], "f": 0, "t": 6, "d": [47,102], "a": 1 },
 						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 },
+						{ "px": [288,64], "src": [0,0], "f": 0, "t": 0, "d": [49,35], "a": 1 },
 						{ "px": [32,96], "src": [0,0], "f": 0, "t": 0, "d": [49,40], "a": 1 },
 						{ "px": [64,96], "src": [0,0], "f": 0, "t": 0, "d": [49,41], "a": 1 },
-						{ "px": [192,96], "src": [0,0], "f": 0, "t": 0, "d": [49,45], "a": 1 },
-						{ "px": [192,128], "src": [0,0], "f": 0, "t": 0, "d": [49,58], "a": 1 },
-						{ "px": [192,160], "src": [0,0], "f": 0, "t": 0, "d": [49,71], "a": 1 },
-						{ "px": [192,192], "src": [0,0], "f": 0, "t": 0, "d": [49,84], "a": 1 }
+						{ "px": [288,96], "src": [0,0], "f": 0, "t": 0, "d": [49,48], "a": 1 },
+						{ "px": [288,128], "src": [0,0], "f": 0, "t": 0, "d": [49,61], "a": 1 },
+						{ "px": [288,160], "src": [0,0], "f": 0, "t": 0, "d": [49,74], "a": 1 },
+						{ "px": [288,192], "src": [0,0], "f": 0, "t": 0, "d": [49,87], "a": 1 }
 					],
 					"seed": 4176735,
 					"overrideTilesetUid": null,
@@ -2267,7 +2320,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": true, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ true ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2292,7 +2348,87 @@
 					"seed": 5554485,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Door",
+							"__grid": [10,0],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "e584b440-fec0-11ee-833e-25ab15777ca1",
+							"width": 32,
+							"height": 32,
+							"defUid": 39,
+							"px": [320,0],
+							"fieldInstances": [],
+							"__worldX": -128,
+							"__worldY": 928
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [11,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "da83d200-fec0-11ee-833e-01fbd1c6fcd4",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [352,160],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
+							"__worldX": -96,
+							"__worldY": 1088
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [6,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "e9f1b5e0-fec0-11ee-833e-572d8cfb7266",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [192,96],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Up"]
+							}] }],
+							"__worldX": -256,
+							"__worldY": 1024
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [1,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "f7118b10-fec0-11ee-833e-093f25235dfa",
+							"width": 32,
+							"height": 32,
+							"defUid": 19,
+							"px": [32,160],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["B"]
+							}, {
+								"id": "V_String",
+								"params": ["Right"]
+							}, {
+								"id": "V_String",
+								"params": ["A"]
+							} ] }],
+							"__worldX": -416,
+							"__worldY": 1088
+						}
+					]
 				},
 				{
 					"__identifier": "Level",
@@ -2313,28 +2449,45 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-						0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
-						0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+						1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,1,1,1,1,1,0,0,0,0,0,1,2,1,
+						1,0,0,1,1,0,0,0,0,1,0,2,0,0,0,0,1,1,0,0,0,0,1,0,2,0,0,0,0,1,1,0,0,1,0,
+						1,1,1,1,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1
 					],
 					"autoLayerTiles": [
 						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
+						{ "px": [192,0], "src": [32,32], "f": 0, "t": 6, "d": [47,6], "a": 1 },
 						{ "px": [384,0], "src": [32,32], "f": 0, "t": 6, "d": [47,12], "a": 1 },
 						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
+						{ "px": [192,32], "src": [32,32], "f": 0, "t": 6, "d": [47,19], "a": 1 },
+						{ "px": [288,32], "src": [32,32], "f": 0, "t": 6, "d": [47,22], "a": 1 },
+						{ "px": [320,32], "src": [32,32], "f": 0, "t": 6, "d": [47,23], "a": 1 },
+						{ "px": [352,32], "src": [32,32], "f": 0, "t": 6, "d": [47,24], "a": 1 },
 						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
 						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
+						{ "px": [192,64], "src": [32,32], "f": 0, "t": 6, "d": [47,32], "a": 1 },
+						{ "px": [256,64], "src": [32,32], "f": 0, "t": 6, "d": [47,34], "a": 1 },
+						{ "px": [288,64], "src": [32,32], "f": 0, "t": 6, "d": [47,35], "a": 1 },
 						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
 						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
+						{ "px": [160,96], "src": [32,32], "f": 0, "t": 6, "d": [47,44], "a": 1 },
 						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
 						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
+						{ "px": [160,128], "src": [32,32], "f": 0, "t": 6, "d": [47,57], "a": 1 },
 						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
 						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
+						{ "px": [96,160], "src": [32,32], "f": 0, "t": 6, "d": [47,68], "a": 1 },
+						{ "px": [160,160], "src": [32,32], "f": 0, "t": 6, "d": [47,70], "a": 1 },
+						{ "px": [192,160], "src": [32,32], "f": 0, "t": 6, "d": [47,71], "a": 1 },
+						{ "px": [224,160], "src": [32,32], "f": 0, "t": 6, "d": [47,72], "a": 1 },
+						{ "px": [256,160], "src": [32,32], "f": 0, "t": 6, "d": [47,73], "a": 1 },
+						{ "px": [288,160], "src": [32,32], "f": 0, "t": 6, "d": [47,74], "a": 1 },
 						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
 						{ "px": [0,192], "src": [32,32], "f": 0, "t": 6, "d": [47,78], "a": 1 },
+						{ "px": [32,192], "src": [32,32], "f": 0, "t": 6, "d": [47,79], "a": 1 },
+						{ "px": [64,192], "src": [32,32], "f": 0, "t": 6, "d": [47,80], "a": 1 },
+						{ "px": [96,192], "src": [32,32], "f": 0, "t": 6, "d": [47,81], "a": 1 },
+						{ "px": [352,192], "src": [32,32], "f": 0, "t": 6, "d": [47,89], "a": 1 },
 						{ "px": [384,192], "src": [32,32], "f": 0, "t": 6, "d": [47,90], "a": 1 },
-						{ "px": [0,224], "src": [32,32], "f": 0, "t": 6, "d": [47,91], "a": 1 },
-						{ "px": [32,224], "src": [32,32], "f": 0, "t": 6, "d": [47,92], "a": 1 },
-						{ "px": [64,224], "src": [32,32], "f": 0, "t": 6, "d": [47,93], "a": 1 },
 						{ "px": [96,224], "src": [32,32], "f": 0, "t": 6, "d": [47,94], "a": 1 },
 						{ "px": [128,224], "src": [32,32], "f": 0, "t": 6, "d": [47,95], "a": 1 },
 						{ "px": [160,224], "src": [32,32], "f": 0, "t": 6, "d": [47,96], "a": 1 },
@@ -2344,7 +2497,10 @@
 						{ "px": [288,224], "src": [32,32], "f": 0, "t": 6, "d": [47,100], "a": 1 },
 						{ "px": [320,224], "src": [32,32], "f": 0, "t": 6, "d": [47,101], "a": 1 },
 						{ "px": [352,224], "src": [32,32], "f": 0, "t": 6, "d": [47,102], "a": 1 },
-						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 }
+						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 },
+						{ "px": [224,64], "src": [0,0], "f": 0, "t": 0, "d": [49,33], "a": 1 },
+						{ "px": [224,96], "src": [0,0], "f": 0, "t": 0, "d": [49,46], "a": 1 },
+						{ "px": [224,128], "src": [0,0], "f": 0, "t": 0, "d": [49,59], "a": 1 }
 					],
 					"seed": 8186395,
 					"overrideTilesetUid": null,
@@ -2402,7 +2558,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": true, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ true ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2427,7 +2586,103 @@
 					"seed": 2580074,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Door",
+							"__grid": [11,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "40d312f0-fec0-11ee-833e-9742c89aa0f6",
+							"width": 32,
+							"height": 32,
+							"defUid": 39,
+							"px": [352,96],
+							"fieldInstances": [],
+							"__worldX": 384,
+							"__worldY": 1024
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [3,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "43557810-fec0-11ee-833e-7f616e7b1f65",
+							"width": 32,
+							"height": 32,
+							"defUid": 19,
+							"px": [96,160],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "A", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["A"]
+							}, {
+								"id": "V_String",
+								"params": ["Right"]
+							} ] }],
+							"__worldX": 128,
+							"__worldY": 1088
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [5,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "46191d30-fec0-11ee-842f-177bbea75893",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [160,192],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
+							"__worldX": 192,
+							"__worldY": 1120
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [4,1],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "9988d320-fec0-11ee-842f-0d5fb40442ec",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [128,32],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
+							"__worldX": 160,
+							"__worldY": 960
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [1,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "d8262ec0-fec0-11ee-842f-21882a6ac393",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [32,128],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Up"]
+							}] }],
+							"__worldX": 64,
+							"__worldY": 1056
+						}
+					]
 				},
 				{
 					"__identifier": "Level",
@@ -2448,11 +2703,68 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,1,1,1,0,0,0,
+						1,1,1,1,1,0,2,0,0,1,0,0,0,1,0,0,1,1,0,2,0,0,1,1,2,1,1,2,1,1,1,0,2,0,0,
+						0,1,2,0,0,2,0,1,1,1,1,1,0,0,1,2,0,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
-					"autoLayerTiles": [],
+					"autoLayerTiles": [
+						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
+						{ "px": [384,0], "src": [32,32], "f": 0, "t": 6, "d": [47,12], "a": 1 },
+						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
+						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
+						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
+						{ "px": [32,64], "src": [32,32], "f": 0, "t": 6, "d": [47,27], "a": 1 },
+						{ "px": [96,64], "src": [32,32], "f": 0, "t": 6, "d": [47,29], "a": 1 },
+						{ "px": [128,64], "src": [32,32], "f": 0, "t": 6, "d": [47,30], "a": 1 },
+						{ "px": [160,64], "src": [32,32], "f": 0, "t": 6, "d": [47,31], "a": 1 },
+						{ "px": [288,64], "src": [32,32], "f": 0, "t": 6, "d": [47,35], "a": 1 },
+						{ "px": [320,64], "src": [32,32], "f": 0, "t": 6, "d": [47,36], "a": 1 },
+						{ "px": [352,64], "src": [32,32], "f": 0, "t": 6, "d": [47,37], "a": 1 },
+						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
+						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
+						{ "px": [160,96], "src": [32,32], "f": 0, "t": 6, "d": [47,44], "a": 1 },
+						{ "px": [288,96], "src": [32,32], "f": 0, "t": 6, "d": [47,48], "a": 1 },
+						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
+						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
+						{ "px": [160,128], "src": [32,32], "f": 0, "t": 6, "d": [47,57], "a": 1 },
+						{ "px": [192,128], "src": [32,32], "f": 0, "t": 6, "d": [47,58], "a": 1 },
+						{ "px": [256,128], "src": [32,32], "f": 0, "t": 6, "d": [47,60], "a": 1 },
+						{ "px": [288,128], "src": [32,32], "f": 0, "t": 6, "d": [47,61], "a": 1 },
+						{ "px": [352,128], "src": [32,32], "f": 0, "t": 6, "d": [47,63], "a": 1 },
+						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
+						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
+						{ "px": [192,160], "src": [32,32], "f": 0, "t": 6, "d": [47,71], "a": 1 },
+						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
+						{ "px": [0,192], "src": [32,32], "f": 0, "t": 6, "d": [47,78], "a": 1 },
+						{ "px": [32,192], "src": [32,32], "f": 0, "t": 6, "d": [47,79], "a": 1 },
+						{ "px": [64,192], "src": [32,32], "f": 0, "t": 6, "d": [47,80], "a": 1 },
+						{ "px": [96,192], "src": [32,32], "f": 0, "t": 6, "d": [47,81], "a": 1 },
+						{ "px": [192,192], "src": [32,32], "f": 0, "t": 6, "d": [47,84], "a": 1 },
+						{ "px": [384,192], "src": [32,32], "f": 0, "t": 6, "d": [47,90], "a": 1 },
+						{ "px": [0,224], "src": [32,32], "f": 0, "t": 6, "d": [47,91], "a": 1 },
+						{ "px": [32,224], "src": [32,32], "f": 0, "t": 6, "d": [47,92], "a": 1 },
+						{ "px": [64,224], "src": [32,32], "f": 0, "t": 6, "d": [47,93], "a": 1 },
+						{ "px": [96,224], "src": [32,32], "f": 0, "t": 6, "d": [47,94], "a": 1 },
+						{ "px": [128,224], "src": [32,32], "f": 0, "t": 6, "d": [47,95], "a": 1 },
+						{ "px": [160,224], "src": [32,32], "f": 0, "t": 6, "d": [47,96], "a": 1 },
+						{ "px": [192,224], "src": [32,32], "f": 0, "t": 6, "d": [47,97], "a": 1 },
+						{ "px": [224,224], "src": [32,32], "f": 0, "t": 6, "d": [47,98], "a": 1 },
+						{ "px": [256,224], "src": [32,32], "f": 0, "t": 6, "d": [47,99], "a": 1 },
+						{ "px": [288,224], "src": [32,32], "f": 0, "t": 6, "d": [47,100], "a": 1 },
+						{ "px": [320,224], "src": [32,32], "f": 0, "t": 6, "d": [47,101], "a": 1 },
+						{ "px": [352,224], "src": [32,32], "f": 0, "t": 6, "d": [47,102], "a": 1 },
+						{ "px": [384,224], "src": [32,32], "f": 0, "t": 6, "d": [47,103], "a": 1 },
+						{ "px": [64,64], "src": [0,0], "f": 0, "t": 0, "d": [49,28], "a": 1 },
+						{ "px": [64,96], "src": [0,0], "f": 0, "t": 0, "d": [49,41], "a": 1 },
+						{ "px": [64,128], "src": [0,0], "f": 0, "t": 0, "d": [49,54], "a": 1 },
+						{ "px": [224,128], "src": [0,0], "f": 0, "t": 0, "d": [49,59], "a": 1 },
+						{ "px": [320,128], "src": [0,0], "f": 0, "t": 0, "d": [49,62], "a": 1 },
+						{ "px": [64,160], "src": [0,0], "f": 0, "t": 0, "d": [49,67], "a": 1 },
+						{ "px": [224,160], "src": [0,0], "f": 0, "t": 0, "d": [49,72], "a": 1 },
+						{ "px": [320,160], "src": [0,0], "f": 0, "t": 0, "d": [49,75], "a": 1 },
+						{ "px": [224,192], "src": [0,0], "f": 0, "t": 0, "d": [49,85], "a": 1 },
+						{ "px": [320,192], "src": [0,0], "f": 0, "t": 0, "d": [49,88], "a": 1 }
+					],
 					"seed": 2608273,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
@@ -2509,7 +2821,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2534,7 +2849,103 @@
 					"seed": 4266646,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [3,1],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "f03b66c0-fec0-11ee-833e-5d9cd4ef3989",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [96,32],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["A"]
+							}] }],
+							"__worldX": -352,
+							"__worldY": 1280
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [3,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "f6a47bf0-fec0-11ee-833e-b5a80a63740f",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [96,192],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
+							"__worldX": -352,
+							"__worldY": 1440
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [10,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "fcab73f0-fec0-11ee-833e-ad5585d20a80",
+							"width": 32,
+							"height": 32,
+							"defUid": 19,
+							"px": [320,128],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["Left"]
+							}, {
+								"id": "V_String",
+								"params": ["Up"]
+							} ] }],
+							"__worldX": -128,
+							"__worldY": 1376
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [7,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "1a5fd2b0-fec0-11ee-833e-8d47d25f5b0b",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [224,128],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
+							"__worldX": -224,
+							"__worldY": 1376
+						},
+						{
+							"__identifier": "Door",
+							"__grid": [10,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "4fd82d70-fec0-11ee-833e-d3140e2f65aa",
+							"width": 32,
+							"height": 32,
+							"defUid": 39,
+							"px": [320,64],
+							"fieldInstances": [],
+							"__worldX": -128,
+							"__worldY": 1312
+						}
+					]
 				},
 				{
 					"__identifier": "Level",
@@ -2555,11 +2966,66 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						1,2,0,0,0,0,0,0,1,1,1,0,1,1,2,0,0,0,0,0,1,1,0,0,0,1,1,2,1,1,1,1,0,0,1,
+						0,0,0,1,1,2,0,0,0,1,0,0,1,1,1,1,1,1,2,0,0,0,1,0,0,0,0,0,0,1,1,1,2,0,0,
+						1,1,2,1,1,1,1,1,0,1,2,0,0,0,0,2,1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0
 					],
-					"autoLayerTiles": [],
+					"autoLayerTiles": [
+						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
+						{ "px": [256,0], "src": [32,32], "f": 0, "t": 6, "d": [47,8], "a": 1 },
+						{ "px": [288,0], "src": [32,32], "f": 0, "t": 6, "d": [47,9], "a": 1 },
+						{ "px": [320,0], "src": [32,32], "f": 0, "t": 6, "d": [47,10], "a": 1 },
+						{ "px": [384,0], "src": [32,32], "f": 0, "t": 6, "d": [47,12], "a": 1 },
+						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
+						{ "px": [224,32], "src": [32,32], "f": 0, "t": 6, "d": [47,20], "a": 1 },
+						{ "px": [256,32], "src": [32,32], "f": 0, "t": 6, "d": [47,21], "a": 1 },
+						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
+						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
+						{ "px": [64,64], "src": [32,32], "f": 0, "t": 6, "d": [47,28], "a": 1 },
+						{ "px": [96,64], "src": [32,32], "f": 0, "t": 6, "d": [47,29], "a": 1 },
+						{ "px": [128,64], "src": [32,32], "f": 0, "t": 6, "d": [47,30], "a": 1 },
+						{ "px": [160,64], "src": [32,32], "f": 0, "t": 6, "d": [47,31], "a": 1 },
+						{ "px": [256,64], "src": [32,32], "f": 0, "t": 6, "d": [47,34], "a": 1 },
+						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
+						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
+						{ "px": [160,96], "src": [32,32], "f": 0, "t": 6, "d": [47,44], "a": 1 },
+						{ "px": [256,96], "src": [32,32], "f": 0, "t": 6, "d": [47,47], "a": 1 },
+						{ "px": [288,96], "src": [32,32], "f": 0, "t": 6, "d": [47,48], "a": 1 },
+						{ "px": [320,96], "src": [32,32], "f": 0, "t": 6, "d": [47,49], "a": 1 },
+						{ "px": [352,96], "src": [32,32], "f": 0, "t": 6, "d": [47,50], "a": 1 },
+						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
+						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
+						{ "px": [160,128], "src": [32,32], "f": 0, "t": 6, "d": [47,57], "a": 1 },
+						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
+						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
+						{ "px": [32,160], "src": [32,32], "f": 0, "t": 6, "d": [47,66], "a": 1 },
+						{ "px": [160,160], "src": [32,32], "f": 0, "t": 6, "d": [47,70], "a": 1 },
+						{ "px": [192,160], "src": [32,32], "f": 0, "t": 6, "d": [47,71], "a": 1 },
+						{ "px": [256,160], "src": [32,32], "f": 0, "t": 6, "d": [47,73], "a": 1 },
+						{ "px": [288,160], "src": [32,32], "f": 0, "t": 6, "d": [47,74], "a": 1 },
+						{ "px": [320,160], "src": [32,32], "f": 0, "t": 6, "d": [47,75], "a": 1 },
+						{ "px": [352,160], "src": [32,32], "f": 0, "t": 6, "d": [47,76], "a": 1 },
+						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
+						{ "px": [32,192], "src": [32,32], "f": 0, "t": 6, "d": [47,79], "a": 1 },
+						{ "px": [256,192], "src": [32,32], "f": 0, "t": 6, "d": [47,86], "a": 1 },
+						{ "px": [32,224], "src": [32,32], "f": 0, "t": 6, "d": [47,92], "a": 1 },
+						{ "px": [64,224], "src": [32,32], "f": 0, "t": 6, "d": [47,93], "a": 1 },
+						{ "px": [96,224], "src": [32,32], "f": 0, "t": 6, "d": [47,94], "a": 1 },
+						{ "px": [128,224], "src": [32,32], "f": 0, "t": 6, "d": [47,95], "a": 1 },
+						{ "px": [160,224], "src": [32,32], "f": 0, "t": 6, "d": [47,96], "a": 1 },
+						{ "px": [192,224], "src": [32,32], "f": 0, "t": 6, "d": [47,97], "a": 1 },
+						{ "px": [224,224], "src": [32,32], "f": 0, "t": 6, "d": [47,98], "a": 1 },
+						{ "px": [256,224], "src": [32,32], "f": 0, "t": 6, "d": [47,99], "a": 1 },
+						{ "px": [32,0], "src": [0,0], "f": 0, "t": 0, "d": [49,1], "a": 1 },
+						{ "px": [32,32], "src": [0,0], "f": 0, "t": 0, "d": [49,14], "a": 1 },
+						{ "px": [32,64], "src": [0,0], "f": 0, "t": 0, "d": [49,27], "a": 1 },
+						{ "px": [32,96], "src": [0,0], "f": 0, "t": 0, "d": [49,40], "a": 1 },
+						{ "px": [32,128], "src": [0,0], "f": 0, "t": 0, "d": [49,53], "a": 1 },
+						{ "px": [64,160], "src": [0,0], "f": 0, "t": 0, "d": [49,67], "a": 1 },
+						{ "px": [224,160], "src": [0,0], "f": 0, "t": 0, "d": [49,72], "a": 1 },
+						{ "px": [64,192], "src": [0,0], "f": 0, "t": 0, "d": [49,80], "a": 1 },
+						{ "px": [224,192], "src": [0,0], "f": 0, "t": 0, "d": [49,85], "a": 1 }
+					],
 					"seed": 6121512,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
@@ -2616,7 +3082,10 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [] }],
+			"fieldInstances": [{ "__identifier": "HintCrank", "__type": "Bool", "__value": false, "__tile": null, "defUid": 60, "realEditorValues": [{
+				"id": "V_Bool",
+				"params": [ false ]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
@@ -2641,7 +3110,103 @@
 					"seed": 8073696,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Door",
+							"__grid": [5,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "f4bf4bc0-fec0-11ee-833e-d56fd746dea8",
+							"width": 32,
+							"height": 32,
+							"defUid": 39,
+							"px": [160,192],
+							"fieldInstances": [],
+							"__worldX": 192,
+							"__worldY": 1440
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [5,0],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "1decfba0-fec0-11ee-833e-d78684276be8",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [160,0],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
+							"__worldX": 192,
+							"__worldY": 1248
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [8,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "2a88fad0-fec0-11ee-833e-c16da07164b7",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [256,128],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Up"]
+							}] }],
+							"__worldX": 288,
+							"__worldY": 1376
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [11,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "2cb02090-fec0-11ee-833e-c53ec14308e3",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [352,128],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
+							"__worldX": 384,
+							"__worldY": 1376
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [1,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "312b2160-fec0-11ee-833e-c39c36e33e79",
+							"width": 32,
+							"height": 32,
+							"defUid": 19,
+							"px": [32,128],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "A", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["A"]
+							}, {
+								"id": "V_String",
+								"params": ["Right"]
+							} ] }],
+							"__worldX": 64,
+							"__worldY": 1376
+						}
+					]
 				},
 				{
 					"__identifier": "Level",
@@ -2662,11 +3227,45 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,2,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
+						0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,2,2,2,1,0,0,0,0,1,1,1,1,1,0,
+						0,0,1,1,1,1,1,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0
 					],
-					"autoLayerTiles": [],
+					"autoLayerTiles": [
+						{ "px": [0,0], "src": [32,32], "f": 0, "t": 6, "d": [47,0], "a": 1 },
+						{ "px": [384,0], "src": [32,32], "f": 0, "t": 6, "d": [47,12], "a": 1 },
+						{ "px": [0,32], "src": [32,32], "f": 0, "t": 6, "d": [47,13], "a": 1 },
+						{ "px": [384,32], "src": [32,32], "f": 0, "t": 6, "d": [47,25], "a": 1 },
+						{ "px": [0,64], "src": [32,32], "f": 0, "t": 6, "d": [47,26], "a": 1 },
+						{ "px": [384,64], "src": [32,32], "f": 0, "t": 6, "d": [47,38], "a": 1 },
+						{ "px": [0,96], "src": [32,32], "f": 0, "t": 6, "d": [47,39], "a": 1 },
+						{ "px": [384,96], "src": [32,32], "f": 0, "t": 6, "d": [47,51], "a": 1 },
+						{ "px": [0,128], "src": [32,32], "f": 0, "t": 6, "d": [47,52], "a": 1 },
+						{ "px": [96,128], "src": [32,32], "f": 0, "t": 6, "d": [47,55], "a": 1 },
+						{ "px": [224,128], "src": [32,32], "f": 0, "t": 6, "d": [47,59], "a": 1 },
+						{ "px": [384,128], "src": [32,32], "f": 0, "t": 6, "d": [47,64], "a": 1 },
+						{ "px": [0,160], "src": [32,32], "f": 0, "t": 6, "d": [47,65], "a": 1 },
+						{ "px": [32,160], "src": [32,32], "f": 0, "t": 6, "d": [47,66], "a": 1 },
+						{ "px": [64,160], "src": [32,32], "f": 0, "t": 6, "d": [47,67], "a": 1 },
+						{ "px": [96,160], "src": [32,32], "f": 0, "t": 6, "d": [47,68], "a": 1 },
+						{ "px": [224,160], "src": [32,32], "f": 0, "t": 6, "d": [47,72], "a": 1 },
+						{ "px": [256,160], "src": [32,32], "f": 0, "t": 6, "d": [47,73], "a": 1 },
+						{ "px": [288,160], "src": [32,32], "f": 0, "t": 6, "d": [47,74], "a": 1 },
+						{ "px": [320,160], "src": [32,32], "f": 0, "t": 6, "d": [47,75], "a": 1 },
+						{ "px": [352,160], "src": [32,32], "f": 0, "t": 6, "d": [47,76], "a": 1 },
+						{ "px": [384,160], "src": [32,32], "f": 0, "t": 6, "d": [47,77], "a": 1 },
+						{ "px": [96,192], "src": [32,32], "f": 0, "t": 6, "d": [47,81], "a": 1 },
+						{ "px": [224,192], "src": [32,32], "f": 0, "t": 6, "d": [47,85], "a": 1 },
+						{ "px": [96,224], "src": [32,32], "f": 0, "t": 6, "d": [47,94], "a": 1 },
+						{ "px": [128,224], "src": [32,32], "f": 0, "t": 6, "d": [47,95], "a": 1 },
+						{ "px": [160,224], "src": [32,32], "f": 0, "t": 6, "d": [47,96], "a": 1 },
+						{ "px": [192,224], "src": [32,32], "f": 0, "t": 6, "d": [47,97], "a": 1 },
+						{ "px": [224,224], "src": [32,32], "f": 0, "t": 6, "d": [47,98], "a": 1 },
+						{ "px": [160,32], "src": [0,0], "f": 0, "t": 0, "d": [49,18], "a": 1 },
+						{ "px": [128,128], "src": [0,0], "f": 0, "t": 0, "d": [49,56], "a": 1 },
+						{ "px": [160,128], "src": [0,0], "f": 0, "t": 0, "d": [49,57], "a": 1 },
+						{ "px": [192,128], "src": [0,0], "f": 0, "t": 0, "d": [49,58], "a": 1 }
+					],
 					"seed": 9629859,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
