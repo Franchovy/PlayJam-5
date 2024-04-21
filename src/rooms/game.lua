@@ -12,21 +12,19 @@ local function restartLevel()
 end
 
 function Game:init(lvl)
-  self.level = lvl
-  self.startingItem = self:startingItemForLevel(lvl)
+    self.level = lvl
 end
-
 
 function Game:enter(previous, ...)
     -- Set local reference to sceneManager
 
     sceneManager = self.manager
     -- Load level
-    local levelName = "Level_"..self.level
+    local levelName = "Level_" .. self.level
     LDtk.loadAllLayersAsSprites(levelName)
-    LDtk.loadAllEntitiesAsSprites(self, levelName, self.startingItem)
+    LDtk.loadAllEntitiesAsSprites(levelName)
 
-    self.abilityPanel = AbilityPanel(self.startingItem)
+    self.abilityPanel = AbilityPanel()
 
     -- Menu items
     systemMenu:addMenuItem("main menu", goToMainMenu)
@@ -35,6 +33,7 @@ end
 
 function Game:update(dt)
     -- update entities
+    self.abilityPanel:gameUpdate()
 end
 
 function Game:leave(next, ...)
@@ -56,26 +55,20 @@ local maxLevels <const> = 3
 function Game:levelComplete()
     self.level = self.level + 1
     if self.level >= maxLevels then
-      self.level = 0
-      goToMainMenu()
+        self.level = 0
+        goToMainMenu()
     else
-      sceneManager.scenes.currentGame = Game(self.level, self.startingItem)
-      sceneManager:enter(sceneManager.scenes.currentGame)
+        self:cleanUp()
+        sceneManager.scenes.currentGame = Game(self.level)
+        sceneManager:enter(sceneManager.scenes.currentGame)
     end
 end
 
--- wow, this is inelegant!
-function Game:startingItemForLevel(level)
-  if level == 0 then
-    return "right"
-  elseif level == 1 then
-    return "right"
-  elseif level == 2 then
-    return "left"
-  end
-  return "right"
+function Game:cleanUp()
+    self.abilityPanel:cleanUp()
 end
 
-function Game:itemPickedUp(item)
-  self.abilityPanel:addItem(item)
+function Game:pickup(object)
+    self.abilityPanel:addItem(object.abilityName)
+    object:remove()
 end

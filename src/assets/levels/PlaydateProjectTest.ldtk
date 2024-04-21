@@ -948,6 +948,63 @@
 							"fieldInstances": [],
 							"__worldX": -96,
 							"__worldY": 128
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [3,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "94fd5d90-fec0-11ee-8792-697011b5d151",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [96,160],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
+							"__worldX": -352,
+							"__worldY": 128
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [5,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "98b4c040-fec0-11ee-8792-873817b57ad0",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [160,160],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Up"]
+							}] }],
+							"__worldX": -288,
+							"__worldY": 128
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [6,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "9ad0e980-fec0-11ee-8792-8b27b8a44456",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [192,160],
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
+							"__worldX": -256,
+							"__worldY": 128
 						}
 					]
 				},
