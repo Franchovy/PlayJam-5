@@ -33,7 +33,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
     end
 end
 
-function LDtk.loadAllEntitiesAsSprites(levelName, startingItem)
+function LDtk.loadAllEntitiesAsSprites(game, levelName, startingItem)
     for _, entity in ipairs(LDtk.get_entities(levelName)) do
         if not _G[entity.name] then
             error("No sprite class for entity with name: " .. entity.name)
@@ -44,7 +44,7 @@ function LDtk.loadAllEntitiesAsSprites(levelName, startingItem)
         if entity.name == "Player" then
           sprite = Player(startingItem)
         else
-          sprite = _G[entity.name](entity)
+          sprite = _G[entity.name](game, entity)
         end
 
         sprite:moveTo(entity.position.x, entity.position.y)

@@ -5,7 +5,6 @@ class("Player").extends(AnimatedSprite)
 
 function Player:init(startingItem)
     local playerImageTable = gfx.imagetable.new("assets/images/player-table-32-32")
-  print(startingItem)
     Player.super.init(self, playerImageTable)
 
     self:addState("idle", 1, 1)
