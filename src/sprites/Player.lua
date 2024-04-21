@@ -50,6 +50,7 @@ function Player:init()
     self.state = STATE.OnGround
     self.keys = { [1] = KEYNAMES.Right }
     self.abilityCount = 1
+    self.isDroppingItem = false
 end
 
 function Player:collisionResponse(other)
@@ -67,9 +68,25 @@ local velocityX = 0
 local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 
-function Player:update()
-    local statePrevious = self.state
+function Player:dropLastItem()
+  if self.abilityCount == 1 then
+    return
+  end
 
+  self.isDroppingItem = true
+  table.remove(self.keys, self.abilityCount)
+  self.abilityCount = self.abilityCount - 1;
+  Manager.emitEvent(EVENTS.CrankDrop)
+  pd.timer.new(1500, function()
+    self.isDroppingItem = false
+  end)
+end
+
+function Player:update()
+    local _, acceleratedChange = pd.getCrankChange()
+    if acceleratedChange > 75 and not self.isDroppingItem then
+      self:dropLastItem()
+    end
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X

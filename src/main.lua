@@ -36,4 +36,5 @@ function playdate.update()
 
   -- Update sprites
   playdate.graphics.sprite.update()
+  playdate.timer.updateTimers()
 end

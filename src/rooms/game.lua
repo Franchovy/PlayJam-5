@@ -72,3 +72,7 @@ function Game:pickup(object)
     self.abilityPanel:addItem(object.abilityName)
     object:remove()
 end
+
+function Game:crankDrop()
+  self.abilityPanel:removeRightMost()
+end
