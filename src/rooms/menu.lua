@@ -48,7 +48,7 @@ function Menu:AButtonDown()
     if data then 
       sceneManager:enter(Game(data.LEVEL))
     else
-      sceneManager:enter(Game(1))
+      sceneManager:enter(Game(0))
     end
 end
 
