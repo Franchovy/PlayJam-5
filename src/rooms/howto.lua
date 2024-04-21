@@ -9,7 +9,6 @@ local rulesImage = gfx.image.new("assets/images/howtoplay_rules")
 local spriteBackground = gfx.sprite.new(storyImage)
 
 function HowTo:init(manager)
-  print("init w manager")
   self.m = manager
 end
 
