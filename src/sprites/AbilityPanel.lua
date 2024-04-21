@@ -121,11 +121,11 @@ end
 
 function AbilityPanel:removeRightMost()
   if self.abilitiesCount == 1 then
-    item[1] = nil
+    items[1] = nil
   elseif self.abilitiesCount == 2 then
-    item[2] = nil
+    items[2] = nil
   elseif self.abilitiesCount == 3 then
-    item[3] = nil
+    items[3] = nil
   end
 
   self:updateItemsCount()
