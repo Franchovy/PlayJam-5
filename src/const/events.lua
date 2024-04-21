@@ -3,5 +3,6 @@ EVENTS = {
     LevelComplete = 'levelComplete',
     Pickup = 'pickup',
     CrankDrop = 'crankDrop',
-    LoadItems = 'loadItems'
+    LoadItems = 'loadItems',
+    ShowPanel = 'showPanel'
 }
