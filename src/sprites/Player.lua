@@ -9,6 +9,18 @@ local ANIMATION_STATES = {
     Jumping = 3
 }
 
+local STATE = {
+    InAir = 1,
+    Jumping = 2,
+    OnGround = 3,
+    OnLadderTop = 4,
+    OnLadder = 5
+}
+
+-- debug
+local debugReverseState = {}
+for k, v in pairs(STATE) do debugReverseState[v] = k end
+
 local maxSpeed = 4.5
 local maxSpeedVertical = 3.5
 local gravity = 1.3
@@ -28,8 +40,7 @@ function Player:init()
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
     self:playAnimation()
 
-    self.onGround = true
-    self.onLadder = false
+    self.state = STATE.OnGround
 end
 
 function Player:collisionResponse(other)
@@ -55,16 +66,21 @@ function Player:update()
 
     -- Velocity Y
 
-    velocityY = 0
-    if self.onGround then
+    if self.state == STATE.OnLadder or self.state == STATE.OnLadderTop then
+        velocityY = 0
+    end
+
+    if self.state == STATE.OnLadder then
+        self:handleUpMovement()
+        self:handleDownMovement()
+    elseif self.state == STATE.OnLadderTop then
         self:handleJump()
-    end
-
-    if self.onLadder then
-        self:handleVerticalMovement()
-    end
-
-    if not (self.onGround) and not (self.onLadder) then
+        self:handleDownMovement()
+    elseif self.state == STATE.OnGround then
+        self:handleJump()
+    elseif self.state == STATE.InAir then
+        self:handleGravity()
+    elseif self.state == STATE.Jumping then
         self:handleGravity()
     end
 
@@ -75,6 +91,7 @@ function Player:update()
 
     local onGround = false
     local onLadder = false
+    local onLadderTop = false
 
     for _, collisionData in pairs(collisions) do
         local other = collisionData.other
@@ -82,25 +99,37 @@ function Player:update()
         local type = collisionData.type
         local normal = collisionData.normal
         local position = collisionData.touch
+        local overlaps = collisionData.overlaps
 
         if (type == kCollisionTypeSlide and normal.y == -1) then
-            self.onGround = true
-        end
+            onGround = true
+        elseif tag == TAGS.Ladder then
+            local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
+            local topDetectionRangeMargin = 2.5
 
-        if tag == TAGS.Ladder then
-            onLadder = true
+            if actualY < position.y - topDetectionRangeMargin and not overlaps then
+                -- Player is jumping or moving down
+            elseif actualY > otherTop + topDetectionRangeMargin then
+                onLadder = true
+            elseif position.y <= otherTop + topDetectionRangeMargin and position.y >= otherTop - topDetectionRangeMargin then
+                onLadderTop = true
 
-            -- Adjust for glitchy top bit of ladder for smooth standing on block
-            --[[local otherTop = other.y - other.height
-            if otherTop - 1 < self.y and otherTop + 5 > self.y then
-                actualY = otherTop
-                onGround = true
-            end--]]
+                actualY = otherTop + LADDER_TOP_ADJUSTMENT
+            end
         end
     end
 
-    self.onLadder = onLadder
-    self.onGround = onGround
+    if onLadder then
+        self.state = STATE.OnLadder
+    elseif onLadderTop then
+        self.state = STATE.OnLadderTop
+    elseif onGround then
+        self.state = STATE.OnGround
+    else
+        self.state = STATE.InAir
+    end
+
+    print(debugReverseState[self.state])
 
     -- Movement
 
@@ -142,18 +171,20 @@ function Player:handleHorizontalMovement()
     end
 end
 
-function Player:handleVerticalMovement()
+function Player:handleUpMovement()
     if self:isMovingUp() then
         velocityY = -maxSpeedVertical
-    elseif self:isMovingDown() then
+    end
+end
+
+function Player:handleDownMovement()
+    if self:isMovingDown() then
         velocityY = maxSpeedVertical
-    else
-        velocityY = 0
     end
 end
 
 function Player:handleGravity()
-    velocityY = math.max(-velocityY + gravity, maxFallSpeed)
+    velocityY = math.min(velocityY + gravity, maxFallSpeed)
 end
 
 -- Input Handlers
