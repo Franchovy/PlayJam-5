@@ -1,7 +1,6 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
-local kCollisionTypeOverlap <const> = pd.graphics.sprite.kCollisionTypeOverlap
 
 local ANIMATION_STATES = {
     Idle = 1,
@@ -50,13 +49,6 @@ function Player:init()
 
     self.state = STATE.OnGround
     self.keys = { [KEYNAMES.Right] = true }
-
-    -- TODO: Handle starting items:
-    -- startingItem == "left";
-    -- startingItem == "right";
-    -- startingItem == "up";
-    -- startingItem == "a";
-    -- startingItem == "b";
 end
 
 function Player:collisionResponse(other)

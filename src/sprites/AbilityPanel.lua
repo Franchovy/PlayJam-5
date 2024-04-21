@@ -17,7 +17,7 @@ local spriteFour = gfx.sprite.new()
 local spriteFive = gfx.sprite.new()
 
 
-function AbilityPanel:init(startingItem)
+function AbilityPanel:init()
     AbilityPanel.super.init(self, imagePanel)
     self:add()
 
@@ -37,7 +37,7 @@ function AbilityPanel:init(startingItem)
     spriteFive:setZIndex(100)
     spriteFive:add()
 
-    spriteOne:setImage(self:imageForItem(startingItem))
+    spriteOne:setImage(self:imageForItem("right"))
     self.abilitiesCount = 1
     self:setZIndex(99)
 end

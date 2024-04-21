@@ -13,7 +13,6 @@ end
 
 function Game:init(lvl)
     self.level = lvl
-    self.startingItem = self:startingItemForLevel(lvl)
 end
 
 function Game:enter(previous, ...)
@@ -23,9 +22,9 @@ function Game:enter(previous, ...)
     -- Load level
     local levelName = "Level_" .. self.level
     LDtk.loadAllLayersAsSprites(levelName)
-    LDtk.loadAllEntitiesAsSprites(levelName, self.startingItem)
+    LDtk.loadAllEntitiesAsSprites(levelName)
 
-    self.abilityPanel = AbilityPanel(self.startingItem)
+    self.abilityPanel = AbilityPanel()
 
     -- Menu items
     systemMenu:addMenuItem("main menu", goToMainMenu)
@@ -59,21 +58,9 @@ function Game:levelComplete()
         goToMainMenu()
     else
         self:cleanUp()
-        sceneManager.scenes.currentGame = Game(self.level, self.startingItem)
+        sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
     end
-end
-
--- wow, this is inelegant!
-function Game:startingItemForLevel(level)
-    if level == 0 then
-        return "right"
-    elseif level == 1 then
-        return "right"
-    elseif level == 2 then
-        return "left"
-    end
-    return "right"
 end
 
 function Game:cleanUp()
