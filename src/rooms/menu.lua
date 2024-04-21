@@ -44,7 +44,12 @@ function Menu:draw()
 end
 
 function Menu:AButtonDown()
-    sceneManager:enter(Game(0))
+    local data = playdate.datastore.read()
+    if data then 
+      sceneManager:enter(Game(data.LEVEL))
+    else
+      sceneManager:enter(Game(1))
+    end
 end
 
 function Menu:BButtonDown()

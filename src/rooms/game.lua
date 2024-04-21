@@ -82,10 +82,12 @@ function Game:levelComplete()
     if self.level >= maxLevels then
         self.level = 0
         goToMainMenu()
+        playdate.datastore.write({LEVEL=0})
     else
         self:cleanUp()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
+        playdate.datastore.write({LEVEL=self.level})
     end
 end
 
