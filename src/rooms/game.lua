@@ -59,6 +59,7 @@ function Game:levelComplete()
       self.level = 0
       goToMainMenu()
     else
+      self:cleanUp()
       sceneManager.scenes.currentGame = Game(self.level, self.startingItem)
       sceneManager:enter(sceneManager.scenes.currentGame)
     end
@@ -78,4 +79,8 @@ end
 
 function Game:itemPickedUp(item)
   self.abilityPanel:addItem(item)
+end
+
+function Game:cleanUp()
+  self.abilityPanel:destroy()
 end

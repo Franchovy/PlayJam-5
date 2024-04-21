@@ -22,18 +22,24 @@ function AbilityPanel:init(startingItem)
     self:add()
 
     spriteOne:moveTo(16, 12)
+    spriteOne:setZIndex(100)
     spriteOne:add()
     spriteTwo:moveTo(48, 12)
+    spriteTwo:setZIndex(100)
     spriteTwo:add()
     spriteThree:moveTo(80, 12)
+    spriteThree:setZIndex(100)
     spriteThree:add()
     spriteFour:moveTo(102, 12) 
+    spriteFour:setZIndex(100)
     spriteFour:add()
     spriteFive:moveTo(120, 12)
+    spriteFive:setZIndex(100)
     spriteFive:add()
 
     spriteOne:setImage(self:imageForItem(startingItem))
     self.abilitiesCount = 1
+    self:setZIndex(99)
 end
 
 function AbilityPanel:shake(shakeTime, shakeMagnitude)
@@ -81,4 +87,14 @@ function AbilityPanel:imageForItem(item)
   elseif item == "a" then
     return imageA
   end
+end
+
+function AbilityPanel:destroy()
+  local emptyImage =gfx.image.new(1, 1)
+  spriteOne:setImage(emptyImage)
+  spriteTwo:setImage(emptyImage)
+  spriteThree:setImage(emptyImage)
+  spriteFour:setImage(emptyImage)
+  spriteFive:setImage(emptyImage)
+  self:remove()
 end
