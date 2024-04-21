@@ -81,7 +81,6 @@ end
 local maxLevels <const> = 10
 
 function Game:levelComplete()
-    local saveData = playdate.datastore.read()
     self.level = self.level + 1
     if self.level >= maxLevels then
         self.level = 0
@@ -92,7 +91,8 @@ function Game:levelComplete()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
 
-        if saveData.LEVEL < self.level then
+        local saveData = playdate.datastore.read()
+        if not saveData or saveData.LEVEL < self.level then
             playdate.datastore.write({ LEVEL = self.level })
         end
     end
