@@ -34,3 +34,8 @@ function Menu:AButtonDown()
     sceneManager.scenes.currentGame = Game(0)
     sceneManager:enter(sceneManager.scenes.currentGame)
 end
+
+function Menu:BButtonDown()
+  sceneManager.scenes.howto = HowTo(sceneManager)
+  sceneManager:push(sceneManager.scenes.howto)
+end
