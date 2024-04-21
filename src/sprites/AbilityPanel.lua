@@ -31,38 +31,38 @@ local buttonThreePointsShow = gmt.polygon.new(buttonThreeX, buttonHiddenY, butto
 local buttonThreePointsHide = gmt.polygon.new(buttonThreeX, buttonShownY, buttonThreeX, buttonHiddenY)
 
 function AbilityPanel:init()
-    AbilityPanel.super.init(self, imagePanel)
-    self:moveTo(0, panelHiddenY)
-    self:add()
+  AbilityPanel.super.init(self, imagePanel)
+  self:moveTo(0, panelHiddenY)
+  self:add()
 
-    spriteOne:moveTo(16, buttonHiddenY)
-    spriteOne:setZIndex(100)
-    spriteOne:add()
-    spriteTwo:moveTo(48, buttonHiddenY)
-    spriteTwo:setZIndex(100)
-    spriteTwo:add()
-    spriteThree:moveTo(80, buttonHiddenY)
-    spriteThree:setZIndex(100)
-    spriteThree:add()
+  spriteOne:moveTo(16, buttonHiddenY)
+  spriteOne:setZIndex(100)
+  spriteOne:add()
+  spriteTwo:moveTo(48, buttonHiddenY)
+  spriteTwo:setZIndex(100)
+  spriteTwo:add()
+  spriteThree:moveTo(80, buttonHiddenY)
+  spriteThree:setZIndex(100)
+  spriteThree:add()
 
-    spriteOne:setImage(self:imageForItem("right"))
-    self.abilitiesCount = 1
-    self:setZIndex(99)
+  spriteOne:setImage(self:imageForItem("right"))
+  self.abilitiesCount = 1
+  self:setZIndex(99)
 end
 
 function AbilityPanel:shake(shakeTime, shakeMagnitude)
-    local shakeTimer = pd.timer.new(shakeTime, shakeMagnitude, 0)
+  local shakeTimer = pd.timer.new(shakeTime, shakeMagnitude, 0)
 
-    shakeTimer.updateCallback = function(timer)
-        local magnitude = math.floor(timer.value)
-        local shakeX = math.random(-magnitude, magnitude)
-        local shakeY = math.random(-magnitude, magnitude)
-        self:moveTo(self.original_x + shakeX, self.original_y + shakeY)
-    end
+  shakeTimer.updateCallback = function(timer)
+    local magnitude = math.floor(timer.value)
+    local shakeX = math.random(-magnitude, magnitude)
+    local shakeY = math.random(-magnitude, magnitude)
+    self:moveTo(self.original_x + shakeX, self.original_y + shakeY)
+  end
 
-    shakeTimer.timerEndedCallback = function()
-        self:moveTo(self.original_x, self.original_y)
-    end
+  shakeTimer.timerEndedCallback = function()
+    self:moveTo(self.original_x, self.original_y)
+  end
 end
 
 function AbilityPanel:gameUpdate()
@@ -85,7 +85,7 @@ function AbilityPanel:animate(show)
     spriteThree:setAnimator(gfx.animator.new(duration, buttonThreePointsShow, easing))
   else
     local delay = 150
-    local panelPoints = gmt.polygon.new(0, panelShownY , 0, panelHiddenY)
+    local panelPoints = gmt.polygon.new(0, panelShownY, 0, panelHiddenY)
     self:setAnimator(gfx.animator.new(duration, panelPoints, easing, delay))
     spriteOne:setAnimator(gfx.animator.new(duration, buttonOnePointsHide, easing, delay))
     spriteTwo:setAnimator(gfx.animator.new(duration, buttonTwoPointsHide, easing, delay))
@@ -149,5 +149,4 @@ function AbilityPanel:removeRightMost()
   end
 
   self.abilitiesCount = self.abilitiesCount - 1;
-
 end

@@ -16,6 +16,10 @@ local STATE = {
     OnLadder = 5
 }
 
+-- debug
+local debugStateReverse = {}
+for k, state in pairs(STATE) do debugStateReverse[state] = k end
+
 KEYS = {
     [KEYNAMES.Up] = pd.kButtonUp,
     [KEYNAMES.Down] = pd.kButtonDown,
@@ -37,7 +41,7 @@ local jumpHoldTimeInTicks <const> = 4
 
 class("Player").extends(AnimatedSprite)
 
-function Player:init()
+function Player:init(entity)
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
@@ -46,11 +50,17 @@ function Player:init()
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
     self:playAnimation()
 
-
     self.state = STATE.OnGround
-    self.keys = { [1] = KEYNAMES.Right }
-    self.abilityCount = 1
     self.isDroppingItem = false
+
+    -- Setup keys array and starting keys
+    self.keys = {}
+    local startingKeys = entity.fields.type
+    for _, key in ipairs(startingKeys) do
+        table.insert(self.keys, key)
+    end
+
+    self.abilityCount = #self.keys
 end
 
 function Player:collisionResponse(other)
@@ -69,23 +79,23 @@ local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 
 function Player:dropLastItem()
-  if self.abilityCount == 1 then
-    return
-  end
+    if self.abilityCount == 1 then
+        return
+    end
 
-  self.isDroppingItem = true
-  table.remove(self.keys, self.abilityCount)
-  self.abilityCount = self.abilityCount - 1;
-  Manager.emitEvent(EVENTS.CrankDrop)
-  pd.timer.new(1500, function()
-    self.isDroppingItem = false
-  end)
+    self.isDroppingItem = true
+    table.remove(self.keys, self.abilityCount)
+    self.abilityCount = self.abilityCount - 1;
+    Manager.emitEvent(EVENTS.CrankDrop)
+    pd.timer.new(1500, function()
+        self.isDroppingItem = false
+    end)
 end
 
 function Player:update()
     local _, acceleratedChange = pd.getCrankChange()
     if acceleratedChange > 75 and not self.isDroppingItem then
-      self:dropLastItem()
+        self:dropLastItem()
     end
     -- Movement handling (update velocity X and Y)
 
@@ -155,12 +165,13 @@ function Player:update()
             end
         elseif tag == TAGS.Ability then
             Manager.emitEvent(EVENTS.Pickup, other)
+
             if self.abilityCount == 3 then
-              table.remove(self.keys, 1)
-            else
-              self.abilityCount = self.abilityCount + 1
+                table.remove(self.keys, 1)
             end
-            self.keys[self.abilityCount] = other.abilityName
+
+            table.insert(self.keys, other.abilityName)
+            self.abilityCount = #self.keys
         elseif tag == TAGS.Door then
             Manager.emitEvent(EVENTS.LevelComplete)
         end
@@ -313,11 +324,17 @@ end
 
 -- Generic gated input handler
 
+local shouldSkipKeyGate = false
 function Player:isKeyPressedGated(key)
-  for _, abilityName in ipairs(self.keys) do
-      if abilityName == key then
-        return pd.buttonIsPressed(abilityName)
-      end
-  end
-  return false
+    --debug
+    if shouldSkipKeyGate then
+        return pd.buttonIsPressed(key)
+    end
+
+    for _, abilityName in ipairs(self.keys) do
+        if abilityName == key then
+            return pd.buttonIsPressed(abilityName)
+        end
+    end
+    return false
 end

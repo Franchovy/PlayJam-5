@@ -28,10 +28,10 @@ function Game:enter(previous, ...)
     local levelName = "Level_" .. self.level
     local hintCrank = LDtk.loadAllLayersAsSprites(levelName)
     playdate.timer.new(1500, function()
-      self.hintCrank = hintCrank
-      playdate.timer.new(3000, function()
-        self.hintCrank = false
-      end)
+        self.hintCrank = hintCrank
+        playdate.timer.new(3000, function()
+            self.hintCrank = false
+        end)
     end)
 
     LDtk.loadAllEntitiesAsSprites(levelName)
@@ -52,7 +52,7 @@ function Game:update(dt)
     -- update entities
     self.abilityPanel:gameUpdate()
     if self.hintCrank then
-      playdate.ui.crankIndicator:draw()
+        playdate.ui.crankIndicator:draw()
     end
 end
 
@@ -75,7 +75,7 @@ function Game:draw()
     -- draw the level
 end
 
-local maxLevels <const> = 3
+local maxLevels <const> = 10
 
 function Game:levelComplete()
     local saveData = playdate.datastore.read()
@@ -83,14 +83,15 @@ function Game:levelComplete()
     if self.level >= maxLevels then
         self.level = 0
         goToMainMenu()
-        playdate.datastore.write({LEVEL=0})
+        playdate.datastore.write({ LEVEL = 0 })
     else
         self:cleanUp()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
-      if saveData < self.level then
-          playdate.datastore.write({LEVEL=self.level})
-      end
+
+        if saveData < self.level then
+            playdate.datastore.write({ LEVEL = self.level })
+        end
     end
 end
 
@@ -104,5 +105,5 @@ function Game:pickup(object)
 end
 
 function Game:crankDrop()
-  self.abilityPanel:removeRightMost()
+    self.abilityPanel:removeRightMost()
 end
