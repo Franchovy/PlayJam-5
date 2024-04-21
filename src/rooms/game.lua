@@ -26,7 +26,14 @@ function Game:enter(previous, ...)
 
     -- Load level
     local levelName = "Level_" .. self.level
-    self.hintCrank = LDtk.loadAllLayersAsSprites(levelName)
+    local hintCrank = LDtk.loadAllLayersAsSprites(levelName)
+    playdate.timer.new(1500, function()
+      self.hintCrank = hintCrank
+      playdate.timer.new(3000, function()
+        self.hintCrank = false
+      end)
+    end)
+
     LDtk.loadAllEntitiesAsSprites(levelName)
 
     self.abilityPanel = AbilityPanel()
@@ -45,6 +52,7 @@ function Game:update(dt)
     -- update entities
     self.abilityPanel:gameUpdate()
     if self.hintCrank then
+      playdate.ui.crankIndicator:draw()
     end
 end
 
