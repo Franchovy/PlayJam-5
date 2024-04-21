@@ -209,7 +209,7 @@ end
 -- Jump
 
 function Player:handleJumpStart()
-    if self:isJumping() then
+    if pd:buttonJustPressed(pd.kButtonA) and self:isJumping() then
         velocityY = -jumpSpeed
         jumpTimeLeftInTicks -= 1
 
