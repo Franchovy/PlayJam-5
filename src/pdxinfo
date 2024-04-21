@@ -1,7 +1,7 @@
-name=HatPack
+name=Discontrolled
 author=TeamNameHere
-description=Hat Pack is a game about... we don't know yet!
-bundleID=io.franchovy.hatpack
+description=Find your buttons in... Discontrolled!
+bundleID=io.franchovy.discontrolled
 version=0.0.1
 buildNumber=1
 imagePath=assets
