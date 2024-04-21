@@ -26,9 +26,10 @@ manager:enter(manager.scenes.menu)
 
 -- Play Music
 
-local fileplayer <const> = playdate.sound.fileplayer.new("assets/music/digit")
+SuperFilePlayer.loadFiles("assets/music/1", "assets/music/2", "assets/music/3", "assets/music/4")
+SuperFilePlayer.setPlayConfig(4, 4, 4, 4)
 
-assert(fileplayer:play(0))
+SuperFilePlayer.play()
 
 function playdate.update()
   -- Update Scenes using Scene Manager
