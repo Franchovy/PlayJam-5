@@ -60,6 +60,8 @@ local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 
 function Player:update()
+    local statePrevious = self.state
+
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X
@@ -147,22 +149,47 @@ function Player:update()
 
     -- Animation Handling
 
-    self:updateAnimationState()
+    self:updateAnimationState(self.state, statePrevious)
     self:updateAnimation()
 end
 
 -- Animation Handling
 
-function Player:updateAnimationState()
-    if self.onGround or self.onLadder then
+local flip
+
+function Player:updateAnimationState(stateCurrent, statePrevious)
+    local animationState
+
+    -- Idle/moving (on ground)
+
+    if stateCurrent == STATE.OnGround or stateCurrent == STATE.OnLadderTop then
         if math.abs(velocityX) > 0 then
-            self:changeState(ANIMATION_STATES.Moving)
+            animationState = ANIMATION_STATES.Moving
         else
-            self:changeState(ANIMATION_STATES.Idle)
+            animationState = ANIMATION_STATES.Idle
         end
-    else
-        self:changeState(ANIMATION_STATES.Jumping)
     end
+
+    -- In Air / Jumping
+
+    if stateCurrent == STATE.OnLadder then
+        animationState = ANIMATION_STATES.Idle
+    elseif stateCurrent == STATE.Jumping then
+        animationState = ANIMATION_STATES.Jumping
+    elseif stateCurrent == STATE.InAir then
+        animationState = ANIMATION_STATES.Jumping
+    end
+
+    -- Handle direction (flip)
+
+    if velocityX < 0 then
+        flip = 1
+    elseif velocityX > 0 then
+        flip = 0
+    end
+
+    self.states[animationState].flip = flip
+    self:changeState(animationState)
 end
 
 -- Movement Handlers --
