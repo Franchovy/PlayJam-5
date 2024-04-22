@@ -7,7 +7,7 @@ local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
 local forceShowPanel = false
 
-
+local fileplayer
 
 local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
@@ -68,10 +68,10 @@ function Game:update(dt)
         pd.ui.crankIndicator:draw()
     end
 
-    if self.fileplayer == nil then
+    if fileplayer == nil then
         self:setupFilePlayer()
 
-        self.fileplayer:play()
+        fileplayer:play()
     end
 end
 
@@ -87,8 +87,8 @@ function Game:leave(next, ...)
     -- Music
 
     if next.super.className == "Menu" then
-        self.fileplayer:stop()
-        self.fileplayer = nil
+        fileplayer:stop()
+        fileplayer = nil
     end
 end
 
@@ -99,18 +99,18 @@ end
 -- Fileplayer
 
 function Game:setupFilePlayer()
-    self.fileplayer = SuperFilePlayer()
+    fileplayer = SuperFilePlayer()
 
     if self.level >= 6 then
-        self.fileplayer:loadFiles("assets/music/robot-cavern/1", "assets/music/robot-cavern/2",
+        fileplayer:loadFiles("assets/music/robot-cavern/1", "assets/music/robot-cavern/2",
             "assets/music/robot-cavern/3", "assets/music/robot-cavern/4")
 
-        self.fileplayer:setPlayConfig(4, 4, 3, 2)
+        fileplayer:setPlayConfig(4, 4, 3, 2)
     else
-        self.fileplayer:loadFiles("assets/music/robot-redux/1", "assets/music/robot-redux/2",
+        fileplayer:loadFiles("assets/music/robot-redux/1", "assets/music/robot-redux/2",
             "assets/music/robot-redux/3", "assets/music/robot-redux/4")
 
-        self.fileplayer:setPlayConfig(2, 2, 3, 2)
+        fileplayer:setPlayConfig(2, 2, 3, 2)
     end
 end
 
@@ -141,9 +141,9 @@ function Game:levelComplete()
 
     if self.level == 6 and levelPrevious == 5 then
         -- Switch Music
-        self.fileplayer:stop()
+        fileplayer:stop()
 
-        self.fileplayer = nil
+        fileplayer = nil
     end
 end
 
