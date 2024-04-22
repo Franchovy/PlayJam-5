@@ -13,6 +13,10 @@ local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
+local function goToCredits()
+    sceneManager:enter(sceneManager.scenes.menu)
+end
+
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
@@ -126,16 +130,14 @@ function Game:levelComplete()
 
     if self.level >= maxLevels then
         self.level = 0
-        goToMainMenu()
+        goToCredits()
         pd.datastore.write({ LEVEL = 0 })
     else
         self:cleanUp()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
-
-        local saveData = pd.datastore.read()
-        if not saveData or saveData.LEVEL < self.level then
-            pd.datastore.write({ LEVEL = self.level })
+        if saveData < self.level then
+            playdate.datastore.write({ LEVEL = self.level })
         end
     end
 
