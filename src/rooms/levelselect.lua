@@ -8,28 +8,32 @@ local gridview = pd.ui.gridview.new(175, 42)
 gridview:setContentInset(25, 25, 10, 10)
 
 local padding = 2
+local maxLevel = 1
 
 function gridview:drawCell(_, row, column, selected, x, y, width, height)
-  gfx.setImageDrawMode(gfx.kDrawModeCopy)
-  local cellFont
-  if selected then
-    cellFont = gfx.font.kVariantBold
-    gfx.fillRoundRect(x + padding, y + padding, width - (padding * 2), height - (padding * 2), 8)
-    gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-  else
-    cellFont = gfx.font.kVariantNormal
-    gfx.drawRoundRect(x + padding, y + padding, width - (padding * 2), height - (padding * 2), 8)
-  end
-
-  local lvl = 0
+  local lvl = row
   if column == 1 then
     lvl = (row * 2) - 1
   else
     lvl = row * column
   end
 
-  local cellText = "Level " .. lvl
-  gfx.drawTextInRect(cellText, x, y + 14, width, 20, nil, nil, kTextAlignment.center, gfx.getFont(cellFont))
+  if maxLevel >= lvl then
+    gfx.setImageDrawMode(gfx.kDrawModeCopy)
+    local cellFont
+    if selected then
+      cellFont = gfx.font.kVariantBold
+      gfx.fillRoundRect(x + padding, y + padding, width - (padding * 2), height - (padding * 2), 8)
+      gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+    else
+      cellFont = gfx.font.kVariantNormal
+      gfx.drawRoundRect(x + padding, y + padding, width - (padding * 2), height - (padding * 2), 8)
+    end
+
+
+    local cellText = "Level " .. lvl
+    gfx.drawTextInRect(cellText, x, y + 14, width, 20, nil, nil, kTextAlignment.center, gfx.getFont(cellFont))
+  end
 end
 
 class("LevelSelect").extends(Room)
@@ -44,7 +48,8 @@ function LevelSelect:enter()
 
   local rows = 1
   if data then 
-    local rows = math.ceil(data.LEVEL / 2)
+    maxLevel = data.LEVEL
+    rows = math.ceil(data.LEVEL / 2)
       if rows == 0 then
         rows = 1
       end
@@ -82,7 +87,6 @@ function LevelSelect:BButtonDown()
 end
 
 function LevelSelect:AButtonDown()
-  spButton:play(1)
   local _, row, column = gridview:getSelection()
   local lvl = 0
   if column == 1 then
@@ -90,6 +94,9 @@ function LevelSelect:AButtonDown()
   else
     lvl = row * column
   end
-  sceneManager.scenes.currentGame = Game(lvl)
-  sceneManager:enter(sceneManager.scenes.currentGame)
+  if maxLevel >= lvl then
+    spButton:play(1)
+    sceneManager.scenes.currentGame = Game(lvl)
+    sceneManager:enter(sceneManager.scenes.currentGame)
+  end
 end
