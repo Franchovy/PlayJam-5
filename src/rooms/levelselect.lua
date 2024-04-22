@@ -39,20 +39,25 @@ end
 class("LevelSelect").extends(Room)
 
 local sceneManager
+local fileplayer
+
+function LevelSelect:init(menuFileplayer)
+  fileplayer = menuFileplayer
+end
 
 function LevelSelect:enter()
-  sceneManager = self.manager
+  sceneManager = Manager.getInstance()
 
   local data = playdate.datastore.read()
   gridview:setNumberOfColumns(2)
 
   local rows = 1
-  if data then 
+  if data then
     maxLevel = data.LEVEL
     rows = math.ceil(data.LEVEL / 2)
-      if rows == 0 then
-        rows = 1
-      end
+    if rows == 0 then
+      rows = 1
+    end
   end
   gridview:setNumberOfRows(rows)
 end
@@ -98,5 +103,7 @@ function LevelSelect:AButtonDown()
     spButton:play(1)
     sceneManager.scenes.currentGame = Game(lvl)
     sceneManager:enter(sceneManager.scenes.currentGame)
+
+    fileplayer:stop()
   end
 end

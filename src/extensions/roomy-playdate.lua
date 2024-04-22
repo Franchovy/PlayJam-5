@@ -22,3 +22,7 @@ function Manager.emitEvent(eventName, ...)
     assert(sceneManager)
     Manager.emit(sceneManager, eventName, ...)
 end
+
+function Manager.getInstance()
+    return sceneManager
+end

@@ -3,7 +3,7 @@ local sound <const> = playdate.sound
 
 local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
-class ("HowTo").extends(Room)
+class("HowTo").extends(Room)
 
 local storyImage = gfx.image.new("assets/images/howtoplay_story")
 local controlsImage = gfx.image.new("assets/images/howtoplay_controls")
@@ -11,16 +11,16 @@ local rulesImage = gfx.image.new("assets/images/howtoplay_rules")
 
 local spriteBackground = gfx.sprite.new(storyImage)
 
-function HowTo:init(manager)
-  self.m = manager
+function HowTo:init()
+
 end
 
 function HowTo:enter(previous, ...)
-    spriteBackground:add()
-    spriteBackground:setCenter(0, 0)
-    spriteBackground:moveTo(0, 0)
+  spriteBackground:add()
+  spriteBackground:setCenter(0, 0)
+  spriteBackground:moveTo(0, 0)
 
-    self.currentStep = 0
+  self.currentStep = 0
 end
 
 function HowTo:AButtonDown()
@@ -32,8 +32,7 @@ function HowTo:AButtonDown()
   elseif self.currentStep == 2 then
     spriteBackground:setImage(rulesImage)
   else
-    self.m:pop()
+    spriteBackground:setImage(storyImage)
+    Manager.getInstance():pop()
   end
 end
-
-

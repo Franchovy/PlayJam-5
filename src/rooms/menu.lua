@@ -12,58 +12,60 @@ local sceneManager
 local fileplayer
 
 function Menu:enter(previous, ...)
-    -- Set sceneManager reference
-    sceneManager = self.manager
+  -- Set sceneManager reference
+  sceneManager = self.manager
 
-    -- Add background image
+  -- Add background image
 
-    spriteBackground:add()
-    spriteBackground:setCenter(0, 0)
-    spriteBackground:moveTo(0, 0)
+  spriteBackground:add()
+  spriteBackground:setCenter(0, 0)
+  spriteBackground:moveTo(0, 0)
 
-    -- Music
+  -- Music
 
-    if not fileplayer then
-        fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
-    end
+  if not fileplayer then
+    fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
+  end
 
-    fileplayer:play()
+  fileplayer:play()
 end
 
 function Menu:update(dt)
-    -- print("Menu update!")
+  -- print("Menu update!")
 end
 
 function Menu:leave(next, ...)
-    -- destroy entities and cleanup resources
-    spriteBackground:remove()
+  -- destroy entities and cleanup resources
+  spriteBackground:remove()
 
-    -- Music
+  -- Music
+  if next.super.className == "Game" then
     fileplayer:stop()
+  end
 end
 
 function Menu:draw()
-    -- draw the level
+  -- draw the level
 end
 
 function Menu:AButtonDown()
-    local data = playdate.datastore.read()
-    if data then
-      sceneManager.scenes.currentGame = Game(data.LEVEL)
-    else
-      sceneManager.scenes.currentGame = Game(0)
-    end
-    spButton:play(1)
-    sceneManager:enter(sceneManager.scenes.currentGame)
+  local data = playdate.datastore.read()
+  if data then
+    sceneManager.scenes.currentGame = Game(data.LEVEL)
+  else
+    sceneManager.scenes.currentGame = Game(0)
+  end
+  spButton:play(1)
+  sceneManager:enter(sceneManager.scenes.currentGame)
 end
 
 function Menu:rightButtonDown()
   spButton:play(1)
-  sceneManager:enter(LevelSelect())
+  sceneManager:enter(LevelSelect(fileplayer))
 end
 
 function Menu:BButtonDown()
   spButton:play(1)
-  sceneManager.scenes.howto = HowTo(sceneManager)
+  sceneManager.scenes.howto = HowTo()
   sceneManager:push(sceneManager.scenes.howto)
 end
