@@ -26,6 +26,8 @@ local function restartLevel()
 end
 
 function Game:init(lvl)
+    lvl = lvl or 0
+
     self.level = lvl
 end
 
@@ -125,19 +127,30 @@ local maxLevels <const> = 10
 function Game:levelComplete()
     spWin:play(1)
 
+    local data = playdate.datastore.read()
+
     local levelPrevious = self.level
     self.level = self.level + 1
 
     if self.level >= maxLevels then
+        -- Game complete
         goToCredits()
         pd.datastore.write({ LEVEL = 0, GAMECOMPLETE = true })
     else
+        -- Level complete, next level
         self:cleanUp()
+
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
+        --[[
         local saveData = pd.datastore.read()
         if not saveData and saveData.LEVEL < self.level then
             playdate.datastore.write({ LEVEL = self.level })
+        end--]]
+
+        if data then
+            data.LEVEL = math.max(data.LEVEL or 0, math.min(self.level, maxLevels))
+            pd.datastore.write(data)
         end
     end
 

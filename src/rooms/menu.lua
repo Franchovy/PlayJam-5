@@ -52,7 +52,11 @@ function Menu:enter(previous, inFileplayer)
   -- Music
 
   if not fileplayer then
-    fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
+    if not data.GAMECOMPLETE then
+      fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
+    else
+      fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu-credits"))
+    end
   end
 
   fileplayer:play()
@@ -65,6 +69,7 @@ end
 function Menu:leave(next, ...)
   -- destroy entities and cleanup resources
   spriteBackground:remove()
+  spriteRobot:remove()
 
   -- Music
   if next.super.className == "Game" then
@@ -77,20 +82,27 @@ function Menu:draw()
 end
 
 function Menu:AButtonDown()
-  local data = playdate.datastore.read()
-  if data then
-    sceneManager.scenes.currentGame = Game(data.LEVEL)
-  else
-    sceneManager.scenes.currentGame = Game(0)
-  end
-
-  if not data.NOTFIRSTPLAYTHROUGH then
-    data.NOTFIRSTPLAYTHROUGH = true
-    pd.datastore.write(data)
-  end
-
   spButton:play(1)
-  sceneManager:enter(sceneManager.scenes.currentGame)
+
+  local data = playdate.datastore.read()
+
+  if not data then
+    data = {
+      NOTFIRSTPLAYTHROUGH = true
+    }
+
+    pd.datastore.write(data)
+
+    sceneManager:enter(HowTo(), fileplayer, true)
+  else
+    if data.LEVEL then
+      sceneManager.scenes.currentGame = Game(data.LEVEL)
+    else
+      sceneManager.scenes.currentGame = Game(0)
+    end
+
+    sceneManager:enter(sceneManager.scenes.currentGame)
+  end
 end
 
 function Menu:rightButtonDown()
@@ -106,5 +118,5 @@ end
 
 function Menu:leftButtonDown()
   spButton:play(1)
-  sceneManager:enter(GameComplete(fileplayer))
+  sceneManager:push(GameComplete(), true)
 end

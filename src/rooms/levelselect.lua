@@ -54,7 +54,7 @@ function LevelSelect:enter()
   local rows = 1
   if data then
     if data.GAMECOMPLETE then
-      maxLevel = 9
+      maxLevel = 10
     else
       maxLevel = data.LEVEL
     end
@@ -106,7 +106,7 @@ function LevelSelect:AButtonDown()
   end
   if maxLevel >= lvl then
     spButton:play(1)
-    sceneManager.scenes.currentGame = Game(lvl)
+    sceneManager.scenes.currentGame = Game(lvl - 1)
     sceneManager:enter(sceneManager.scenes.currentGame)
 
     fileplayer:stop()

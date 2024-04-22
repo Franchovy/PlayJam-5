@@ -11,11 +11,17 @@ local rulesImage = gfx.image.new("assets/images/howtoplay_rules")
 
 local spriteBackground = gfx.sprite.new(storyImage)
 
+local fileplayer
+local shouldPlayGame
+
 function HowTo:init()
 
 end
 
-function HowTo:enter(previous, ...)
+function HowTo:enter(previous, argFileplayer, argShouldPlayGame, ...)
+  shouldPlayGame = argShouldPlayGame or false
+  fileplayer = argFileplayer
+
   spriteBackground:add()
   spriteBackground:setCenter(0, 0)
   spriteBackground:moveTo(0, 0)
@@ -33,6 +39,15 @@ function HowTo:AButtonDown()
     spriteBackground:setImage(rulesImage)
   else
     spriteBackground:setImage(storyImage)
-    Manager.getInstance():pop()
+
+    if shouldPlayGame then
+      fileplayer:stop()
+
+      local sceneManager = Manager.getInstance()
+      sceneManager.scenes.currentGame = Game(0)
+      sceneManager:enter(sceneManager.scenes.currentGame)
+    else
+      Manager.getInstance():pop()
+    end
   end
 end

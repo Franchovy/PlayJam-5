@@ -13,15 +13,17 @@ local creditsSprite
 local imageCreditsSprite
 
 local showingCredits
+local fromMenu
 
-function GameComplete:enter(previous)
+function GameComplete:enter(previous, argFromMenu)
     sceneManager = self.manager
 
     showingCredits = false
 
+    fromMenu = argFromMenu or false
+
     spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
     sp = sound.sampleplayer.new("assets/sfx/ButtonSelect")
-    fileplayer = sound.fileplayer.new("assets/music/menu-credits")
     imagetableBgSprite = gfx.imagetable.new("assets/images/gamecomplete-table-400-240")
     bgSprite = AnimatedSprite.new(imagetableBgSprite)
 
@@ -29,7 +31,11 @@ function GameComplete:enter(previous)
     creditsSprite = gfx.sprite.new(imageCreditsSprite)
 
     sp:play()
-    fileplayer:play(0)
+
+    if not fromMenu then
+        fileplayer = sound.fileplayer.new("assets/music/menu-credits")
+        fileplayer:play(0)
+    end
 
     bgSprite:add()
     bgSprite:setCenter(0, 0)
@@ -53,6 +59,10 @@ function GameComplete:BButtonDown()
 
         showingCredits = true
     else
-        sceneManager:enter(sceneManager.scenes.menu, fileplayer)
+        if fromMenu then
+            Manager.getInstance():pop()
+        else
+            sceneManager:enter(sceneManager.scenes.menu, fileplayer)
+        end
     end
 end
