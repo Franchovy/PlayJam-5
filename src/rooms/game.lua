@@ -7,8 +7,7 @@ local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
 local forceShowPanel = false
 
-SuperFilePlayer.loadFiles("assets/music/1", "assets/music/2", "assets/music/3", "assets/music/4")
-SuperFilePlayer.setPlayConfig(4, 4, 2, 2)
+
 
 local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
@@ -53,11 +52,6 @@ function Game:enter(previous, ...)
     systemMenu:addMenuItem("main menu", goToMainMenu)
     systemMenu:addMenuItem("restart", restartLevel)
 
-    -- Music
-    if previous.super.className == "Menu" then
-        SuperFilePlayer.play()
-    end
-
     -- Show ability Panel (3s)
 
     self.abilityPanel:animate(true)
@@ -73,6 +67,12 @@ function Game:update(dt)
     if self.hintCrank then
         pd.ui.crankIndicator:draw()
     end
+
+    if self.fileplayer == nil then
+        self:setupFilePlayer()
+
+        self.fileplayer:play()
+    end
 end
 
 function Game:leave(next, ...)
@@ -85,8 +85,10 @@ function Game:leave(next, ...)
     sceneManager.scenes.currentGame = nil
 
     -- Music
+
     if next.super.className == "Menu" then
-        SuperFilePlayer.stop()
+        self.fileplayer:stop()
+        self.fileplayer = nil
     end
 end
 
@@ -94,11 +96,34 @@ function Game:draw()
     -- draw the level
 end
 
+-- Fileplayer
+
+function Game:setupFilePlayer()
+    self.fileplayer = SuperFilePlayer()
+
+    if self.level >= 6 then
+        self.fileplayer:loadFiles("assets/music/robot-cavern/1", "assets/music/robot-cavern/2",
+            "assets/music/robot-cavern/3", "assets/music/robot-cavern/4")
+
+        self.fileplayer:setPlayConfig(4, 4, 3, 2)
+    else
+        self.fileplayer:loadFiles("assets/music/robot-redux/1", "assets/music/robot-redux/2",
+            "assets/music/robot-redux/3", "assets/music/robot-redux/4")
+
+        self.fileplayer:setPlayConfig(2, 2, 3, 2)
+    end
+end
+
+-- Events
+
 local maxLevels <const> = 10
 
 function Game:levelComplete()
     spWin:play(1)
+
+    local levelPrevious = self.level
     self.level = self.level + 1
+
     if self.level >= maxLevels then
         self.level = 0
         goToMainMenu()
@@ -112,6 +137,13 @@ function Game:levelComplete()
         if not saveData or saveData.LEVEL < self.level then
             pd.datastore.write({ LEVEL = self.level })
         end
+    end
+
+    if self.level == 6 and levelPrevious == 5 then
+        -- Switch Music
+        self.fileplayer:stop()
+
+        self.fileplayer = nil
     end
 end
 

@@ -4,51 +4,52 @@
 
 local fileplayer <const> = playdate.sound.fileplayer
 
-SuperFilePlayer = {
-    fileplayers = {},
-    playConfig = {},
-}
+class("SuperFilePlayer").extends()
 
-local currentFilePlayer
+local function finishedCallback(self, i)
+    local nextIndex = #self.fileplayers < i + 1 and 1 or i + 1
 
-local function finishedCallback(fileplayer, i)
-    local nextIndex = #SuperFilePlayer.fileplayers < i + 1 and 1 or i + 1
-
-    currentFilePlayer = SuperFilePlayer.fileplayers[nextIndex]
-    currentFilePlayer:play(SuperFilePlayer.playConfig[i].repeatCount)
+    self.currentFilePlayer = self.fileplayers[nextIndex]
+    self.currentFilePlayer:play(self.playConfig[i].repeatCount)
 end
 
-function SuperFilePlayer.loadFiles(...)
+function SuperFilePlayer:init()
+    self.fileplayers = {}
+    self.playConfig = {}
+    self.currentFilePlayer = nil
+end
+
+function SuperFilePlayer:loadFiles(...)
     for i, path in ipairs({ ... }) do
         local fileplayer = assert(fileplayer.new(path), "No sound file found in " .. path)
-        fileplayer:setFinishCallback(finishedCallback, i)
+        fileplayer:setFinishCallback(function() finishedCallback(self, i) end)
 
-        SuperFilePlayer.fileplayers[i] = fileplayer
+        self.fileplayers[i] = fileplayer
     end
 end
 
-function SuperFilePlayer.setPlayConfig(...)
+function SuperFilePlayer:setPlayConfig(...)
     for i, repeatCount in ipairs({ ... }) do
         local config = {
             repeatCount = repeatCount
         }
 
-        SuperFilePlayer.playConfig[i] = config
+        self.playConfig[i] = config
     end
 end
 
-function SuperFilePlayer.play()
-    assert(#SuperFilePlayer.fileplayers > 0, "No files to play.")
-    assert(#SuperFilePlayer.fileplayers == #SuperFilePlayer.playConfig, "Invalid Config Files.")
+function SuperFilePlayer:play()
+    assert(#self.fileplayers > 0, "No files to play.")
+    assert(#self.fileplayers == #self.playConfig, "Invalid Config Files.")
 
-    currentFilePlayer = SuperFilePlayer.fileplayers[1]
-    currentFilePlayer:play(SuperFilePlayer.playConfig[1].repeatCount)
+    self.currentFilePlayer = self.fileplayers[1]
+    self.currentFilePlayer:play(self.playConfig[1].repeatCount)
 end
 
-function SuperFilePlayer.stop()
-    if currentFilePlayer then
-        currentFilePlayer:stopWithoutCallback()
+function SuperFilePlayer:stop()
+    if self.currentFilePlayer then
+        self.currentFilePlayer:stopWithoutCallback()
     end
 
-    currentFilePlayer = nil
+    self.currentFilePlayer = nil
 end
