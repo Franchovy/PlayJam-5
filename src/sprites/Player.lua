@@ -5,6 +5,7 @@ local gfx <const> = pd.graphics
 
 local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
+local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 
@@ -157,6 +158,10 @@ function Player:update()
         self:handleGravity()
     elseif self.state == STATE.Jumping then
         self:handleJump()
+    end
+
+    if self.state ~= STATE.OnLadder and spLadder:isPlaying() then
+      spLadder:stop()
     end
 
     -- Collision Handling
@@ -315,12 +320,18 @@ end
 
 function Player:handleUpMovement()
     if self:isMovingUp() then
+        if not spLadder:isPlaying() then
+          spLadder:play(1)
+        end
         velocityY = -maxSpeedVertical
     end
 end
 
 function Player:handleDownMovement()
     if self:isMovingDown() then
+        if not spLadder:isPlaying() then
+          spLadder:play(1)
+        end
         velocityY = maxSpeedVertical
     end
 end
