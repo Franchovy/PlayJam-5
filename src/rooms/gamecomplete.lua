@@ -6,32 +6,53 @@ class("GameComplete").extends(Room)
 local spButton
 local sp
 local fileplayer
-local imagetable
+local imagetableBgSprite
 local bgSprite
 local sceneManager
+local creditsSprite
+local imageCreditsSprite
+
+local showingCredits
 
 function GameComplete:enter(previous)
     sceneManager = self.manager
 
+    showingCredits = false
+
     spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
     sp = sound.sampleplayer.new("assets/sfx/ButtonSelect")
-    fileplayer = sound.fileplayer.new("assets/music/menu-credits.wav")
-    bgSprite = AnimatedSprite.new(imagetable)
-    imagetable = gfx.imagetable.new("assets/images/gamecomplete")
+    fileplayer = sound.fileplayer.new("assets/music/menu-credits")
+    imagetableBgSprite = gfx.imagetable.new("assets/images/gamecomplete-table-400-240")
+    bgSprite = AnimatedSprite.new(imagetableBgSprite)
+
+    imageCreditsSprite = gfx.image.new("assets/images/credits")
+    creditsSprite = gfx.sprite.new(imageCreditsSprite)
 
     sp:play()
     fileplayer:play(0)
 
     bgSprite:add()
+    bgSprite:setCenter(0, 0)
+    bgSprite:moveTo(0, 0)
     bgSprite:playAnimation()
+
+    creditsSprite:setCenter(0, 0)
+    creditsSprite:moveTo(0, 0)
 end
 
 function GameComplete:leave(next)
-
+    creditsSprite:remove()
 end
 
-function Menu:BButtonDown()
+function GameComplete:BButtonDown()
     spButton:play(1)
-    sceneManager.scenes.howto = HowTo()
-    sceneManager:push(sceneManager.scenes.howto)
+
+    if not showingCredits then
+        bgSprite:remove()
+        creditsSprite:add()
+
+        showingCredits = true
+    else
+        sceneManager:enter(sceneManager.scenes.menu, fileplayer)
+    end
 end

@@ -11,9 +11,14 @@ local spriteBackground = gfx.sprite.new(imageBackground)
 local sceneManager
 local fileplayer
 
-function Menu:enter(previous, ...)
+function Menu:enter(previous, inFileplayer)
   -- Set sceneManager reference
   sceneManager = self.manager
+
+  -- fileplayer input
+  if inFileplayer then
+    fileplayer = inFileplayer
+  end
 
   -- Add background image
 
@@ -68,4 +73,9 @@ function Menu:BButtonDown()
   spButton:play(1)
   sceneManager.scenes.howto = HowTo()
   sceneManager:push(sceneManager.scenes.howto)
+end
+
+function Menu:leftButtonDown()
+  spButton:play(1)
+  sceneManager:enter(GameComplete(fileplayer))
 end

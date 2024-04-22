@@ -31,5 +31,4 @@ function playdate.update()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
-
 end

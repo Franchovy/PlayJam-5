@@ -14,7 +14,7 @@ local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
 local function goToCredits()
-    sceneManager:enter(sceneManager.scenes.menu)
+    sceneManager:enter(GameComplete())
 end
 
 local function goToMainMenu()
@@ -90,7 +90,7 @@ function Game:leave(next, ...)
 
     -- Music
 
-    if next.super.className == "Menu" then
+    if next.super.className == "Menu" or next.super.className == "GameComplete" then
         fileplayer:stop()
         fileplayer = nil
     end
@@ -129,14 +129,14 @@ function Game:levelComplete()
     self.level = self.level + 1
 
     if self.level >= maxLevels then
-        self.level = 0
         goToCredits()
-        pd.datastore.write({ LEVEL = 0 })
+        pd.datastore.write({ LEVEL = 0, GAMECOMPLETE = true })
     else
         self:cleanUp()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
-        if saveData < self.level then
+        local saveData = pd.datastore.read()
+        if not saveData and saveData.LEVEL < self.level then
             playdate.datastore.write({ LEVEL = self.level })
         end
     end

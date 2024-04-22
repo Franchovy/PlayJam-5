@@ -53,8 +53,13 @@ function LevelSelect:enter()
 
   local rows = 1
   if data then
-    maxLevel = data.LEVEL
-    rows = math.ceil(data.LEVEL / 2)
+    if data.GAMECOMPLETE then
+      maxLevel = 9
+    else
+      maxLevel = data.LEVEL
+    end
+
+    rows = math.ceil(maxLevel / 2)
     if rows == 0 then
       rows = 1
     end
