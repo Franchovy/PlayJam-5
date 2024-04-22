@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 67,
+	"nextUid": 66,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -604,7 +604,7 @@
 			"padding": 0,
 			"tags": [],
 			"tagsSourceEnumUid": 3,
-			"enumTags": [ { "enumValueId": "Solid", "tileIds": [1,2,3,5,6,7,8,9,10,11,12,14,15,16,17,18] }, { "enumValueId": "Ladder", "tileIds": [0] } ],
+			"enumTags": [ { "enumValueId": "Solid", "tileIds": [1,2,3,5,6,7,8,9,10,11,12,14,15,16,17,18,19] }, { "enumValueId": "Ladder", "tileIds": [0] } ],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
