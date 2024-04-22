@@ -41,9 +41,13 @@ function LevelSelect:enter()
 
   local data = playdate.datastore.read()
   gridview:setNumberOfColumns(2)
-  local rows = data.LEVEL / 2
-  if rows == 0 then
-    rows = 1
+
+  local rows = 1
+  if data then 
+    local rows = math.ceil(data.LEVEL / 2)
+      if rows == 0 then
+        rows = 1
+      end
   end
   gridview:setNumberOfRows(rows)
 end
