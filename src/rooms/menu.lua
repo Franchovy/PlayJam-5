@@ -6,8 +6,10 @@ local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 class("Menu").extends(Room)
 
-local imageBackground <const> = gfx.image.new("assets/images/menu2")
-local spriteBackground = gfx.sprite.new(imageBackground)
+local imagetableBackground <const> = gfx.imagetable.new("assets/images/menu2")
+local spriteBackground
+local imagetableRobot = gfx.imagetable.new("assets/images/boseki")
+local spriteRobot
 local sceneManager
 local fileplayer
 
@@ -20,11 +22,32 @@ function Menu:enter(previous, inFileplayer)
     fileplayer = inFileplayer
   end
 
+  -- Read progress from file
+  local data = pd.datastore.read()
+  local spriteImage
+  if not data then
+    spriteImage = imagetableBackground[1]
+  elseif data.GAMECOMPLETE then
+    spriteImage = imagetableBackground[4]
+  elseif data.LEVEL then
+    spriteImage = imagetableBackground[3]
+  elseif data.NOTFIRSTPLAYTHROUGH then
+    spriteImage = imagetableBackground[2]
+  end
+
+  spriteBackground = gfx.sprite.new(spriteImage)
+  spriteRobot = AnimatedSprite.new(imagetableRobot)
+  spriteRobot:addState("placeholder-name", 5, 6, { tickStep = 2 }).asDefault()
+
   -- Add background image
 
   spriteBackground:add()
   spriteBackground:setCenter(0, 0)
   spriteBackground:moveTo(0, 0)
+
+  spriteRobot:add()
+  spriteRobot:moveTo(180, 100)
+  spriteRobot:playAnimation()
 
   -- Music
 
@@ -60,6 +83,12 @@ function Menu:AButtonDown()
   else
     sceneManager.scenes.currentGame = Game(0)
   end
+
+  if not data.NOTFIRSTPLAYTHROUGH then
+    data.NOTFIRSTPLAYTHROUGH = true
+    pd.datastore.write(data)
+  end
+
   spButton:play(1)
   sceneManager:enter(sceneManager.scenes.currentGame)
 end
