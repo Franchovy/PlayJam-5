@@ -374,9 +374,10 @@ function Player:isKeyPressedGated(key)
     for _, abilityName in ipairs(self.keys) do
         if abilityName == key then
             return pd.buttonIsPressed(abilityName)
-        elseif pd.buttonJustPressed(key) then
-          spError:play(1)
         end
+    end
+    if pd.buttonJustPressed(key) then
+        spError:play(1)
     end
     return false
 end
