@@ -1,4 +1,7 @@
 local gfx <const> = playdate.graphics
+local sound <const> = playdate.sound
+
+local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 class ("HowTo").extends(Room)
 
@@ -21,6 +24,7 @@ function HowTo:enter(previous, ...)
 end
 
 function HowTo:AButtonDown()
+  spButton:play(1)
   self.currentStep = self.currentStep + 1
 
   if self.currentStep == 1 then

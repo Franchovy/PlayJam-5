@@ -1,11 +1,18 @@
+local pd <const> = playdate
+local sound <const> = pd.sound
+
 class("Game").extends(Room)
 
 local sceneManager
-local systemMenu <const> = playdate.getSystemMenu()
+local systemMenu <const> = pd.getSystemMenu()
 local forceShowPanel = false
 
 SuperFilePlayer.loadFiles("assets/music/1", "assets/music/2", "assets/music/3", "assets/music/4")
 SuperFilePlayer.setPlayConfig(4, 4, 2, 2)
+
+local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
+local spWin = sound.sampleplayer.new("assets/sfx/Win")
+local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
@@ -33,9 +40,9 @@ function Game:enter(previous, ...)
 
     local levelName = "Level_" .. self.level
     local hintCrank = LDtk.loadAllLayersAsSprites(levelName)
-    playdate.timer.new(1500, function()
+    pd.timer.new(1500, function()
         self.hintCrank = hintCrank
-        playdate.timer.new(3000, function()
+        pd.timer.new(3000, function()
             self.hintCrank = false
         end)
     end)
@@ -55,7 +62,7 @@ function Game:enter(previous, ...)
 
     self.abilityPanel:animate(true)
     forceShowPanel = true
-    playdate.timer.performAfterDelay(3000, function()
+    pd.timer.performAfterDelay(3000, function()
         forceShowPanel = false
         self.abilityPanel:animate(false)
     end)
@@ -64,14 +71,14 @@ end
 function Game:update(dt)
     -- update entities
     if self.hintCrank then
-        playdate.ui.crankIndicator:draw()
+        pd.ui.crankIndicator:draw()
     end
 end
 
 function Game:leave(next, ...)
     -- Menu items
 
-    playdate.graphics.sprite.removeAll()
+    pd.graphics.sprite.removeAll()
     systemMenu:removeAllMenuItems()
 
     -- Remove currentGame reference from manager
@@ -90,19 +97,20 @@ end
 local maxLevels <const> = 10
 
 function Game:levelComplete()
+    spWin:play(1)
     self.level = self.level + 1
     if self.level >= maxLevels then
         self.level = 0
         goToMainMenu()
-        playdate.datastore.write({ LEVEL = 0 })
+        pd.datastore.write({ LEVEL = 0 })
     else
         self:cleanUp()
         sceneManager.scenes.currentGame = Game(self.level)
         sceneManager:enter(sceneManager.scenes.currentGame)
 
-        local saveData = playdate.datastore.read()
+        local saveData = pd.datastore.read()
         if not saveData or saveData.LEVEL < self.level then
-            playdate.datastore.write({ LEVEL = self.level })
+            pd.datastore.write({ LEVEL = self.level })
         end
     end
 end
@@ -116,11 +124,13 @@ function Game:cleanUp()
 end
 
 function Game:pickup(object)
+    spCollect:play(1)
     self.abilityPanel:addItem(object.abilityName)
     object:remove()
 end
 
 function Game:crankDrop()
+    spItemDrop:play()
     self.abilityPanel:removeRightMost()
 end
 

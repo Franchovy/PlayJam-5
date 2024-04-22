@@ -1,6 +1,11 @@
 local pd <const> = playdate
+local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
+
+local spJump = sound.sampleplayer.new("assets/sfx/Jump")
+local spError = sound.sampleplayer.new("assets/sfx/Error")
+
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 
 local ANIMATION_STATES = {
@@ -267,6 +272,7 @@ end
 
 function Player:handleJumpStart()
     if pd:buttonJustPressed(pd.kButtonA) and self:isJumping() then
+        spJump:play(1)
         velocityY = -jumpSpeed
         jumpTimeLeftInTicks -= 1
 
@@ -357,6 +363,8 @@ function Player:isKeyPressedGated(key)
     for _, abilityName in ipairs(self.keys) do
         if abilityName == key then
             return pd.buttonIsPressed(abilityName)
+        elseif pd.buttonJustPressed(key) then
+          spError:play(1)
         end
     end
     return false

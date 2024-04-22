@@ -1,5 +1,8 @@
 local pd <const> = playdate
+local sound <const> = pd.sound
 local gfx <const> = pd.graphics
+
+local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 local gridview = pd.ui.gridview.new(175, 42)
 gridview:setContentInset(25, 25, 10, 10)
@@ -50,26 +53,32 @@ function LevelSelect:update()
 end
 
 function LevelSelect:rightButtonDown()
+  spButton:play(1)
   gridview:selectNextColumn(true)
 end
 
 function LevelSelect:leftButtonDown()
+  spButton:play(1)
   gridview:selectPreviousColumn(true)
 end
 
 function LevelSelect:downButtonDown()
+  spButton:play(1)
   gridview:selectNextRow(true)
 end
 
 function LevelSelect:upButtonDown()
+  spButton:play(1)
   gridview:selectPreviousRow(true)
 end
 
 function LevelSelect:BButtonDown()
+  spButton:play(1)
   sceneManager:enter(sceneManager.scenes.menu)
 end
 
 function LevelSelect:AButtonDown()
+  spButton:play(1)
   local _, row, column = gridview:getSelection()
   local lvl = 0
   if column == 1 then

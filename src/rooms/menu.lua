@@ -1,5 +1,8 @@
 local pd <const> = playdate
+local sound <const> = pd.sound
 local gfx <const> = pd.graphics
+
+local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 class("Menu").extends(Room)
 
@@ -50,14 +53,17 @@ function Menu:AButtonDown()
     else
       sceneManager.scenes.currentGame = Game(0)
     end
+    spButton:play(1)
     sceneManager:enter(sceneManager.scenes.currentGame)
 end
 
 function Menu:rightButtonDown()
+  spButton:play(1)
   sceneManager:enter(LevelSelect())
 end
 
 function Menu:BButtonDown()
+  spButton:play(1)
   sceneManager.scenes.howto = HowTo(sceneManager)
   sceneManager:push(sceneManager.scenes.howto)
 end
