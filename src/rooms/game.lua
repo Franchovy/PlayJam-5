@@ -149,7 +149,7 @@ function Game:levelComplete()
         end--]]
 
         if data then
-            data.LEVEL = math.max(data.LEVEL or 0, math.min(self.level, maxLevels))
+            data.LEVEL = math.max(data.LEVEL or 0, math.min(self.level + 1, maxLevels))
             pd.datastore.write(data)
         end
     end

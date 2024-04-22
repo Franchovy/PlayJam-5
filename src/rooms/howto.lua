@@ -34,9 +34,9 @@ function HowTo:AButtonDown()
   self.currentStep = self.currentStep + 1
 
   if self.currentStep == 1 then
-    spriteBackground:setImage(controlsImage)
-  elseif self.currentStep == 2 then
     spriteBackground:setImage(rulesImage)
+  elseif self.currentStep == 2 then
+    spriteBackground:setImage(controlsImage)
   else
     spriteBackground:setImage(storyImage)
 

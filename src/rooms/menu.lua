@@ -52,7 +52,7 @@ function Menu:enter(previous, inFileplayer)
   -- Music
 
   if not fileplayer then
-    if not data.GAMECOMPLETE then
+    if not data or not data.GAMECOMPLETE then
       fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
     else
       fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu-credits"))
@@ -96,7 +96,7 @@ function Menu:AButtonDown()
     sceneManager:enter(HowTo(), fileplayer, true)
   else
     if data.LEVEL then
-      sceneManager.scenes.currentGame = Game(data.LEVEL)
+      sceneManager.scenes.currentGame = Game(data.LEVEL - 1)
     else
       sceneManager.scenes.currentGame = Game(0)
     end
