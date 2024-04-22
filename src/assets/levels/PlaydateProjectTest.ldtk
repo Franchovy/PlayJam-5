@@ -3137,7 +3137,10 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [96,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "A", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "A", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["B"]
+							}, {
 								"id": "V_String",
 								"params": ["A"]
 							}, {
@@ -3527,7 +3530,10 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [320,128],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "B", "Left", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["B"]
+							}, {
 								"id": "V_String",
 								"params": ["Left"]
 							}, {
