@@ -243,7 +243,7 @@ function Player:update()
     -- Camera Movement
 
     local playerX, playerY = self.x, self.y
-    local idealX, idealY = playerX - 200, playerY - 180
+    local idealX, idealY = playerX - 200, playerY - 100
 
     -- Check for horizontal bounds
     if idealX < levelX then
