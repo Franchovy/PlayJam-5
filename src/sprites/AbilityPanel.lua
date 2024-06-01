@@ -52,6 +52,11 @@ function AbilityPanel:init()
   spriteThree:setZIndex(100)
   spriteThree:add()
 
+  self:setIgnoresDrawOffset(true)
+  spriteOne:setIgnoresDrawOffset(true)
+  spriteTwo:setIgnoresDrawOffset(true)
+  spriteThree:setIgnoresDrawOffset(true)
+
   self.abilitiesCount = 1
   self:setZIndex(99)
 end
