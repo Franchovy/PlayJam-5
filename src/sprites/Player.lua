@@ -7,6 +7,15 @@ local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
 local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 
+-- Level Bounds for camera movement
+
+local levelX
+local levelY
+local levelWidth
+local levelHeight
+
+--
+
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 
 local ANIMATION_STATES = {
@@ -93,12 +102,12 @@ function Player:dropLastItem()
     end
 
     self.isDroppingItem = true
-    local removed = table.remove(self.keys, self.abilityCount)
+    local removed = table.remove(self.keys, #self.keys)
     self.abilityCount = self.abilityCount - 1;
     Manager.emitEvent(EVENTS.CrankDrop)
 
-    local dropOffPoints = gmt.polygon.new(self.x+15, self.y+15, self.x+30, self.y+240)
-    local sprite = gfx.sprite.new(gfx.image.new("assets/images/"..removed))
+    local dropOffPoints = gmt.polygon.new(self.x + 15, self.y + 15, self.x + 30, self.y + 240)
+    local sprite = gfx.sprite.new(gfx.image.new("assets/images/" .. removed))
     sprite:setZIndex(100)
     sprite:add()
     sprite:setAnimator(gfx.animator.new(800, dropOffPoints, pd.easingFunctions.inBack))
@@ -161,7 +170,7 @@ function Player:update()
     end
 
     if self.state ~= STATE.OnLadder and spLadder:isPlaying() then
-      spLadder:stop()
+        spLadder:stop()
     end
 
     -- Collision Handling
@@ -230,6 +239,35 @@ function Player:update()
 
     self:updateAnimationState(self.state)
     self:updateAnimation()
+
+    -- Camera Movement
+
+    local playerX, playerY = self.x, self.y
+    local idealX, idealY = playerX - 200, playerY - 180
+
+    -- Check for horizontal bounds
+    if idealX < levelX then
+        idealX = levelX
+    elseif idealX + 400 > levelX + levelWidth then
+        idealX = levelX + levelWidth - 400
+    end
+
+    -- Check for vertical bounds
+    if idealY < levelY then
+        idealY = levelY
+    elseif idealY + 240 > levelY + levelHeight then
+        idealY = levelY + levelHeight - 240
+    end
+
+    --> set screen offset
+    gfx.setDrawOffset(-idealX, -idealY)
+end
+
+function Player:setLevelBounds(bounds)
+    levelX = 0
+    levelY = 0
+    levelWidth = bounds.width
+    levelHeight = bounds.height
 end
 
 -- Animation Handling
@@ -321,7 +359,7 @@ end
 function Player:handleUpMovement()
     if self:isMovingUp() then
         if not spLadder:isPlaying() then
-          spLadder:play(1)
+            spLadder:play(1)
         end
         velocityY = -maxSpeedVertical
     end
@@ -330,7 +368,7 @@ end
 function Player:handleDownMovement()
     if self:isMovingDown() then
         if not spLadder:isPlaying() then
-          spLadder:play(1)
+            spLadder:play(1)
         end
         velocityY = maxSpeedVertical
     end
