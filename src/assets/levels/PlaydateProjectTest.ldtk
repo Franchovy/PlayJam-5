@@ -107,7 +107,7 @@
 				{ "value": 2, "identifier": "Ladder", "color": "#BE4A2F", "tile": null, "groupUid": 0 },
 				{ "value": 3, "identifier": "Wall2", "color": "#D77643", "tile": null, "groupUid": 0 },
 				{ "value": 4, "identifier": "Wall3", "color": "#EAD4AA", "tile": null, "groupUid": 0 },
-				{ "value": 5, "identifier": "conveyor_belt", "color": "#000AFF", "tile": null, "groupUid": 0 }
+				{ "value": 5, "identifier": "conveyor_belt", "color": "#FF0000", "tile": null, "groupUid": 0 }
 			],
 			"intGridValuesGroups": [],
 			"autoRuleGroups": [
@@ -771,7 +771,7 @@
 			"padding": 0,
 			"tags": [],
 			"tagsSourceEnumUid": 3,
-			"enumTags": [ { "enumValueId": "Solid", "tileIds": [1,2,3,6,7,8,9,10,12,13,14,16,18,19,20,21] }, { "enumValueId": "Ladder", "tileIds": [0] } ],
+			"enumTags": [ { "enumValueId": "Solid", "tileIds": [1,2,3,6,7,8,9,10,12,13,14,16,18,19,20,21] }, { "enumValueId": "Ladder", "tileIds": [0] }, { "enumValueId": "ConveyorBelt", "tileIds": [25,26,27] } ],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
@@ -780,7 +780,11 @@
 			}
 		}
 	], "enums": [
-		{ "identifier": "TileEnum", "uid": 3, "values": [ { "id": "Solid", "tileRect": null, "color": 12470831 }, { "id": "Ladder", "tileRect": null, "color": 4412119 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "TileEnum", "uid": 3, "values": [
+			{ "id": "Solid", "tileRect": null, "color": 12470831 },
+			{ "id": "Ladder", "tileRect": null, "color": 4412119 },
+			{ "id": "ConveyorBelt", "tileRect": null, "color": 15335424 }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "ObjectEnum", "uid": 37, "values": [
 			{ "id": "Left", "tileRect": null, "color": 12470831 },
 			{ "id": "Right", "tileRect": null, "color": 14120515 },

@@ -4,5 +4,6 @@ TAGS = {
     Ability = 3,
     Ladder = 4,
     Wall = 5,
-    Box = 6
+    Box = 6,
+    ConveyorBelt = 7
 }

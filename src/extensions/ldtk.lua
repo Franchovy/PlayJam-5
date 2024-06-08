@@ -14,7 +14,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
             sprite:setZIndex(layer.zIndex)
             sprite:add()
 
-            -- TODO: 2 loops? could improve ldtk code
+            -- TODO: 3 loops??? could improve ldtk code
             local solidTiles = LDtk.get_empty_tileIDs(levelName, "Solid", layerName)
             if solidTiles then
                 local stiles = gfx.sprite.addWallSprites(tilemap, solidTiles)
@@ -30,6 +30,14 @@ function LDtk.loadAllLayersAsSprites(levelName)
                     lsprite:setTag(TAGS.Ladder)
                     lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, lsprite.width,
                         lsprite.height + LADDER_TOP_ADJUSTMENT + LADDER_BOTTOM_ADJUSTMENT)
+                end
+            end
+
+            local conveyorTiles = LDtk.get_empty_tileIDs(levelName, "ConveyorBelt", layerName)
+            if conveyorTiles then
+                local conveyorSprites = gfx.sprite.addWallSprites(tilemap, conveyorTiles)
+                for _, lsprite in ipairs(conveyorSprites) do
+                    lsprite:setTag(TAGS.ConveyorBelt)
                 end
             end
         end

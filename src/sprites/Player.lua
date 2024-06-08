@@ -83,7 +83,7 @@ end
 
 function Player:collisionResponse(other)
     local tag = other:getTag()
-    if tag == TAGS.Wall then
+    if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box then
         return gfx.sprite.kCollisionTypeSlide
     else
         return gfx.sprite.kCollisionTypeOverlap
