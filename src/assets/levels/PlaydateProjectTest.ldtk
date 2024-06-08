@@ -4598,7 +4598,10 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [32,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [], "__tile": null, "defUid": 40, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Right"], "__tile": null, "defUid": 40, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
 							"__worldX": 608,
 							"__worldY": 160
 						},
