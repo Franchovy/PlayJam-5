@@ -5,6 +5,7 @@ import "playdate"
 import "extensions"
 import "rooms"
 import "sprites"
+import "vector"
 
 
 -- Set up Scene Manager (Roomy)

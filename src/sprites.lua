@@ -1,4 +1,6 @@
+import "sprites/RigidBody"
 import "sprites/Door"
 import "sprites/Player"
 import "sprites/ButtonPickup"
 import "sprites/AbilityPanel"
+import "sprites/Box"
