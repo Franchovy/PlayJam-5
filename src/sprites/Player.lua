@@ -47,11 +47,11 @@ KEYS = {
 
 local maxSpeed <const> = 4.5
 local maxSpeedVertical <const> = 3.5
-local gravity <const> = 1.6
+local gravity <const> = 2
 local maxFallSpeed <const> = 7.5
-local jumpSpeed <const> = 7.5
+local jumpSpeed <const> = 10
 local jumpSpeedReleased <const> = 3.5
-local jumpHoldTimeInTicks <const> = 4
+local jumpHoldTimeInTicks <const> = 10
 
 -- Setup
 
