@@ -45,8 +45,8 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local maxSpeed <const> = 4.5
-local maxSpeedVertical <const> = 3.5
+local maxSpeed <const> = 100
+local maxSpeedVertical <const> = 100
 local gravity <const> = 2
 local maxFallSpeed <const> = 7.5
 local jumpSpeed <const> = 10
