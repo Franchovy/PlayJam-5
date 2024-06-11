@@ -48,8 +48,8 @@ end
 function LDtk.loadAllEntitiesAsSprites(levelName)
     for _, entity in ipairs(LDtk.get_entities(levelName)) do
         if not _G[entity.name] then
-            -- error("No sprite class for entity with name: " .. entity.name)
-            goto continue
+            error("No sprite class for entity with name: " .. entity.name)
+            --goto continue
         end
 
         local sprite = _G[entity.name](entity)

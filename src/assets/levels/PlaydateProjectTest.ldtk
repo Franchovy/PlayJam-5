@@ -1301,22 +1301,6 @@
 						},
 						{
 							"__identifier": "DrillableBlock",
-							"__grid": [10,3],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#BE4A2F",
-							"iid": "e29a3de0-fec0-11ee-b86c-e785bbcf31bb",
-							"width": 32,
-							"height": 32,
-							"defUid": 67,
-							"px": [320,96],
-							"fieldInstances": [],
-							"__worldX": -448,
-							"__worldY": 64
-						},
-						{
-							"__identifier": "DrillableBlock",
 							"__grid": [10,4],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1343,12 +1327,31 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [64,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Right"], "__tile": null, "defUid": 40, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Right", "Down" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Right"]
-							}] }],
+							}, {
+								"id": "V_String",
+								"params": ["Down"]
+							} ] }],
 							"__worldX": -704,
 							"__worldY": 128
+						},
+						{
+							"__identifier": "DrillableBlock",
+							"__grid": [10,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "3ca90520-25d0-11ef-8304-73bed860f3b3",
+							"width": 32,
+							"height": 32,
+							"defUid": 67,
+							"px": [320,96],
+							"fieldInstances": [],
+							"__worldX": -448,
+							"__worldY": 64
 						}
 					]
 				},
