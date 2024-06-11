@@ -21,7 +21,8 @@ local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 local ANIMATION_STATES = {
     Idle = 1,
     Moving = 2,
-    Jumping = 3
+    Jumping = 3,
+    Drilling = 4
 }
 
 local STATE = {
@@ -29,7 +30,7 @@ local STATE = {
     Jumping = 2,
     OnGround = 3,
     OnLadderTop = 4,
-    OnLadder = 5
+    OnLadder = 5,
 }
 
 -- debug
@@ -64,10 +65,12 @@ function Player:init(entity)
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
     self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
+    self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
     self:playAnimation()
 
     self.state = STATE.OnGround
     self.isDroppingItem = false
+    self.isDrilling = false
 
     -- Setup keys array and starting keys
     self.keys = {}
@@ -83,7 +86,7 @@ end
 
 function Player:collisionResponse(other)
     local tag = other:getTag()
-    if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box then
+    if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.DrillableBlock then
         return gfx.sprite.kCollisionTypeSlide
     else
         return gfx.sprite.kCollisionTypeOverlap
@@ -119,6 +122,8 @@ function Player:dropLastItem()
     end)
 end
 
+local drillableBlockCurrentlyDrilling
+
 function Player:update()
     -- Crank
 
@@ -135,13 +140,29 @@ function Player:update()
         Manager.emitEvent(EVENTS.ShowPanel, false)
     end
 
+
+    -- Drilling
+
+    if self:isMovingDown() then
+        self.isDrilling = true
+    else
+        self.isDrilling = false
+
+        if drillableBlockCurrentlyDrilling ~= nil then
+            drillableBlockCurrentlyDrilling:release()
+            drillableBlockCurrentlyDrilling = nil
+        end
+    end
+
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X
 
     velocityX = 0
 
-    self:handleHorizontalMovement()
+    if not self.isDrilling then
+        self:handleHorizontalMovement()
+    end
 
     -- Velocity Y
 
@@ -192,6 +213,12 @@ function Player:update()
 
         if (type == kCollisionTypeSlide and normal.y == -1) then
             onGround = true
+
+            if self.isDrilling and other:getTag() == TAGS.DrillableBlock then
+                drillableBlockCurrentlyDrilling = other
+
+                drillableBlockCurrentlyDrilling:activate()
+            end
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
             local topDetectionRangeMargin = 2.5
@@ -280,7 +307,9 @@ function Player:updateAnimationState(stateCurrent)
     -- Idle/moving (on ground)
 
     if stateCurrent == STATE.OnGround or stateCurrent == STATE.OnLadderTop then
-        if math.abs(velocityX) > 0 then
+        if self.isDrilling then
+            animationState = ANIMATION_STATES.Drilling
+        elseif math.abs(velocityX) > 0 then
             animationState = ANIMATION_STATES.Moving
         else
             animationState = ANIMATION_STATES.Idle

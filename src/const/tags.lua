@@ -5,5 +5,6 @@ TAGS = {
     Ladder = 4,
     Wall = 5,
     Box = 6,
-    ConveyorBelt = 7
+    ConveyorBelt = 7,
+    DrillableBlock = 8
 }
