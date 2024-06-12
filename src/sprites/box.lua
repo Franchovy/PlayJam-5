@@ -10,4 +10,7 @@ function Box:init(entity)
 
     self:addState("n", 1, 1).asDefault()
     self:playAnimation()
+    self.g_mult = 1
+    self.inv_mass = .2
+    self.dynamic_friction = 0
 end
