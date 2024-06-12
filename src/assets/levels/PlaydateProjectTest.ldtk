@@ -4583,24 +4583,8 @@
 							"__worldY": 160
 						},
 						{
-							"__identifier": "Box",
-							"__grid": [6,1],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#AE14F4",
-							"iid": "ea8a9ed0-fec0-11ee-874c-ed3d329a7026",
-							"width": 32,
-							"height": 32,
-							"defUid": 74,
-							"px": [192,32],
-							"fieldInstances": [],
-							"__worldX": 768,
-							"__worldY": 32
-						},
-						{
 							"__identifier": "ConveyorBelt",
-							"__grid": [6,4],
+							"__grid": [6,3],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 24, "x": 96, "y": 128, "w": 32, "h": 32 },
@@ -4609,13 +4593,13 @@
 							"width": 128,
 							"height": 16,
 							"defUid": 75,
-							"px": [192,128],
+							"px": [192,96],
 							"fieldInstances": [{ "__identifier": "ConveyorDirection", "__type": "LocalEnum.ConveyorDirection", "__value": "Right", "__tile": null, "defUid": 78, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Right"]
 							}] }],
 							"__worldX": 768,
-							"__worldY": 128
+							"__worldY": 96
 						},
 						{
 							"__identifier": "Player",
@@ -4635,6 +4619,54 @@
 							}] }],
 							"__worldX": 608,
 							"__worldY": 160
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [6,1],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#AE14F4",
+							"iid": "a798cfd0-25d0-11ef-b582-a1916014e200",
+							"width": 32,
+							"height": 32,
+							"defUid": 74,
+							"px": [192,32],
+							"fieldInstances": [],
+							"__worldX": 768,
+							"__worldY": 32
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [8,1],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#AE14F4",
+							"iid": "54d0e3e0-25d0-11ef-b582-0d889effbfd2",
+							"width": 32,
+							"height": 32,
+							"defUid": 74,
+							"px": [256,32],
+							"fieldInstances": [],
+							"__worldX": 832,
+							"__worldY": 32
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [6,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#AE14F4",
+							"iid": "7ee85780-25d0-11ef-b582-33e6f19bce8e",
+							"width": 32,
+							"height": 32,
+							"defUid": 74,
+							"px": [192,64],
+							"fieldInstances": [],
+							"__worldX": 768,
+							"__worldY": 64
 						}
 					]
 				},
