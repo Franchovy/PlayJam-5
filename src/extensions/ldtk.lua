@@ -21,26 +21,6 @@ function LDtk.loadAllLayersAsSprites(levelName)
                     lsprite:setTag(TAGS.Wall)
                 end
             end
-
-            --[[ -- DEBUGGING
-            local ladderTiles = LDtk.get_empty_tileIDs(levelName, "Ladder", layerName)
-            if ladderTiles then
-                local ladderSprites = gfx.sprite.addWallSprites(tilemap, ladderTiles)
-                for _, lsprite in ipairs(ladderSprites) do
-                    lsprite:setTag(TAGS.Ladder)
-                    lsprite:setCollideRect(0, -LADDER_TOP_ADJUSTMENT, lsprite.width,
-                        lsprite.height + LADDER_TOP_ADJUSTMENT + LADDER_BOTTOM_ADJUSTMENT)
-                end
-            end
-
-            local conveyorTiles = LDtk.get_empty_tileIDs(levelName, "ConveyorBelt", layerName)
-            if conveyorTiles then
-                local conveyorSprites = gfx.sprite.addWallSprites(tilemap, conveyorTiles)
-                for _, lsprite in ipairs(conveyorSprites) do
-                    lsprite:setTag(TAGS.ConveyorBelt)
-                end
-            end
-            --]]
         end
     end
     return hintCrank
@@ -53,10 +33,14 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             --goto continue
         end
 
+        -- If Player already exists and is playing, then don't create a new player.
+        if entity.name == "Player" and Player.getInstance() then
+            goto continue
+        end
+
         local sprite = _G[entity.name](entity)
         sprite:moveTo(entity.position.x, entity.position.y)
 
-        -- another hack, oh boy
         if entity.name == "Player" then
             -- Reduce hitbox sizes
             local trimWidth, trimTop = 6, 8

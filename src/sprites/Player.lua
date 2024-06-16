@@ -7,10 +7,10 @@ local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
 local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 
--- Level Bounds for camera movement
+-- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
-local levelX
-local levelY
+local levelGX
+local levelGY
 local levelWidth
 local levelHeight
 
@@ -58,7 +58,15 @@ local jumpHoldTimeInTicks <const> = 4
 
 class("Player").extends(AnimatedSprite)
 
+-- Reference to player sprite
+
+local _instance
+
+function Player.getInstance() return _instance end
+
 function Player:init(entity)
+    _instance = self
+
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
@@ -273,28 +281,62 @@ function Player:update()
     local idealX, idealY = playerX - 200, playerY - 100
 
     -- Check for horizontal bounds
-    if idealX < levelX then
-        idealX = levelX
-    elseif idealX + 400 > levelX + levelWidth then
-        idealX = levelX + levelWidth - 400
+    if idealX < 0 then
+        idealX = 0
+    elseif idealX + 400 > 0 + levelWidth then
+        idealX = 0 + levelWidth - 400
     end
 
     -- Check for vertical bounds
-    if idealY < levelY then
-        idealY = levelY
-    elseif idealY + 240 > levelY + levelHeight then
-        idealY = levelY + levelHeight - 240
+    if idealY < 0 then
+        idealY = 0
+    elseif idealY + 240 > 0 + levelHeight then
+        idealY = 0 + levelHeight - 240
     end
 
     --> set screen offset
     gfx.setDrawOffset(-idealX, -idealY)
+
+    -- Check if player has moved into another level
+
+    local direction
+
+    if playerX > levelWidth then
+        direction = DIRECTION.RIGHT
+    elseif playerX < 0 then
+        direction = DIRECTION.LEFT
+    end
+
+    if playerY > levelHeight then
+        direction = DIRECTION.BOTTOM
+    elseif playerY < 0 then
+        direction = DIRECTION.TOP
+    end
+
+    if direction then
+        Manager.emitEvent(EVENTS.LevelComplete, { direction = direction })
+
+        self:enterLevel(direction)
+    end
 end
 
 function Player:setLevelBounds(bounds)
-    levelX = 0
-    levelY = 0
+    levelGX = bounds.width
+    levelGY = bounds.height
     levelWidth = bounds.width
     levelHeight = bounds.height
+end
+
+function Player:enterLevel(direction)
+    if direction == DIRECTION.RIGHT then
+        self:moveTo(15, self.y)
+    elseif direction == DIRECTION.LEFT then
+        self:moveTo(levelWidth - 15, self.y)
+    elseif direction == DIRECTION.BOTTOM then
+        self:moveTo(self.x, 15)
+    elseif direction == DIRECTION.TOP then
+        self:moveTo(self.x, levelHeight - 15)
+    end
 end
 
 -- Animation Handling
