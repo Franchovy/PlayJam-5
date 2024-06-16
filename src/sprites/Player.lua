@@ -335,13 +335,19 @@ function Player:enterLevel(direction, levelBounds)
 
         self:moveTo(x, y)
     elseif direction == DIRECTION.LEFT then
-        self:moveTo(levelWidth - 15, self.y)
+        local x = levelWidth - 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
     elseif direction == DIRECTION.BOTTOM then
-        local x = self.x + (levelGXPrevious - levelGX)
+        local x = self.x - (levelGX - levelGXPrevious)
         local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
 
         self:moveTo(x, y)
     elseif direction == DIRECTION.TOP then
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = levelHeight + 15
+
         self:moveTo(self.x, levelHeight - 15)
     end
 end
