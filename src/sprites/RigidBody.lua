@@ -35,30 +35,28 @@ function RigidBody:update()
       self:checkCollision(other)
     end
     local tag = other:getTag()
-    onGround = not onGround and (tag == TAGS.Wall or tag == TAGS.ConveyorBelt) and normalY == -1
+    onGround = not onGround and (tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box) and normalY == -1
 
-    if tag == TAGS.Box and normalY == -1 then -- really basic platform
-      self:moveTo(other.x, self.y)
-      return
-    elseif tag == TAGS.ConveyorBelt and normalY == -1 then
+    if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
       if not self.onBelt then-- only apply belt velocity once
         local dir = other:getDirection()
         if dir == "Right" then
-          self.velocity = self.velocity + (gmt.vector2D.new(10, 0) * _G.delta_time)
+          self.velocity = self.velocity + (gmt.vector2D.new(5, 0) * _G.delta_time)
         elseif dir == "Left" then
-          self.velocity = self.velocity + (gmt.vector2D.new(-10, 0) * _G.delta_time)
+          self.velocity = self.velocity + (gmt.vector2D.new(-5, 0) * _G.delta_time)
         end
       end
     end
   end
-  self.onBelt = beltFound
 
   local _, currentVY = self.velocity:unpack()
-
-  if not beltFound then
+  -- left belt
+  if self.onBelt and not beltFound then
     self.velocity = gmt.vector2D.new(0, currentVY)
   end
+
+  self.onBelt = beltFound
 
   -- incorporate gravity
   if (complexCollision or not onGround) and currentVY < maxFallSpeed then
@@ -70,10 +68,6 @@ function RigidBody:update()
 end
 
 function RigidBody:checkCollision(other)
-  if not other["inv_mass"] then
-    return
-  end
-
   local normal = gmt.vector2D.new(0, 0)
   local pen = 0.0
 
@@ -111,22 +105,29 @@ function RigidBody:checkCollision(other)
     pen = xOverlap
   end
 
-  self:collide(other, normal)
+  local other_inv_mass = 0
+  if other["inv_mass"] then
+    other_inv_mass = other.inv_mass
+  end
+
+  self:collide(other, normal, other_inv_mass)
 
   -- positional correction for sinking objects
-  -- local percent = 0.001
-  -- local slop = .001
-  -- local correction = normal * (math.max(pen - slop, 0 ) / (self.inv_mass + other.inv_mass) * percent)
-  -- self.pos = self.pos:addVector(-correction * self.inv_mass)
-  -- other.pos = other.pos:add(correction:multiply(other.inv_mass))
+  local percent = 0.2
+  local slop = .1
+  local correction = normal * (math.max(pen - slop, 0 ) / (self.inv_mass + other_inv_mass) * percent)
+  local newSelfPos = gmt.vector2D.new(self.x, self.y) + (-correction * self.inv_mass)
+  self:moveTo(newSelfPos.x, newSelfPos.y)
+  local newOtherPos = gmt.vector2D.new(other.x, other.y) + (correction * other_inv_mass)
+  other:moveTo(newOtherPos.x, newOtherPos.y)
 end
 
 function RigidBody:collisionResponse(_)
   return gfx.sprite.kCollisionTypeSlide
 end
 
-function RigidBody:collide(other, normal)
-  local inv_mass_sum = self.inv_mass + other.inv_mass
+function RigidBody:collide(other, normal, other_inv_mass)
+  local inv_mass_sum = self.inv_mass + other_inv_mass
 
   if inv_mass_sum == 0 then
     self.velocity = gmt.vector2D.new(0, 0)
@@ -134,7 +135,12 @@ function RigidBody:collide(other, normal)
     return;
   end
 
-  local relative_velocity = other.velocity - self.velocity
+  local relative_velocity = gmt.vector2D.new(0, 0)
+  if other["velocity"] then
+    relative_velocity = other.velocity - self.velocity
+  else
+    relative_velocity = -self.velocity
+  end
 
   -- put it in terms of the collision normal direction
   local velocity_along_normal = relative_velocity * normal
@@ -145,7 +151,10 @@ function RigidBody:collide(other, normal)
   end
 
   -- calculate restitution
-  local e = math.min(self.restitution, other.restitution)
+  local e = self.restitution
+  if other["restitution"] then
+    e = math.min(self.restitution, other.restitution)
+  end
 
   -- calculate impulse scalar
   local j = (-1 * (1 + e)) * velocity_along_normal
@@ -155,7 +164,9 @@ function RigidBody:collide(other, normal)
   local impulse = normal * j
   if j >= 1 then
     self.velocity = self.velocity - (impulse * self.inv_mass)
-    other.velocity = other.velocity - (impulse * other.inv_mass)
+    if other["velocity"] then
+      other.velocity = other.velocity - (impulse * other_inv_mass)
+    end
   end
 
   -- BEGIN FRICTION CALC
@@ -163,7 +174,11 @@ function RigidBody:collide(other, normal)
   -- Re-calculate relative velocity after normal impulse
   -- is applied (impulse from first article, this code comes
   -- directly thereafter in the same resolve function)
-  relative_velocity = other.velocity - self.velocity
+  if other["velocity"] then
+    relative_velocity = other.velocity - self.velocity
+  else
+    relative_velocity = -self.velocity
+  end
 
   -- Solve for the tangent vector
   local dot = relative_velocity * normal
@@ -184,7 +199,15 @@ function RigidBody:collide(other, normal)
 
   -- PythagoreanSolve = A^2 + B^2 = C^2, solving for C given A and B
   -- Use to approximate mu given friction coefficients of each body
-  local mu = math.sqrt((self.static_friction * self.static_friction) + (other.static_friction * other.static_friction))
+  local other_static_friction = 0
+  local other_dynamic_friction = 0
+  if other["static_friction"] then
+    other_static_friction = other.static_friction
+  end
+  if other["dynamicFriction"] then
+    other_dynamic_friction = other.dynamic_friction
+  end
+  local mu = math.sqrt((self.static_friction * self.static_friction) + (other_static_friction * other_static_friction))
 
   -- Clamp magnitude of friction and create impulse vector
   local friction_impulse = gmt.vector2D.new(0, 0)
@@ -192,11 +215,13 @@ function RigidBody:collide(other, normal)
   if math.abs(jt) < j * mu then
     friction_impulse = tangent * jt
   else
-    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) + (other.dynamic_friction * other.dynamic_friction))
+    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) + (other_dynamic_friction * other_dynamic_friction))
     friction_impulse = tangent * (-j * dynamicFriction)
   end
 
   -- Apply
   self.velocity = self.velocity - (friction_impulse * self.inv_mass)
-  other.velocity = other.velocity + (friction_impulse * other.inv_mass)
+  if other["velocity"] then
+    other.velocity = other.velocity + (friction_impulse * other_inv_mass)
+  end
 end
