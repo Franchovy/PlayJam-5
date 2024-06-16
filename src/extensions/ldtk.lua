@@ -45,9 +45,6 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             -- Reduce hitbox sizes
             local trimWidth, trimTop = 6, 8
             sprite:setCollideRect(trimWidth, trimTop, sprite.width - trimWidth * 2, sprite.height - trimTop)
-
-            -- Pass level data to player (for camera movement)
-            sprite:setLevelBounds(LDtk.get_rect(levelName))
         else
             sprite:setCollideRect(0, 0, entity.size.width, entity.size.height)
         end

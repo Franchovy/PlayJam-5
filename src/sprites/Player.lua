@@ -315,25 +315,32 @@ function Player:update()
 
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete, { direction = direction })
-
-        self:enterLevel(direction)
     end
 end
 
-function Player:setLevelBounds(bounds)
-    levelGX = bounds.width
-    levelGY = bounds.height
-    levelWidth = bounds.width
-    levelHeight = bounds.height
-end
+function Player:enterLevel(direction, levelBounds)
+    local levelGXPrevious = levelGX
+    local levelGYPrevious = levelGY
+    local levelWidthPrevious = levelWidth
+    local levelHeightPrevious = levelHeight
 
-function Player:enterLevel(direction)
+    levelGX = levelBounds.x
+    levelGY = levelBounds.y
+    levelWidth = levelBounds.width
+    levelHeight = levelBounds.height
+
     if direction == DIRECTION.RIGHT then
-        self:moveTo(15, self.y)
+        local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
     elseif direction == DIRECTION.LEFT then
         self:moveTo(levelWidth - 15, self.y)
     elseif direction == DIRECTION.BOTTOM then
-        self:moveTo(self.x, 15)
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
+
+        self:moveTo(x, y)
     elseif direction == DIRECTION.TOP then
         self:moveTo(self.x, levelHeight - 15)
     end

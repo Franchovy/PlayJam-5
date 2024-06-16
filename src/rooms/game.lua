@@ -28,7 +28,13 @@ end
 
 function Game:init() end
 
-function Game:enter(previous, nextLevelName)
+function Game:enter(previous, data)
+    data = data or {}
+    local direction = data.direction
+    local nextLevelName = data.nextLevelName
+
+    -- This should run only once to initialize the game instance.
+
     if not self.isInitialized then
         self.isInitialized = true
 
@@ -64,6 +70,9 @@ function Game:enter(previous, nextLevelName)
     local player = Player.getInstance()
     if player ~= nil then
         player:add()
+
+        local levelBounds = LDtk.get_rect(currentLevelName)
+        player:enterLevel(direction, levelBounds)
     end
 
     -- Show ability Panel (3s)
@@ -134,7 +143,7 @@ function Game:levelComplete(data)
     -- For now, just get the first neightbor. For handling multiple neighbors we'll have to do a coordinates check.
     local nextLevel = neighbors[1]
 
-    sceneManager:enter(sceneManager.scenes.currentGame, nextLevel)
+    sceneManager:enter(sceneManager.scenes.currentGame, { direction = direction, nextLevelName = nextLevel })
 end
 
 function Game:loadItems(item1, item2, item3)
