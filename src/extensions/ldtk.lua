@@ -2,7 +2,7 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 -- Add all layers as tilemaps
 
-function LDtk.loadAllLayersAsSprites(levelName)
+function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
     local hintCrank = LDtk.get_custom_data(levelName, "HintCrank")
     for layerName, layer in pairs(LDtk.get_layers(levelName)) do
         if layer.tiles then
@@ -10,7 +10,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
             local sprite = gfx.sprite.new()
             sprite:setTilemap(tilemap)
             sprite:setCenter(0, 0)
-            sprite:moveTo(0, 0)
+            sprite:moveTo(0, 0) -- sprite:moveTo(levelX, levelY)
             sprite:setZIndex(layer.zIndex)
             sprite:add()
 
@@ -19,6 +19,7 @@ function LDtk.loadAllLayersAsSprites(levelName)
                 local stiles = gfx.sprite.addWallSprites(tilemap, solidTiles)
                 for _, lsprite in ipairs(stiles) do
                     lsprite:setTag(TAGS.Wall)
+                    -- lsprite:moveBy(levelX, levelY)
                 end
             end
         end

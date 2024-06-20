@@ -31,7 +31,7 @@ function Game:init() end
 function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
-    local nextLevelName = data.nextLevelName
+    local nextLevel = data.nextLevel
 
     -- This should run only once to initialize the game instance.
 
@@ -53,11 +53,28 @@ function Game:enter(previous, data)
         systemMenu:addMenuItem("restart", restartLevel)
     end
 
-    -- Load level
+    -- Load level --
 
-    currentLevelName = nextLevelName or initialLevelName
+    currentLevelName = nextLevel and nextLevel.name or initialLevelName
+    local levelBounds = nextLevel and nextLevel.bounds or LDtk.get_rect(currentLevelName)
 
-    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
+    -- Get level bounds
+
+    local levelX, levelY
+
+    if levelBounds.width < 400 then
+        levelX = (400 - levelBounds.width) / 2
+    else
+        levelX = 0
+    end
+
+    if levelBounds.height < 240 then
+        levelY = (240 - levelBounds.height) / 2
+    else
+        levelY = 0
+    end
+
+    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName, levelX, levelY)
     pd.timer.new(1500, function()
         self.hintCrank = hintCrank
         pd.timer.new(3000, function()
@@ -71,7 +88,6 @@ function Game:enter(previous, data)
     if player ~= nil then
         player:add()
 
-        local levelBounds = LDtk.get_rect(currentLevelName)
         player:enterLevel(direction, levelBounds)
     end
 
@@ -133,17 +149,31 @@ local maxLevels <const> = 10
 
 function Game:levelComplete(data)
     local direction = data.direction
+    local coordinates = data.coordinates
 
     spWin:play(1)
 
     -- Load next level
 
+    function getNeighborLevelForPos(neighbors, position)
+        assert(#neighbors > 0)
+
+        for _, levelName in pairs(neighbors) do
+            local levelBounds = LDtk.get_rect(levelName)
+            if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
+                levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
+                return levelName, levelBounds
+            end
+        end
+    end
+
     local neighbors = LDtk.get_neighbours(currentLevelName, direction)
 
     -- For now, just get the first neightbor. For handling multiple neighbors we'll have to do a coordinates check.
-    local nextLevel = neighbors[1]
+    local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
 
-    sceneManager:enter(sceneManager.scenes.currentGame, { direction = direction, nextLevelName = nextLevel })
+    sceneManager:enter(sceneManager.scenes.currentGame,
+        { direction = direction, nextLevel = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
 function Game:loadItems(item1, item2, item3)

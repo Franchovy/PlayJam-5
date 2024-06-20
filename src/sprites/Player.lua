@@ -314,7 +314,8 @@ function Player:update()
     end
 
     if direction then
-        Manager.emitEvent(EVENTS.LevelComplete, { direction = direction })
+        Manager.emitEvent(EVENTS.LevelComplete,
+            { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
 end
 
