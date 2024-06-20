@@ -6,7 +6,6 @@ class("Game").extends(Room)
 
 local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
-local forceShowPanel = false
 
 local fileplayer
 
@@ -76,10 +75,10 @@ function Game:enter(previous, data)
         player:enterLevel(direction, levelBounds)
     end
 
-    -- Show ability Panel (3s)
-
-    self.abilityPanel:animate(true)
-    forceShowPanel = true
+    local abilityPanel = AbilityPanel.getInstance()
+    if abilityPanel then
+        abilityPanel:add()
+    end
 end
 
 function Game:update()
@@ -102,7 +101,7 @@ function Game:leave(next, ...)
 
     --
 
-    if next.super.className == "Menu" or next.super.className == "GameComplete" then
+    if next.super.className == "Menu" then
         -- Remove system/PD menu items
 
         systemMenu:removeAllMenuItems()
@@ -176,12 +175,4 @@ end
 function Game:crankDrop()
     spItemDrop:play()
     self.abilityPanel:removeRightMost()
-end
-
-function Game:showPanel(isShowing)
-    if forceShowPanel then
-        return
-    end
-
-    self.abilityPanel:animate(isShowing)
 end

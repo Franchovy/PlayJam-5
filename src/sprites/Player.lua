@@ -63,7 +63,7 @@ local jumpHoldTimeInTicks <const> = 4
 
 class("Player").extends(AnimatedSprite)
 
--- Reference to player sprite
+-- Static Reference
 
 local _instance
 
@@ -87,7 +87,7 @@ function Player:init(entity)
 
     -- Setup keys array and starting keys
     self.keys = {}
-    local startingKeys = entity.fields.type
+    local startingKeys = entity.fields.blueprints
     for _, key in ipairs(startingKeys) do
         table.insert(self.keys, key)
     end
@@ -287,23 +287,13 @@ function Player:update()
     local playerX, playerY = self.x, self.y
     local idealX, idealY = playerX - 200, playerY - 100
 
-    -- Check for horizontal bounds
-    if idealX < 0 then
-        idealX = 0
-    elseif idealX + 400 > 0 + levelWidth then
-        idealX = 0 + levelWidth - 400
-    end
+    -- Positon camera within level bounds
 
-    -- Check for vertical bounds
-    if idealY < 0 then
-        idealY = 0
-    elseif idealY + 240 > 0 + levelHeight then
-        idealY = 0 + levelHeight - 240
-    end
+    local cameraOffsetX = math.max(math.min(idealX, levelWidth - 400), 0)
+    local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
 
-    --> set screen offset
-
-    gfx.setDrawOffset(-idealX + levelOffsetX, -idealY + levelOffsetY)
+    gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+    --gfx.setDrawOffset(-cameraOffsetX, -cameraOffsetY)
 
     -- Check if player has moved into another level
 

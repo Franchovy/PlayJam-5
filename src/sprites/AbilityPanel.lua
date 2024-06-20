@@ -37,18 +37,29 @@ local buttonThreeX <const> = 80
 local buttonThreePointsShow = gmt.polygon.new(buttonThreeX, buttonHiddenY, buttonThreeX, buttonShownY)
 local buttonThreePointsHide = gmt.polygon.new(buttonThreeX, buttonShownY, buttonThreeX, buttonHiddenY)
 
+-- Static Reference
+
+local _instance
+
+function AbilityPanel.getInstance() return _instance end
+
+--
+
 function AbilityPanel:init()
   AbilityPanel.super.init(self, imagePanel)
-  self:moveTo(0, panelHiddenY)
+
+  _instance = self
+
+  self:moveTo(0, panelShownY)
   self:add()
 
-  spriteOne:moveTo(16, buttonHiddenY)
+  spriteOne:moveTo(16, buttonShownY)
   spriteOne:setZIndex(100)
   spriteOne:add()
-  spriteTwo:moveTo(48, buttonHiddenY)
+  spriteTwo:moveTo(48, buttonShownY)
   spriteTwo:setZIndex(100)
   spriteTwo:add()
-  spriteThree:moveTo(80, buttonHiddenY)
+  spriteThree:moveTo(80, buttonShownY)
   spriteThree:setZIndex(100)
   spriteThree:add()
 
@@ -59,6 +70,15 @@ function AbilityPanel:init()
 
   self.abilitiesCount = 1
   self:setZIndex(99)
+end
+
+local _spriteAdd = AbilityPanel.add
+function AbilityPanel:add()
+  _spriteAdd(self)
+
+  spriteOne:add()
+  spriteTwo:add()
+  spriteThree:add()
 end
 
 function AbilityPanel:shake(shakeTime, shakeMagnitude)
@@ -73,33 +93,6 @@ function AbilityPanel:shake(shakeTime, shakeMagnitude)
 
   shakeTimer.timerEndedCallback = function()
     self:moveTo(self.original_x, self.original_y)
-  end
-end
-
-local isShowing = false
-function AbilityPanel:animate(show)
-  if isShowing == show then
-    return
-  end
-
-  isShowing = show
-
-  local easing = pd.easingFunctions.inBack
-  local duration = 250
-
-  if show then
-    local panelPoints = gmt.polygon.new(0, panelHiddenY, 0, panelShownY)
-    self:setAnimator(gfx.animator.new(duration, panelPoints, easing))
-    spriteOne:setAnimator(gfx.animator.new(duration, buttonOnePointsShow, easing))
-    spriteTwo:setAnimator(gfx.animator.new(duration, buttonTwoPointsShow, easing))
-    spriteThree:setAnimator(gfx.animator.new(duration, buttonThreePointsShow, easing))
-  else
-    local delay = 150
-    local panelPoints = gmt.polygon.new(0, panelShownY, 0, panelHiddenY)
-    self:setAnimator(gfx.animator.new(duration, panelPoints, easing, delay))
-    spriteOne:setAnimator(gfx.animator.new(duration, buttonOnePointsHide, easing, delay))
-    spriteTwo:setAnimator(gfx.animator.new(duration, buttonTwoPointsHide, easing, delay))
-    spriteThree:setAnimator(gfx.animator.new(duration, buttonThreePointsHide, easing, delay))
   end
 end
 
