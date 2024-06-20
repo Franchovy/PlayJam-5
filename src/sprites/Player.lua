@@ -246,7 +246,9 @@ function Player:update()
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
         elseif tag == TAGS.Ability then
-            Manager.emitEvent(EVENTS.Pickup, other)
+            other:pickUp()
+
+            Manager.emitEvent(EVENTS.Pickup, other.abilityName)
 
             if self.abilityCount == 3 then
                 table.remove(self.keys, 1)

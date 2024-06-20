@@ -169,10 +169,9 @@ function Game:cleanUp()
     self.abilityPanel:cleanUp()
 end
 
-function Game:pickup(object)
+function Game:pickup(ability)
     spCollect:play(1)
-    self.abilityPanel:addItem(object.abilityName)
-    object:remove()
+    self.abilityPanel:addItem(ability)
 end
 
 function Game:crankDrop()
