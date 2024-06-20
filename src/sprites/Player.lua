@@ -97,6 +97,57 @@ function Player:init(entity)
     Manager.emitEvent(EVENTS.LoadItems, table.unpack(startingKeys))
 end
 
+-- Enter Level
+
+function Player:enterLevel(direction, levelBounds)
+    local levelGXPrevious = levelGX
+    local levelGYPrevious = levelGY
+    local levelWidthPrevious = levelWidth
+    local levelHeightPrevious = levelHeight
+
+    -- Set persisted variables
+
+    levelGX = levelBounds.x
+    levelGY = levelBounds.y
+    levelWidth = levelBounds.width
+    levelHeight = levelBounds.height
+
+    -- Set level draw offset
+
+    levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
+    levelOffsetY = levelHeight < 240 and (240 - levelBounds.height) / 2 or 0
+
+    -- Position player based on direction of entry
+
+    if direction == DIRECTION.RIGHT then
+        local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.LEFT then
+        local x = levelWidth - 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.BOTTOM then
+        local x = self.x - (levelGX - levelGXPrevious)
+        local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.TOP then
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = levelHeight + 15
+
+        self:moveTo(self.x, levelHeight - 15)
+    end
+end
+
+function Player:setBlueprints(blueprints)
+    self.keys = blueprints
+end
+
+-- Collision Response
+
 function Player:collisionResponse(other)
     local tag = other:getTag()
     if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.DrillableBlock then
@@ -256,8 +307,8 @@ function Player:update()
 
             table.insert(self.keys, other.abilityName)
             self.abilityCount = #self.keys
-        elseif tag == TAGS.Door then
-            Manager.emitEvent(EVENTS.LevelComplete)
+        elseif tag == TAGS.Checkpoint then
+            Manager.emitEvent(EVENTS.Checkpoint, other)
         end
     end
 
@@ -314,49 +365,6 @@ function Player:update()
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
-    end
-end
-
-function Player:enterLevel(direction, levelBounds)
-    local levelGXPrevious = levelGX
-    local levelGYPrevious = levelGY
-    local levelWidthPrevious = levelWidth
-    local levelHeightPrevious = levelHeight
-
-    -- Set persisted variables
-
-    levelGX = levelBounds.x
-    levelGY = levelBounds.y
-    levelWidth = levelBounds.width
-    levelHeight = levelBounds.height
-
-    -- Set level draw offset
-
-    levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
-    levelOffsetY = levelHeight < 240 and (240 - levelBounds.height) / 2 or 0
-
-    -- Position player based on direction of entry
-
-    if direction == DIRECTION.RIGHT then
-        local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
-        local y = self.y + (levelGYPrevious - levelGY)
-
-        self:moveTo(x, y)
-    elseif direction == DIRECTION.LEFT then
-        local x = levelWidth - 15
-        local y = self.y + (levelGYPrevious - levelGY)
-
-        self:moveTo(x, y)
-    elseif direction == DIRECTION.BOTTOM then
-        local x = self.x - (levelGX - levelGXPrevious)
-        local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
-
-        self:moveTo(x, y)
-    elseif direction == DIRECTION.TOP then
-        local x = self.x + (levelGXPrevious - levelGX)
-        local y = levelHeight + 15
-
-        self:moveTo(self.x, levelHeight - 15)
     end
 end
 

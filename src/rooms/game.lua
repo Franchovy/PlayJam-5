@@ -16,13 +16,25 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 -- LDtk current level name
 local initialLevelName <const> = "Level_0"
 local currentLevelName
+local checkpointPlayerStart
 
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
 
 local function restartLevel()
-    sceneManager:enter(sceneManager.scenes.currentGame)
+    local level, checkpoint
+
+    local spriteCheckpoint = Checkpoint.getLatestCheckpoint()
+    if spriteCheckpoint then
+        level = { name = spriteCheckpoint.levelName }
+        checkpoint = spriteCheckpoint
+    else
+        level = initialLevelName
+        checkpoint = checkpointPlayerStart
+    end
+
+    sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
 end
 
 function Game:init() end
@@ -30,7 +42,8 @@ function Game:init() end
 function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
-    local nextLevel = data.nextLevel
+    local level = data.level
+    local checkpoint = data.checkpoint
 
     -- This should run only once to initialize the game instance.
 
@@ -54,8 +67,8 @@ function Game:enter(previous, data)
 
     -- Load level --
 
-    currentLevelName = nextLevel and nextLevel.name or initialLevelName
-    local levelBounds = nextLevel and nextLevel.bounds or LDtk.get_rect(currentLevelName)
+    currentLevelName = level and level.name or initialLevelName
+    local levelBounds = level and level.bounds or LDtk.get_rect(currentLevelName)
 
     local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
 
@@ -69,15 +82,34 @@ function Game:enter(previous, data)
     LDtk.loadAllEntitiesAsSprites(currentLevelName)
 
     local player = Player.getInstance()
-    if player ~= nil then
+
+    if not checkpointPlayerStart then
+        checkpointPlayerStart = {
+            x = player.x,
+            y = player.y,
+            blueprints = table.deepcopy(player.keys)
+        }
+    end
+
+    if player then
         player:add()
+
+        if checkpoint then
+            player:setBlueprints(checkpoint.blueprints)
+            player:moveTo(checkpoint.x, checkpoint.y)
+        end
 
         player:enterLevel(direction, levelBounds)
     end
 
     local abilityPanel = AbilityPanel.getInstance()
+
     if abilityPanel then
         abilityPanel:add()
+
+        if checkpoint then
+            abilityPanel:setItems(table.unpack(checkpoint.blueprints))
+        end
     end
 end
 
@@ -156,7 +188,7 @@ function Game:levelComplete(data)
     local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
 
     sceneManager:enter(sceneManager.scenes.currentGame,
-        { direction = direction, nextLevel = { name = nextLevel, bounds = nextLevelBounds } })
+        { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
 function Game:loadItems(item1, item2, item3)
@@ -175,4 +207,8 @@ end
 function Game:crankDrop()
     spItemDrop:play()
     self.abilityPanel:removeRightMost()
+end
+
+function Game:checkpoint(spriteCheckpoint)
+    spriteCheckpoint:activate(currentLevelName)
 end

@@ -39,7 +39,7 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             goto continue
         end
 
-        -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. drillableBlock, buttonPickup)
+        -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. DrillableBlock, ButtonPickup)
         if entity.fields.consumed == true then
             goto continue
         end

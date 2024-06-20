@@ -4,5 +4,6 @@ EVENTS = {
     Pickup = 'pickup',
     CrankDrop = 'crankDrop',
     LoadItems = 'loadItems',
-    ShowPanel = 'showPanel'
+    ShowPanel = 'showPanel',
+    Checkpoint = 'checkpoint'
 }
