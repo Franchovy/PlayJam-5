@@ -58,23 +58,8 @@ function Game:enter(previous, data)
     currentLevelName = nextLevel and nextLevel.name or initialLevelName
     local levelBounds = nextLevel and nextLevel.bounds or LDtk.get_rect(currentLevelName)
 
-    -- Get level bounds
+    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
 
-    local levelX, levelY
-
-    if levelBounds.width < 400 then
-        levelX = (400 - levelBounds.width) / 2
-    else
-        levelX = 0
-    end
-
-    if levelBounds.height < 240 then
-        levelY = (240 - levelBounds.height) / 2
-    else
-        levelY = 0
-    end
-
-    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName, levelX, levelY)
     pd.timer.new(1500, function()
         self.hintCrank = hintCrank
         pd.timer.new(3000, function()

@@ -25,6 +25,8 @@ manager.scenes = {
 
 manager:enter(manager.scenes.menu)
 
+playdate.graphics.setBackgroundColor(0)
+
 function playdate.update()
   -- Update sprites
   playdate.graphics.sprite.update()

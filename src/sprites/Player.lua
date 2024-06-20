@@ -14,6 +14,11 @@ local levelGY
 local levelWidth
 local levelHeight
 
+-- Level offset for drawing levels smaller than screen size
+
+local levelOffsetX
+local levelOffsetY
+
 --
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
@@ -295,7 +300,8 @@ function Player:update()
     end
 
     --> set screen offset
-    gfx.setDrawOffset(-idealX, -idealY)
+
+    gfx.setDrawOffset(-idealX + levelOffsetX, -idealY + levelOffsetY)
 
     -- Check if player has moved into another level
 
@@ -325,10 +331,19 @@ function Player:enterLevel(direction, levelBounds)
     local levelWidthPrevious = levelWidth
     local levelHeightPrevious = levelHeight
 
+    -- Set persisted variables
+
     levelGX = levelBounds.x
     levelGY = levelBounds.y
     levelWidth = levelBounds.width
     levelHeight = levelBounds.height
+
+    -- Set level draw offset
+
+    levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
+    levelOffsetY = levelHeight < 240 and (240 - levelBounds.height) / 2 or 0
+
+    -- Position player based on direction of entry
 
     if direction == DIRECTION.RIGHT then
         local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15

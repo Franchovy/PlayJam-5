@@ -10,7 +10,7 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
             local sprite = gfx.sprite.new()
             sprite:setTilemap(tilemap)
             sprite:setCenter(0, 0)
-            sprite:moveTo(0, 0) -- sprite:moveTo(levelX, levelY)
+            sprite:moveTo(0, 0)
             sprite:setZIndex(layer.zIndex)
             sprite:add()
 
@@ -19,7 +19,6 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
                 local stiles = gfx.sprite.addWallSprites(tilemap, solidTiles)
                 for _, lsprite in ipairs(stiles) do
                     lsprite:setTag(TAGS.Wall)
-                    -- lsprite:moveBy(levelX, levelY)
                 end
             end
         end
@@ -30,8 +29,9 @@ end
 function LDtk.loadAllEntitiesAsSprites(levelName)
     for _, entity in ipairs(LDtk.get_entities(levelName)) do
         if not _G[entity.name] then
-            error("No sprite class for entity with name: " .. entity.name)
-            --goto continue
+            print("WARNING: No sprite class for entity with name: " .. entity.name)
+
+            goto continue
         end
 
         -- If Player already exists and is playing, then don't create a new player.
