@@ -1,18 +1,23 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
-class("ConveyorBelt").extends(gfx.sprite)
+class("ConveyorBelt").extends(RigidBody)
 
 local width <const> = 32
 
 function ConveyorBelt:init(entity)
+  local imageTable = gfx.imagetable.new("assets/images/conveyorbelt")
+  ConveyorBelt.super.init(self, entity, imageTable)
+
+  self.g_mult = 0
+  self.inv_mass = 0
+  self.dynamic_friction = 0
+
   self:setTag(TAGS.ConveyorBelt)
   self.fields = table.deepcopy(entity.fields)
   self.direction = self.fields.ConveyorDirection
+  self.restitution = .3
 
-  ConveyorBelt.super.init(self)
-
-  local imageTable = gfx.imagetable.new("assets/images/conveyorbelt")
   local tilemap = gfx.tilemap.new()
   tilemap:setImageTable(imageTable)
 
@@ -31,3 +36,6 @@ function ConveyorBelt:init(entity)
   self:setTilemap(tilemap);
 end
 
+function ConveyorBelt:getDirection()
+  return self.direction;
+end

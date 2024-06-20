@@ -5,7 +5,6 @@ import "playdate"
 import "extensions"
 import "rooms"
 import "sprites"
-import "vector"
 
 -- Playdate config
 
@@ -32,7 +31,17 @@ manager.scenes = {
 
 manager:enter(manager.scenes.menu)
 
+local last_time = 0
+
+local function updateDeltaTime()
+  local current_time = playdate.getCurrentTimeMilliseconds();
+  _G.delta_time = (current_time - last_time)/100;
+  last_time = current_time;
+end
+
 function playdate.update()
+  updateDeltaTime();
+
   -- Update sprites
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()

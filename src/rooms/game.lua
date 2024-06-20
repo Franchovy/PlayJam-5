@@ -82,7 +82,7 @@ function Game:enter(previous, data)
     forceShowPanel = true
 end
 
-function Game:update(dt)
+function Game:update()
     -- update entities
     if self.hintCrank then
         pd.ui.crankIndicator:draw()

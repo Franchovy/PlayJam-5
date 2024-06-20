@@ -210,7 +210,7 @@ function Player:update()
     -- Collision Handling
 
     local targetX, targetY = self.x + velocityX, self.y + velocityY
-    local actualX, actualY, collisions, length = self:checkCollisions(targetX, targetY)
+    local actualX, actualY, collisions = self:checkCollisions(targetX, targetY)
 
     local onGround = false
     local onLadder = false
