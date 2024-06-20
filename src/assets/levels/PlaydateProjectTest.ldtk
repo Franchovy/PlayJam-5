@@ -1859,38 +1859,6 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "DrillableBlock",
-							"__grid": [8,5],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#BE4A2F",
-							"iid": "09d521d0-25d0-11ef-82ca-d7b8a090367e",
-							"width": 32,
-							"height": 32,
-							"defUid": 67,
-							"px": [256,160],
-							"fieldInstances": [],
-							"__worldX": 672,
-							"__worldY": -672
-						},
-						{
-							"__identifier": "DrillableBlock",
-							"__grid": [7,5],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#BE4A2F",
-							"iid": "0b4af8f0-25d0-11ef-82ca-b3e824533551",
-							"width": 32,
-							"height": 32,
-							"defUid": 67,
-							"px": [224,160],
-							"fieldInstances": [],
-							"__worldX": 640,
-							"__worldY": -672
-						},
-						{
 							"__identifier": "ButtonPickup",
 							"__grid": [6,4],
 							"__pivot": [0,0],
@@ -1932,6 +1900,22 @@
 								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
 							],
 							"__worldX": 704,
+							"__worldY": -640
+						},
+						{
+							"__identifier": "DrillableBlock",
+							"__grid": [8,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "59410920-25d0-11ef-82ca-f57b4e97039d",
+							"width": 32,
+							"height": 32,
+							"defUid": 67,
+							"px": [256,192],
+							"fieldInstances": [],
+							"__worldX": 672,
 							"__worldY": -640
 						}
 					]

@@ -7,6 +7,13 @@ import "rooms"
 import "sprites"
 import "vector"
 
+-- Playdate config
+
+local fontDefault = playdate.graphics.font.new("assets/fonts/m42.TTF-7")
+playdate.graphics.setFont(fontDefault)
+
+playdate.graphics.setBackgroundColor(0)
+playdate.graphics.clear(0)
 
 -- Set up Scene Manager (Roomy)
 
@@ -24,8 +31,6 @@ manager.scenes = {
 }
 
 manager:enter(manager.scenes.menu)
-
-playdate.graphics.setBackgroundColor(0)
 
 function playdate.update()
   -- Update sprites
