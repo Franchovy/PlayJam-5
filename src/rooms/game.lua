@@ -122,10 +122,9 @@ end
 function Game:setupFilePlayer()
     fileplayer = SuperFilePlayer()
 
-    fileplayer:loadFiles("assets/music/robot-cavern/1", "assets/music/robot-cavern/2",
-        "assets/music/robot-cavern/3", "assets/music/robot-cavern/4")
+    fileplayer:loadFiles("assets/music/01_Mine")
 
-    fileplayer:setPlayConfig(4, 4, 3, 2)
+    fileplayer:setPlayConfig(1)
 end
 
 -- Events

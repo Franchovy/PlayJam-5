@@ -35,7 +35,7 @@ local last_time = 0
 
 local function updateDeltaTime()
   local current_time = playdate.getCurrentTimeMilliseconds();
-  _G.delta_time = (current_time - last_time)/100;
+  _G.delta_time = (current_time - last_time) / 100;
   last_time = current_time;
 end
 
@@ -45,6 +45,7 @@ function playdate.update()
   -- Update sprites
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
+  playdate.graphics.animation.blinker.updateAll()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)

@@ -14,6 +14,9 @@ local spritePressStart
 local sceneManager
 local fileplayer
 
+local timerTitleAnimation
+local blinkerPressStart
+
 function Menu:enter(previous, inFileplayer)
   -- Set sceneManager reference
   sceneManager = self.manager
@@ -41,24 +44,103 @@ function Menu:enter(previous, inFileplayer)
   spritePressStart:add()
   spritePressStart:moveTo(200, 180)
 
+  -- Reset draw offset
+
+  gfx.setDrawOffset(0, 0)
+
   -- Music
 
   if not fileplayer then
-    fileplayer = assert(pd.sound.fileplayer.new("assets/music/menu"))
+    fileplayer = assert(pd.sound.fileplayer.new("assets/music/03_Factory"))
   end
 
   fileplayer:play()
+
+  -- Little fancy animation(s)
+
+  local animationOffset = 10
+  local showDelay = 15
+  local hideDelay = 5
+  local loopDelay = 2000
+
+  timerTitleAnimation = playdate.timer.new(loopDelay, function()
+    spriteTitle:remove()
+
+    -- Title animation
+
+    playdate.timer.performAfterDelay(hideDelay, function()
+      if not timerTitleAnimation then return end -- escape if scene has exited
+
+      spriteTitle:moveBy(-animationOffset, animationOffset)
+      spriteTitle:add()
+
+      playdate.timer.performAfterDelay(showDelay, function()
+        spriteTitle:remove()
+
+        playdate.timer.performAfterDelay(hideDelay, function()
+          if not timerTitleAnimation then return end -- escape if scene has exited
+
+          spriteTitle:moveBy(animationOffset * 2, -animationOffset * 2)
+          spriteTitle:add()
+
+          playdate.timer.performAfterDelay(showDelay, function()
+            spriteTitle:remove()
+
+            playdate.timer.performAfterDelay(hideDelay, function()
+              if not timerTitleAnimation then return end -- escape if scene has exited
+
+              spriteTitle:moveBy(-animationOffset, animationOffset)
+              spriteTitle:add()
+            end)
+          end)
+        end)
+      end)
+    end)
+  end)
+
+  timerTitleAnimation.repeats = true
+
+  -- Press start button blinker
+
+  blinkerPressStart = gfx.animation.blinker.new(1200, 80, true)
+  blinkerPressStart:startLoop()
+end
+
+local blinkerWasActive = false
+
+function Menu:update()
+  -- Update "Press start" sprite if blinker has toggled.
+  if blinkerWasActive ~= blinkerPressStart.on then
+    -- Keep track of previous state
+    blinkerWasActive = blinkerPressStart.on
+
+    if blinkerWasActive then
+      spritePressStart:add()
+    else
+      spritePressStart:remove()
+    end
+  end
 end
 
 function Menu:leave(next, ...)
   -- destroy entities and cleanup resources
+
   spriteTitle:remove()
   spriteRobot:remove()
+  spritePressStart:remove()
 
   -- Music
+
   if next.super.className == "Game" then
     fileplayer:stop()
   end
+
+  -- Menu animation timer
+
+  timerTitleAnimation:remove()
+  blinkerPressStart:remove()
+
+  timerTitleAnimation = nil
 end
 
 function Menu:AButtonDown()
