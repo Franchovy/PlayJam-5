@@ -81,6 +81,8 @@ function Player:init(entity)
     self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
     self:playAnimation()
 
+    self:setTag(TAGS.Player)
+
     self.state = STATE.OnGround
     self.isDroppingItem = false
     self.isDrilling = false
