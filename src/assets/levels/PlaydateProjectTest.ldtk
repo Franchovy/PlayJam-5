@@ -1155,7 +1155,7 @@
 			"pivotY": 0.5,
 			"fieldDefs": [
 				{
-					"identifier": "ElevatorOrientation",
+					"identifier": "orientation",
 					"doc": null,
 					"__type": "LocalEnum.ElevatorOrientation",
 					"uid": 209,
@@ -1192,8 +1192,8 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "Distance",
-					"doc": null,
+					"identifier": "distance",
+					"doc": "how many 32x32 tiles it moves in given orientation",
 					"__type": "Int",
 					"uid": 210,
 					"type": "F_Int",

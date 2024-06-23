@@ -28,14 +28,19 @@ function RigidBody:update()
   local onGround = false
 
   for _, c in pairs(collisions) do
+    local other = c.other
+    local tag = other:getTag()
+    if tag == TAGS.Player then
+      goto continue
+    end
+
     local normal = c.normal
     local _, normalY = normal:unpack()
-    local other = c.other
-    if complexCollision then
+        if complexCollision then
       self:checkCollision(other)
     end
-    local tag = other:getTag()
     onGround = not onGround and (tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box) and normalY == -1
+
 
     if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
@@ -65,6 +70,8 @@ function RigidBody:update()
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
    end
+
+  ::continue::
 end
 
 function RigidBody:checkCollision(other)
