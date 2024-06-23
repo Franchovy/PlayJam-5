@@ -1081,14 +1081,22 @@
 			]
 		},
 		{
+<<<<<<< HEAD
 			"identifier": "Checkpoint",
+=======
+			"identifier": "Elevator",
+>>>>>>> main
 			"uid": 207,
 			"tags": [],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
 			"width": 32,
+<<<<<<< HEAD
 			"height": 32,
+=======
+			"height": 16,
+>>>>>>> main
 			"resizableX": false,
 			"resizableY": false,
 			"minWidth": null,
@@ -1100,7 +1108,11 @@
 			"fillOpacity": 1,
 			"lineOpacity": 1,
 			"hollow": false,
+<<<<<<< HEAD
 			"color": "#0CFA00",
+=======
+			"color": "#D572E4",
+>>>>>>> main
 			"renderMode": "Rectangle",
 			"showName": true,
 			"tilesetId": null,
@@ -1111,6 +1123,7 @@
 			"maxCount": 0,
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
+<<<<<<< HEAD
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": [
@@ -1121,6 +1134,55 @@
 					"uid": 209,
 					"type": "F_Enum(37)",
 					"isArray": true,
+=======
+			"pivotX": 0.5,
+			"pivotY": 0.5,
+			"fieldDefs": [
+				{
+					"identifier": "orientation",
+					"doc": null,
+					"__type": "LocalEnum.ElevatorOrientation",
+					"uid": 209,
+					"type": "F_Enum(208)",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "distance",
+					"doc": "how many 32x32 tiles it moves in given orientation",
+					"__type": "Int",
+					"uid": 210,
+					"type": "F_Int",
+					"isArray": false,
+>>>>>>> main
 					"canBeNull": false,
 					"arrayMinLength": null,
 					"arrayMaxLength": null,
@@ -1231,7 +1293,8 @@
 			{ "id": "B", "tileRect": null, "color": 4073265 },
 			{ "id": "Crank", "tileRect": null, "color": 16690740 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ConveyorDirection", "uid": 77, "values": [ { "id": "Left", "tileRect": null, "color": 16711870 }, { "id": "Right", "tileRect": null, "color": 1376511 } ], "iconTilesetUid": 24, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+		{ "identifier": "ConveyorDirection", "uid": 77, "values": [ { "id": "Left", "tileRect": null, "color": 16711870 }, { "id": "Right", "tileRect": null, "color": 1376511 } ], "iconTilesetUid": 24, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "ElevatorOrientation", "uid": 208, "values": [ { "id": "Horizontal", "tileRect": null, "color": 16711680 }, { "id": "Vertical", "tileRect": null, "color": 1535 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "HintCrank",
