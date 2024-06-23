@@ -1009,7 +1009,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "ConveyorDirection",
+					"identifier": "direction",
 					"doc": null,
 					"__type": "LocalEnum.ConveyorDirection",
 					"uid": 78,

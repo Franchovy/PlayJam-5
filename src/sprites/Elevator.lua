@@ -20,9 +20,9 @@ end
 function Elevator:activate()
   if self.orientation == "Horizontal" then
     if self.x == self.initialX then
-      self.targetX = self.x + self.actualDistance
-    else
       self.targetX = self.x - self.actualDistance
+    else
+      self.targetX = self.x + self.actualDistance
     end
   elseif self.orientation == "Vertical" then
     if self.y == self.initialY then
