@@ -1152,6 +1152,116 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Elevator",
+			"uid": 207,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 32,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#D572E4",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0.5,
+			"pivotY": 0.5,
+			"fieldDefs": [
+				{
+					"identifier": "orientation",
+					"doc": null,
+					"__type": "LocalEnum.ElevatorOrientation",
+					"uid": 209,
+					"type": "F_Enum(208)",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "distance",
+					"doc": "how many 32x32 tiles it moves in given orientation",
+					"__type": "Int",
+					"uid": 210,
+					"type": "F_Int",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -1231,7 +1341,8 @@
 			{ "id": "B", "tileRect": null, "color": 4073265 },
 			{ "id": "Crank", "tileRect": null, "color": 16690740 }
 		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ConveyorDirection", "uid": 77, "values": [ { "id": "Left", "tileRect": null, "color": 16711870 }, { "id": "Right", "tileRect": null, "color": 1376511 } ], "iconTilesetUid": 24, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+		{ "identifier": "ConveyorDirection", "uid": 77, "values": [ { "id": "Left", "tileRect": null, "color": 16711870 }, { "id": "Right", "tileRect": null, "color": 1376511 } ], "iconTilesetUid": 24, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "ElevatorOrientation", "uid": 208, "values": [ { "id": "Horizontal", "tileRect": null, "color": 16711680 }, { "id": "Vertical", "tileRect": null, "color": 1535 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "HintCrank",
@@ -2194,31 +2305,6 @@
 							"__worldY": -400
 						},
 						{
-							"__identifier": "Checkpoint",
-							"__grid": [1,9],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0CFA00",
-							"iid": "f71f1900-25d0-11ef-82ca-d1c64afdd5e0",
-							"width": 32,
-							"height": 32,
-							"defUid": 207,
-							"px": [32,288],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Right", "Left", "A" ], "__tile": null, "defUid": 209, "realEditorValues": [ {
-								"id": "V_String",
-								"params": ["Right"]
-							}, {
-								"id": "V_String",
-								"params": ["Left"]
-							}, {
-								"id": "V_String",
-								"params": ["A"]
-							} ] }],
-							"__worldX": 160,
-							"__worldY": -304
-						},
-						{
 							"__identifier": "ButtonPickup",
 							"__grid": [0,3],
 							"__pivot": [-0.071,-0.071],
@@ -2629,31 +2715,6 @@
 							"fieldInstances": [],
 							"__worldX": -80,
 							"__worldY": -336
-						},
-						{
-							"__identifier": "Checkpoint",
-							"__grid": [3,1],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0CFA00",
-							"iid": "fa57ef20-25d0-11ef-82ca-8953c5ff191e",
-							"width": 32,
-							"height": 32,
-							"defUid": 207,
-							"px": [96,32],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "A", "Down", "Left" ], "__tile": null, "defUid": 209, "realEditorValues": [ {
-								"id": "V_String",
-								"params": ["A"]
-							}, {
-								"id": "V_String",
-								"params": ["Down"]
-							}, {
-								"id": "V_String",
-								"params": ["Left"]
-							} ] }],
-							"__worldX": -48,
-							"__worldY": -560
 						}
 					]
 				},
