@@ -45,18 +45,18 @@ function Elevator:update()
   local moving = false
 
   if self.targetX > self.x then
-    self:moveBy(1, 0)
+    self:moveBy(2, 0)
     moving = true
   elseif self.targetX < self.x then
-    self:moveBy(-1, 0)
+    self:moveBy(-2, 0)
     moving = true
   end
 
   if self.targetY > self.y then
-    self:moveBy(0, 1)
+    self:moveBy(0, 2)
     moving = true
   elseif self.targetY < self.y then
-    self:moveBy(0, -1)
+    self:moveBy(0, -2)
     moving = true
   end
 
