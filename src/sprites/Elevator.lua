@@ -20,7 +20,9 @@ function Elevator:init(entity)
 end
 
 function Elevator:activate()
-  if self.moving then return end
+  if self.moving or self.active then return end
+
+  self.active = true
 
   if self.orientation == "Horizontal" then
     if self.x == self.initialX then

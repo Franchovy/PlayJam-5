@@ -36,7 +36,6 @@ local STATE = {
     OnGround = 3,
     OnLadderTop = 4,
     OnLadder = 5,
-    OnElevator = 6
 }
 
 -- debug
@@ -241,13 +240,6 @@ function Player:update()
                 drillableBlockCurrentlyDrilling:activate()
             end
 
-            if tag == TAGS.Elevator then
-                if self.state ~= STATE.OnElevator then
-                  other:activate()
-                end
-                onElevator = true
-            end
-
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
             local topDetectionRangeMargin = 2.5
@@ -281,8 +273,6 @@ function Player:update()
         self.state = STATE.OnLadder
     elseif onLadderTop then
         self.state = STATE.OnLadderTop
-    elseif onElevator then
-      self.state = STATE.OnElevator
     elseif onGround then
         self.state = STATE.OnGround
     elseif self.state == STATE.Jumping then
@@ -397,7 +387,7 @@ function Player:updateAnimationState(stateCurrent)
 
     -- Idle/moving (on ground)
 
-    if stateCurrent == STATE.OnGround or stateCurrent == STATE.OnLadderTop or stateCurrent == STATE.OnElevator then
+    if stateCurrent == STATE.OnGround or stateCurrent == STATE.OnLadderTop then
         if self.isDrilling then
             animationState = ANIMATION_STATES.Drilling
         elseif math.abs(velocityX) > 0 then
