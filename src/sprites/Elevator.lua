@@ -15,9 +15,13 @@ function Elevator:init(entity)
   self.inv_mass = 0
   self.actualDistance = self.fields.distance * 32
   self.orientation = self.fields.orientation
+  self.kinematic = true
+  self.restitution = 0.2
 end
 
 function Elevator:activate()
+  if self.moving then return end
+
   if self.orientation == "Horizontal" then
     if self.x == self.initialX then
       self.targetX = self.x - self.actualDistance
@@ -26,9 +30,9 @@ function Elevator:activate()
     end
   elseif self.orientation == "Vertical" then
     if self.y == self.initialY then
-      self.targetY = self.y + self.actualDistance
-    else
       self.targetY = self.y - self.actualDistance
+    else
+      self.targetY = self.y + self.actualDistance
     end
   end
 end
@@ -36,17 +40,25 @@ end
 function Elevator:update()
   Elevator.super.update(self)
 
+  local moving = false
+
   if self.targetX > self.x then
     self:moveBy(1, 0)
+    moving = true
   elseif self.targetX < self.x then
     self:moveBy(-1, 0)
+    moving = true
   end
 
   if self.targetY > self.y then
     self:moveBy(0, 1)
+    moving = true
   elseif self.targetY < self.y then
     self:moveBy(0, -1)
+    moving = true
   end
+
+  self.moving = moving
 end
 
 function Elevator:add()
@@ -55,5 +67,4 @@ function Elevator:add()
   self.initialY = self.y
   self.targetX = self.x
   self.targetY = self.y
-  self:activate()
 end
