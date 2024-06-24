@@ -101,7 +101,11 @@ end
 
 function Player:collisionResponse(other)
     local tag = other:getTag()
-    if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.DrillableBlock then
+    if tag == TAGS.Wall or
+       tag == TAGS.ConveyorBelt or
+       tag == TAGS.Box or
+       tag == TAGS.DrillableBlock or
+       tag == TAGS.Elevator then
         return gfx.sprite.kCollisionTypeSlide
     else
         return gfx.sprite.kCollisionTypeOverlap
@@ -217,6 +221,7 @@ function Player:update()
     local onGround = false
     local onLadder = false
     local onLadderTop = false
+    local onElevator = false
 
     for _, collisionData in pairs(collisions) do
         local other = collisionData.other
@@ -234,6 +239,7 @@ function Player:update()
 
                 drillableBlockCurrentlyDrilling:activate()
             end
+
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
             local topDetectionRangeMargin = 2.5
