@@ -14,6 +14,7 @@ function RigidBody:init(entity, imageTable)
   self.restitution = 0.4
   self.static_friction = 0
   self.dynamic_friction = .12
+  self.kinematic = false
 end
 
 function RigidBody:update()
@@ -22,45 +23,68 @@ function RigidBody:update()
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   local newX, newY = newPos:unpack()
 
-  local _, _, collisions = self:moveWithCollisions(newX, newY)
+  local sdkCollisions
+  if not self.kinematic then
+    local _, _, collisions = self:moveWithCollisions(newX, newY)
+    sdkCollisions = collisions
+  else
+    local _, _, collisions = self:checkCollisions(self.x, self.y - 1)
+    sdkCollisions = collisions
+  end
 
   local beltFound = false
+  local elevatorFound = false
   local onGround = false
 
-  for _, c in pairs(collisions) do
+  for _, c in pairs(sdkCollisions) do
     local other = c.other
     local tag = other:getTag()
-    if tag == TAGS.Player then
-      goto continue
-    end
-
     local normal = c.normal
     local _, normalY = normal:unpack()
-        if complexCollision then
+
+    if complexCollision and tag ~= TAGS.Player and not self.kinematic then
       self:checkCollision(other)
     end
-    onGround = not onGround and (tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box) and normalY == -1
 
+    onGround = not onGround and normalY == -1 and
+                (tag == TAGS.Wall or
+                 tag == TAGS.ConveyorBelt or
+                 tag == TAGS.Box or
+                 tag == TAGS.Elevator)
 
     if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
       if not self.onBelt then-- only apply belt velocity once
         local dir = other:getDirection()
-        if dir == "Right" then
+        if dir == "Right" and self["velocity"] then
           self.velocity = self.velocity + (gmt.vector2D.new(5, 0) * _G.delta_time)
-        elseif dir == "Left" then
+        elseif dir == "Left" and self["velocity"] then
           self.velocity = self.velocity + (gmt.vector2D.new(-5, 0) * _G.delta_time)
         end
+      end
+    end
+
+    if self:getTag() == TAGS.Elevator then
+      self:activate()
+      if self.orientation == "Horizontal" then
+        if tag == TAGS.Player and other:isMovingLeft() or other:isMovingRight() then
+          return
+        end
+        other:moveTo(self.x - 16, other.y)
+      else
+        other:moveTo(other.x, self.y - 40)
       end
     end
   end
 
   local _, currentVY = self.velocity:unpack()
-  -- left belt
+
+  -- object left belt, reset x velocity
   if self.onBelt and not beltFound then
     self.velocity = gmt.vector2D.new(0, currentVY)
   end
 
+  self.onElevator = elevatorFound
   self.onBelt = beltFound
 
   -- incorporate gravity
