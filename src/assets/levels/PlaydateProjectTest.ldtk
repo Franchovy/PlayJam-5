@@ -1081,79 +1081,6 @@
 			]
 		},
 		{
-			"identifier": "Checkpoint",
-			"uid": 207,
-			"tags": [],
-			"exportToToc": false,
-			"allowOutOfBounds": false,
-			"doc": null,
-			"width": 32,
-			"height": 32,
-			"resizableX": false,
-			"resizableY": false,
-			"minWidth": null,
-			"maxWidth": null,
-			"minHeight": null,
-			"maxHeight": null,
-			"keepAspectRatio": false,
-			"tileOpacity": 1,
-			"fillOpacity": 1,
-			"lineOpacity": 1,
-			"hollow": false,
-			"color": "#0CFA00",
-			"renderMode": "Rectangle",
-			"showName": true,
-			"tilesetId": null,
-			"tileRenderMode": "FitInside",
-			"tileRect": null,
-			"uiTileRect": null,
-			"nineSliceBorders": [],
-			"maxCount": 0,
-			"limitScope": "PerLevel",
-			"limitBehavior": "MoveLastOne",
-			"pivotX": 0,
-			"pivotY": 0,
-			"fieldDefs": [
-				{
-					"identifier": "blueprints",
-					"doc": null,
-					"__type": "Array<LocalEnum.ObjectEnum>",
-					"uid": 209,
-					"type": "F_Enum(37)",
-					"isArray": true,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				}
-			]
-		},
-		{
 			"identifier": "Elevator",
 			"uid": 207,
 			"tags": [],
@@ -1486,28 +1413,6 @@
 							"__worldY": -672
 						},
 						{
-							"__identifier": "Elevator",
-							"__grid": [11,6],
-							"__pivot": [0.5,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D572E4",
-							"iid": "a6009fa0-25d0-11ef-99f7-5b3159b419a5",
-							"width": 32,
-							"height": 16,
-							"defUid": 207,
-							"px": [368,192],
-							"fieldInstances": [
-								{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Up"], "__tile": null, "defUid": 209, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Up"]
-								}] },
-								{ "__identifier": "distance", "__type": "Int", "__value": 3, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
-							],
-							"__worldX": -432,
-							"__worldY": -640
-						},
-						{
 							"__identifier": "ButtonPickup",
 							"__grid": [10,4],
 							"__pivot": [-0.071,-0.071],
@@ -1525,6 +1430,28 @@
 							}] }],
 							"__worldX": -450,
 							"__worldY": -674
+						},
+						{
+							"__identifier": "Elevator",
+							"__grid": [11,6],
+							"__pivot": [0.5,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D572E4",
+							"iid": "6fb3a4e0-25d0-11ef-99f7-bfb47a21b614",
+							"width": 32,
+							"height": 16,
+							"defUid": 207,
+							"px": [368,192],
+							"fieldInstances": [
+								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Vertical"]
+								}] },
+								{ "__identifier": "distance", "__type": "Int", "__value": 3, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }
+							],
+							"__worldX": -432,
+							"__worldY": -640
 						}
 					]
 				},
@@ -3069,9 +2996,9 @@
 							"defUid": 207,
 							"px": [368,768],
 							"fieldInstances": [
-								{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Up"], "__tile": null, "defUid": 209, "realEditorValues": [{
+								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Up"]
+									"params": ["Vertical"]
 								}] },
 								{ "__identifier": "distance", "__type": "Int", "__value": 23, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [23] }] }
 							],
@@ -3091,9 +3018,9 @@
 							"defUid": 207,
 							"px": [272,992],
 							"fieldInstances": [
-								{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Up"], "__tile": null, "defUid": 209, "realEditorValues": [{
+								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Up"]
+									"params": ["Vertical"]
 								}] },
 								{ "__identifier": "distance", "__type": "Int", "__value": 8, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [8] }] }
 							],
