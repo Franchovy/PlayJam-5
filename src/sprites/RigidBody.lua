@@ -68,6 +68,9 @@ function RigidBody:update()
     if self:getTag() == TAGS.Elevator then
       self:activate()
       if self.orientation == "Horizontal" then
+        if tag == TAGS.Player and other:isMovingLeft() or other:isMovingRight() then
+          return
+        end
         other:moveTo(self.x - 16, other.y)
       else
         other:moveTo(other.x, self.y - 40)
