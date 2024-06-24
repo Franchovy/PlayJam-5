@@ -67,7 +67,7 @@ function RigidBody:update()
 
     if self:getTag() == TAGS.Elevator then
       self:activate()
-      if self.diretion == "Horizontal" then
+      if self.orientation == "Horizontal" then
         other:moveTo(self.x - 16, other.y)
       else
         other:moveTo(other.x, self.y - 40)
