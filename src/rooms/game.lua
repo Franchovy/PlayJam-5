@@ -184,7 +184,7 @@ function Game:levelComplete(data)
 
     local neighbors = LDtk.get_neighbours(currentLevelName, direction)
 
-    -- For now, just get the first neightbor. For handling multiple neighbors we'll have to do a coordinates check.
+    -- Check coordinates function for detecting which neighbor to transition to
     local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
 
     sceneManager:enter(sceneManager.scenes.currentGame,

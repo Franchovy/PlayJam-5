@@ -365,7 +365,7 @@ function Player:update()
 
     if playerY > levelHeight then
         direction = DIRECTION.BOTTOM
-    elseif playerY < 0 then
+    elseif playerY + 24 < 0 then -- Add a margin to not trigger level change so easily.
         direction = DIRECTION.TOP
     end
 
