@@ -35,6 +35,6 @@ function ConveyorBelt:init(entity)
   self:setTilemap(tilemap);
 end
 
-function ConveyorBelt:getDirection()
-  return self.fields.direction;
+function ConveyorBelt:getAppliedSpeed()
+  return self.fields.direction == "Right" and 5 or -5;
 end

@@ -5,18 +5,26 @@ local gfx <const> = pd.graphics
 local complexCollision = true
 local maxFallSpeed = 13
 
-local DEBUG_PRINT = true
+local DEBUG_PRINT = false
 
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
   RigidBody.super.init(self, imageTable)
+
+  -- FROM: FRANCH TO: CALVIN
+  -- How can we remove the "bounce" factor when falling? I think in 95% of cases we don't want any bounce since it
+  -- interferes with horizontal or vertical moving platforms/NPCs. Ideally we could set a threshold on a sprite that
+  -- will limit the "bounciness" to only apply past a certain collision velocity, or be able to turn it off completely.
+
   self.velocity = gmt.vector2D.new(0, 0)
   self.inv_mass = 0.4
   self.restitution = 0.4
   self.static_friction = 0
   self.dynamic_friction = .12
   self.kinematic = false
+
+  self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
 function RigidBody:update()
@@ -49,7 +57,11 @@ function RigidBody:update()
     if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
 
     if complexCollision and tag ~= TAGS.Player and not self.kinematic then
-      self:checkCollision(other) -- MAXIME: What does this do?
+      -- FROM: FRANCH TO: CALVIN
+      -- This function does not interact with the self.velocity in a coherent way – we should be *writing* to self.velocity
+      -- as well as reading from it. For example, I would expect friction and collisions to apply to self.velocity.
+
+      self:checkCollision(other)
     end
 
     onGround = not onGround and normalY == -1 and
@@ -60,15 +72,13 @@ function RigidBody:update()
 
     if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
-      if true or not self.onBelt then -- only apply belt velocity once
+      if not self.onBelt then -- only apply belt velocity once
         if DEBUG_PRINT then print("Applying collision belt logic") end
 
-        local dir = other:getDirection()
-        if dir == "Right" and self["velocity"] then
-          self.velocity = self.velocity + (gmt.vector2D.new(5, 0) * _G.delta_time)
-        elseif dir == "Left" and self["velocity"] then
-          self.velocity = self.velocity + (gmt.vector2D.new(-5, 0) * _G.delta_time)
-        end
+        local conveyorSpeed = other:getAppliedSpeed()
+        self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
+
+        self.DEBUG_SHOULD_PRINT_VELOCITY = true
       end
     end
 
@@ -90,10 +100,15 @@ function RigidBody:update()
 
   local _, currentVY = self.velocity:unpack()
 
+  -- FRANCH: Turned this off since it seemed to be buggy, and we want to conserve some of the x-velocity after an object
+  -- leaves the belt. We would want a low air-friction coefficient and a higher ground-friction coefficient.
+
   -- object left belt, reset x velocity
   if self.onBelt and not beltFound then
-    self.velocity = gmt.vector2D.new(0, currentVY)
+    --self.velocity = gmt.vector2D.new(0, currentVY)
   end
+
+  if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   self.onElevator = elevatorFound
   self.onBelt = beltFound
