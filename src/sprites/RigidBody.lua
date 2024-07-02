@@ -7,6 +7,12 @@ local maxFallSpeed = 13
 
 local DEBUG_PRINT = false
 
+
+-- FRANCH: Behaviors to adjust for / fix:
+-- Elevator going into a wall - should stop (wall should have "infinite mass")
+-- Elevator carrying object going into the ceiling - should stop both
+
+
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
@@ -78,7 +84,7 @@ function RigidBody:update()
         local conveyorSpeed = other:getAppliedSpeed()
         self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
 
-        self.DEBUG_SHOULD_PRINT_VELOCITY = true
+        self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
       end
     end
 
@@ -88,7 +94,10 @@ function RigidBody:update()
       if DEBUG_PRINT then print("Applying elevator logic") end
 
       if self.orientation == "Horizontal" then
-        if tag == TAGS.Player and other:isMovingLeft() or other:isMovingRight() then
+        if tag == TAGS.Player and (other:isMovingLeft() or other:isMovingRight()) then
+          -- FRANCH: Is this really supposed to be a "return", or a "goto ::continue::"? Why are we interrupting the
+          -- execution flow?
+
           return
         end
         other:moveTo(self.x - 16, other.y)
