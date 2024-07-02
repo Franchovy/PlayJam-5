@@ -1376,7 +1376,7 @@
 						},
 						{
 							"__identifier": "ButtonPickup",
-							"__grid": [3,5],
+							"__grid": [7,5],
 							"__pivot": [-0.071,-0.071],
 							"__tags": [],
 							"__tile": null,
@@ -1385,12 +1385,12 @@
 							"width": 28,
 							"height": 28,
 							"defUid": 21,
-							"px": [96,160],
+							"px": [224,160],
 							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Right"]
 							}] }],
-							"__worldX": -704,
+							"__worldX": -576,
 							"__worldY": -672
 						},
 						{
@@ -1413,25 +1413,6 @@
 							"__worldY": -672
 						},
 						{
-							"__identifier": "ButtonPickup",
-							"__grid": [10,4],
-							"__pivot": [-0.071,-0.071],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#15F1D3",
-							"iid": "b6366760-25d0-11ef-99f7-c9afb4a58d6b",
-							"width": 28,
-							"height": 28,
-							"defUid": 21,
-							"px": [350,158],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Up"]
-							}] }],
-							"__worldX": -450,
-							"__worldY": -674
-						},
-						{
 							"__identifier": "Elevator",
 							"__grid": [11,6],
 							"__pivot": [0.5,0],
@@ -1452,6 +1433,57 @@
 							],
 							"__worldX": -432,
 							"__worldY": -640
+						},
+						{
+							"__identifier": "ConveyorBelt",
+							"__grid": [5,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 24, "x": 96, "y": 128, "w": 32, "h": 32 },
+							"__smartColor": "#FF0044",
+							"iid": "dba1dfa0-25d0-11ef-838d-355dc752c42e",
+							"width": 96,
+							"height": 16,
+							"defUid": 75,
+							"px": [160,128],
+							"fieldInstances": [{ "__identifier": "direction", "__type": "LocalEnum.ConveyorDirection", "__value": "Right", "__tile": null, "defUid": 78, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
+							"__worldX": -640,
+							"__worldY": -704
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [5,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#AE14F4",
+							"iid": "009197b0-25d0-11ef-af21-6f6c44ce7f45",
+							"width": 32,
+							"height": 32,
+							"defUid": 74,
+							"px": [160,64],
+							"fieldInstances": [],
+							"__worldX": -640,
+							"__worldY": -768
+						},
+						{
+							"__identifier": "Box",
+							"__grid": [4,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#AE14F4",
+							"iid": "76ad0920-25d0-11ef-8e58-4fd285592987",
+							"width": 32,
+							"height": 32,
+							"defUid": 74,
+							"px": [128,160],
+							"fieldInstances": [],
+							"__worldX": -672,
+							"__worldY": -672
 						}
 					]
 				},

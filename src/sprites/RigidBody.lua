@@ -5,6 +5,8 @@ local gfx <const> = pd.graphics
 local complexCollision = true
 local maxFallSpeed = 13
 
+local DEBUG_PRINT = true
+
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
@@ -18,6 +20,8 @@ function RigidBody:init(entity, imageTable)
 end
 
 function RigidBody:update()
+  if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
+
   RigidBody.super.update(self)
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
@@ -42,19 +46,23 @@ function RigidBody:update()
     local normal = c.normal
     local _, normalY = normal:unpack()
 
+    if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
+
     if complexCollision and tag ~= TAGS.Player and not self.kinematic then
-      self:checkCollision(other)
+      self:checkCollision(other) -- MAXIME: What does this do?
     end
 
     onGround = not onGround and normalY == -1 and
-                (tag == TAGS.Wall or
-                 tag == TAGS.ConveyorBelt or
-                 tag == TAGS.Box or
-                 tag == TAGS.Elevator)
+        (tag == TAGS.Wall or
+          tag == TAGS.ConveyorBelt or
+          tag == TAGS.Box or
+          tag == TAGS.Elevator)
 
     if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
-      if not self.onBelt then-- only apply belt velocity once
+      if true or not self.onBelt then -- only apply belt velocity once
+        if DEBUG_PRINT then print("Applying collision belt logic") end
+
         local dir = other:getDirection()
         if dir == "Right" and self["velocity"] then
           self.velocity = self.velocity + (gmt.vector2D.new(5, 0) * _G.delta_time)
@@ -66,6 +74,9 @@ function RigidBody:update()
 
     if self:getTag() == TAGS.Elevator then
       self:activate()
+
+      if DEBUG_PRINT then print("Applying elevator logic") end
+
       if self.orientation == "Horizontal" then
         if tag == TAGS.Player and other:isMovingLeft() or other:isMovingRight() then
           return
@@ -90,12 +101,14 @@ function RigidBody:update()
   -- incorporate gravity
   if (complexCollision or not onGround) and currentVY < maxFallSpeed then
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
-   elseif not complexCollision and onGround then
+  elseif not complexCollision and onGround then
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
-   end
+  end
 
   ::continue::
+
+  if DEBUG_PRINT then print("RigidBody:update() finished.") end
 end
 
 function RigidBody:checkCollision(other)
@@ -109,7 +122,7 @@ function RigidBody:checkCollision(other)
   if self.y < other.y then
     yVector = gmt.vector2D.new(0, 1)
     yOverlap = (self.y + self.height) - (other.y)
-  -- other is above self
+    -- other is above self
   else
     yVector = gmt.vector2D.new(0, -1)
     yOverlap = self.y - other.y
@@ -146,7 +159,7 @@ function RigidBody:checkCollision(other)
   -- positional correction for sinking objects
   local percent = 0.2
   local slop = .1
-  local correction = normal * (math.max(pen - slop, 0 ) / (self.inv_mass + other_inv_mass) * percent)
+  local correction = normal * (math.max(pen - slop, 0) / (self.inv_mass + other_inv_mass) * percent)
   local newSelfPos = gmt.vector2D.new(self.x, self.y) + (-correction * self.inv_mass)
   self:moveTo(newSelfPos.x, newSelfPos.y)
   local newOtherPos = gmt.vector2D.new(other.x, other.y) + (correction * other_inv_mass)
@@ -246,7 +259,8 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if math.abs(jt) < j * mu then
     friction_impulse = tangent * jt
   else
-    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) + (other_dynamic_friction * other_dynamic_friction))
+    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) +
+      (other_dynamic_friction * other_dynamic_friction))
     friction_impulse = tangent * (-j * dynamicFriction)
   end
 
