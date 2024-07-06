@@ -3,6 +3,7 @@ _G.assets = {
         tileset = "assets/images/tileset"
     },
     levels = {
-        test = "assets/levels/PlaydateProjectTest.ldtk"
+        test = "assets/levels/PlaydateProjectTest.ldtk",
+        physicsTest = "assets/levels/PlaydateProjectPhysicsTest.ldtk"
     }
 }
