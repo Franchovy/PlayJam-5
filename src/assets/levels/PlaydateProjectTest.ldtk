@@ -5294,7 +5294,7 @@
 						},
 						{
 							"__identifier": "ConveyorBelt",
-							"__grid": [2,1],
+							"__grid": [1,4],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 24, "x": 96, "y": 128, "w": 32, "h": 32 },
@@ -5303,17 +5303,17 @@
 							"width": 96,
 							"height": 16,
 							"defUid": 75,
-							"px": [64,32],
+							"px": [32,128],
 							"fieldInstances": [{ "__identifier": "direction", "__type": "LocalEnum.ConveyorDirection", "__value": "Right", "__tile": null, "defUid": 78, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Right"]
 							}] }],
-							"__worldX": -768,
-							"__worldY": -1152
+							"__worldX": -800,
+							"__worldY": -1056
 						},
 						{
 							"__identifier": "ConveyorBelt",
-							"__grid": [3,3],
+							"__grid": [5,6],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 24, "x": 96, "y": 128, "w": 32, "h": 32 },
@@ -5322,13 +5322,13 @@
 							"width": 96,
 							"height": 16,
 							"defUid": 75,
-							"px": [96,96],
+							"px": [160,192],
 							"fieldInstances": [{ "__identifier": "direction", "__type": "LocalEnum.ConveyorDirection", "__value": "Left", "__tile": null, "defUid": 78, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Left"]
 							}] }],
-							"__worldX": -736,
-							"__worldY": -1088
+							"__worldX": -672,
+							"__worldY": -992
 						},
 						{
 							"__identifier": "ConveyorBelt",
@@ -5351,7 +5351,7 @@
 						},
 						{
 							"__identifier": "ConveyorBelt",
-							"__grid": [1,5],
+							"__grid": [1,7],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 24, "x": 96, "y": 128, "w": 32, "h": 32 },
@@ -5360,17 +5360,17 @@
 							"width": 128,
 							"height": 16,
 							"defUid": 75,
-							"px": [32,160],
+							"px": [32,224],
 							"fieldInstances": [{ "__identifier": "direction", "__type": "LocalEnum.ConveyorDirection", "__value": "Right", "__tile": null, "defUid": 78, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Right"]
 							}] }],
 							"__worldX": -800,
-							"__worldY": -1024
+							"__worldY": -960
 						},
 						{
 							"__identifier": "Box",
-							"__grid": [2,0],
+							"__grid": [1,0],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -5379,9 +5379,9 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 74,
-							"px": [64,0],
+							"px": [32,0],
 							"fieldInstances": [],
-							"__worldX": -768,
+							"__worldX": -800,
 							"__worldY": -1184
 						}
 					]
