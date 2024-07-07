@@ -156,11 +156,12 @@ function RigidBody:checkCollision(other)
   local xVector = gmt.vector2D.new(0, 0)
 
   if self.x < other.x then
-    xVector = gmt.vector2D.new(-1, 0)
-    xOverlap = (self.x + self.width) - other.x
-  else
     xVector = gmt.vector2D.new(1, 0)
     xOverlap = (other.x + other.width) - (self.x)
+  else
+    xVector = gmt.vector2D.new(-1, 0)
+    xOverlap = (self.x + self.width) - other.x
+
   end
 
   if yOverlap < xOverlap then
@@ -207,7 +208,7 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if other["velocity"] then
     relative_velocity = other.velocity - self.velocity
   else
-    relative_velocity = -self.velocity
+    relative_velocity = self.velocity:scaledBy(-1)
   end
 
   -- put it in terms of the collision normal direction
@@ -245,7 +246,7 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if other["velocity"] then
     relative_velocity = other.velocity - self.velocity
   else
-    relative_velocity = -self.velocity
+    relative_velocity = self.velocity:scaledBy(-1)
   end
 
   -- Solve for the tangent vector
