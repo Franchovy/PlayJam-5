@@ -24,7 +24,7 @@ function RigidBody:init(entity, imageTable)
 
   self.velocity = gmt.vector2D.new(0, 0)
   self.inv_mass = 0.4
-  self.restitution = 0.4
+  self.restitution = 0
   self.static_friction = 0
   self.dynamic_friction = .12
   self.air_friction = .14
