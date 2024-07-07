@@ -3,7 +3,6 @@ local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
 local complexCollision = true
-local maxFallSpeed = 13
 
 local DEBUG_PRINT = false
 
@@ -28,7 +27,10 @@ function RigidBody:init(entity, imageTable)
   self.restitution = 0.4
   self.static_friction = 0
   self.dynamic_friction = .12
+  self.air_friction = .14
   self.kinematic = false
+  self.maxFallSpeed = 13
+  self.maxXSpeed = 6
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
@@ -40,6 +42,7 @@ function RigidBody:update()
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   local newX, newY = newPos:unpack()
+  local currentVX, currentVY = self.velocity:unpack()
 
   local sdkCollisions
   if not self.kinematic then
@@ -50,7 +53,6 @@ function RigidBody:update()
     sdkCollisions = collisions
   end
 
-  local beltFound = false
   local elevatorFound = false
   local onGround = false
 
@@ -76,16 +78,13 @@ function RigidBody:update()
           tag == TAGS.Box or
           tag == TAGS.Elevator)
 
-    if tag == TAGS.ConveyorBelt and normalY == -1 then
-      beltFound = true
-      if not self.onBelt then -- only apply belt velocity once
-        if DEBUG_PRINT then print("Applying collision belt logic") end
+    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxXSpeed then
+      if DEBUG_PRINT then print("Applying collision belt logic") end
 
-        local conveyorSpeed = other:getAppliedSpeed()
-        self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
+      local conveyorSpeed = other:getAppliedSpeed()
+      self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
 
-        self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
-      end
+      self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
 
     if self:getTag() == TAGS.Elevator then
@@ -107,30 +106,22 @@ function RigidBody:update()
     end
   end
 
-  local _, currentVY = self.velocity:unpack()
-
-  -- FRANCH: Turned this off since it seemed to be buggy, and we want to conserve some of the x-velocity after an object
-  -- leaves the belt. We would want a low air-friction coefficient and a higher ground-friction coefficient.
-
-  -- object left belt, reset x velocity
-  if self.onBelt and not beltFound then
-    --self.velocity = gmt.vector2D.new(0, currentVY)
-  end
-
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   self.onElevator = elevatorFound
-  self.onBelt = beltFound
 
   -- incorporate gravity
-  if (complexCollision or not onGround) and currentVY < maxFallSpeed then
+  if (complexCollision or not onGround) and currentVY < self.maxFallSpeed then
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
   elseif not complexCollision and onGround then
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
   end
 
-  ::continue::
+  -- incorporate any in-air drag
+  if not onGround and currentVX ~= 0 then
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
+  end
 
   if DEBUG_PRINT then print("RigidBody:update() finished.") end
 end
