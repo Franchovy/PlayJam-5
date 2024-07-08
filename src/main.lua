@@ -21,7 +21,7 @@ manager:hook()
 
 -- Pre-load levels data
 
-LDtk.load(assets.levels.test)
+LDtk.load(assets.levels.artTest)
 
 -- Open Menu (& save reference)
 
