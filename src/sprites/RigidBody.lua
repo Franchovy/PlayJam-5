@@ -2,7 +2,7 @@ local pd <const> = playdate
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local complexCollision = true
+local complexCollision = false
 
 local DEBUG_PRINT = false
 
@@ -17,20 +17,16 @@ class("RigidBody").extends(AnimatedSprite)
 function RigidBody:init(entity, imageTable)
   RigidBody.super.init(self, imageTable)
 
-  -- FROM: FRANCH TO: CALVIN
-  -- How can we remove the "bounce" factor when falling? I think in 95% of cases we don't want any bounce since it
-  -- interferes with horizontal or vertical moving platforms/NPCs. Ideally we could set a threshold on a sprite that
-  -- will limit the "bounciness" to only apply past a certain collision velocity, or be able to turn it off completely.
-
   self.velocity = gmt.vector2D.new(0, 0)
   self.inv_mass = 0.4
   self.restitution = 0
   self.static_friction = 0
   self.dynamic_friction = .12
   self.air_friction = .14
+  self.ground_friction = .3
   self.kinematic = false
   self.maxFallSpeed = 13
-  self.maxXSpeed = 6
+  self.maxConveyorSpeed = 6
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
@@ -65,10 +61,6 @@ function RigidBody:update()
     if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
 
     if complexCollision and tag ~= TAGS.Player and not self.kinematic then
-      -- FROM: FRANCH TO: CALVIN
-      -- This function does not interact with the self.velocity in a coherent way – we should be *writing* to self.velocity
-      -- as well as reading from it. For example, I would expect friction and collisions to apply to self.velocity.
-
       self:checkCollision(other)
     end
 
@@ -78,7 +70,7 @@ function RigidBody:update()
           tag == TAGS.Box or
           tag == TAGS.Elevator)
 
-    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxXSpeed then
+    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxConveyorSpeed then
       if DEBUG_PRINT then print("Applying collision belt logic") end
 
       local conveyorSpeed = other:getAppliedSpeed()
@@ -121,6 +113,10 @@ function RigidBody:update()
   -- incorporate any in-air drag
   if not onGround and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
+  end
+
+  if onGround and currentVX ~=0 then
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
   end
 
   if DEBUG_PRINT then print("RigidBody:update() finished.") end
