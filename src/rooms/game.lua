@@ -1,4 +1,5 @@
 local pd <const> = playdate
+local gfx <const> = pd.graphics
 local sound <const> = pd.sound
 
 class("Game").extends(Room)
@@ -13,9 +14,9 @@ local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
-local function goToCredits()
-    sceneManager:enter(GameComplete())
-end
+-- LDtk current level name
+local initialLevelName <const> = "Level_0"
+local currentLevelName
 
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
@@ -25,26 +26,40 @@ local function restartLevel()
     sceneManager:enter(sceneManager.scenes.currentGame)
 end
 
-function Game:init(lvl)
-    lvl = lvl or 0
+function Game:init() end
 
-    self.level = lvl
-end
+function Game:enter(previous, data)
+    data = data or {}
+    local direction = data.direction
+    local nextLevel = data.nextLevel
 
-function Game:enter(previous, ...)
-    -- Set local reference to sceneManager
+    -- This should run only once to initialize the game instance.
 
-    sceneManager = self.manager
-    sceneManager.scenes.currentGame = self
+    if not self.isInitialized then
+        self.isInitialized = true
 
-    -- Load Ability Panel
+        -- Set local reference to sceneManager
 
-    self.abilityPanel = AbilityPanel()
+        sceneManager = self.manager
+        sceneManager.scenes.currentGame = self
 
-    -- Load level
+        -- Load Ability Panel
 
-    local levelName = "Level_" .. self.level
-    local hintCrank = LDtk.loadAllLayersAsSprites(levelName)
+        self.abilityPanel = AbilityPanel()
+
+        -- Menu items
+
+        systemMenu:addMenuItem("main menu", goToMainMenu)
+        systemMenu:addMenuItem("restart", restartLevel)
+    end
+
+    -- Load level --
+
+    currentLevelName = nextLevel and nextLevel.name or initialLevelName
+    local levelBounds = nextLevel and nextLevel.bounds or LDtk.get_rect(currentLevelName)
+
+    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
+
     pd.timer.new(1500, function()
         self.hintCrank = hintCrank
         pd.timer.new(3000, function()
@@ -52,20 +67,19 @@ function Game:enter(previous, ...)
         end)
     end)
 
-    LDtk.loadAllEntitiesAsSprites(levelName)
+    LDtk.loadAllEntitiesAsSprites(currentLevelName)
 
-    -- Menu items
-    systemMenu:addMenuItem("main menu", goToMainMenu)
-    systemMenu:addMenuItem("restart", restartLevel)
+    local player = Player.getInstance()
+    if player ~= nil then
+        player:add()
+
+        player:enterLevel(direction, levelBounds)
+    end
 
     -- Show ability Panel (3s)
 
     self.abilityPanel:animate(true)
     forceShowPanel = true
-    pd.timer.performAfterDelay(3000, function()
-        forceShowPanel = false
-        self.abilityPanel:animate(false)
-    end)
 end
 
 function Game:update()
@@ -82,24 +96,25 @@ function Game:update()
 end
 
 function Game:leave(next, ...)
-    -- Menu items
+    -- Clear sprites in level
 
-    pd.graphics.sprite.removeAll()
-    systemMenu:removeAllMenuItems()
+    gfx.sprite.removeAll()
 
-    -- Remove currentGame reference from manager
-    sceneManager.scenes.currentGame = nil
-
-    -- Music
+    --
 
     if next.super.className == "Menu" or next.super.className == "GameComplete" then
+        -- Remove system/PD menu items
+
+        systemMenu:removeAllMenuItems()
+
+        -- Remove currentGame reference from manager
+        sceneManager.scenes.currentGame = nil
+
+        -- Stop the music!
+
         fileplayer:stop()
         fileplayer = nil
     end
-end
-
-function Game:draw()
-    -- draw the level
 end
 
 -- Fileplayer
@@ -107,59 +122,42 @@ end
 function Game:setupFilePlayer()
     fileplayer = SuperFilePlayer()
 
-    if self.level >= 6 then
-        fileplayer:loadFiles("assets/music/robot-cavern/1", "assets/music/robot-cavern/2",
-            "assets/music/robot-cavern/3", "assets/music/robot-cavern/4")
+    fileplayer:loadFiles("assets/music/01_Mine")
 
-        fileplayer:setPlayConfig(4, 4, 3, 2)
-    else
-        fileplayer:loadFiles("assets/music/robot-redux/1", "assets/music/robot-redux/2",
-            "assets/music/robot-redux/3", "assets/music/robot-redux/4")
-
-        fileplayer:setPlayConfig(2, 2, 3, 2)
-    end
+    fileplayer:setPlayConfig(1)
 end
 
 -- Events
 
 local maxLevels <const> = 10
 
-function Game:levelComplete()
+function Game:levelComplete(data)
+    local direction = data.direction
+    local coordinates = data.coordinates
+
     spWin:play(1)
 
-    local data = playdate.datastore.read()
+    -- Load next level
 
-    local levelPrevious = self.level
-    self.level = self.level + 1
+    function getNeighborLevelForPos(neighbors, position)
+        assert(#neighbors > 0)
 
-    if self.level >= maxLevels then
-        -- Game complete
-        goToCredits()
-        pd.datastore.write({ LEVEL = 0, GAMECOMPLETE = true })
-    else
-        -- Level complete, next level
-        self:cleanUp()
-
-        sceneManager.scenes.currentGame = Game(self.level)
-        sceneManager:enter(sceneManager.scenes.currentGame)
-        --[[
-        local saveData = pd.datastore.read()
-        if not saveData and saveData.LEVEL < self.level then
-            playdate.datastore.write({ LEVEL = self.level })
-        end--]]
-
-        if data then
-            data.LEVEL = math.max(data.LEVEL or 0, math.min(self.level + 1, maxLevels))
-            pd.datastore.write(data)
+        for _, levelName in pairs(neighbors) do
+            local levelBounds = LDtk.get_rect(levelName)
+            if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
+                levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
+                return levelName, levelBounds
+            end
         end
     end
 
-    if self.level == 6 and levelPrevious == 5 then
-        -- Switch Music
-        fileplayer:stop()
+    local neighbors = LDtk.get_neighbours(currentLevelName, direction)
 
-        fileplayer = nil
-    end
+    -- For now, just get the first neightbor. For handling multiple neighbors we'll have to do a coordinates check.
+    local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
+
+    sceneManager:enter(sceneManager.scenes.currentGame,
+        { direction = direction, nextLevel = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
 function Game:loadItems(item1, item2, item3)
@@ -170,10 +168,9 @@ function Game:cleanUp()
     self.abilityPanel:cleanUp()
 end
 
-function Game:pickup(object)
+function Game:pickup(ability)
     spCollect:play(1)
-    self.abilityPanel:addItem(object.abilityName)
-    object:remove()
+    self.abilityPanel:addItem(ability)
 end
 
 function Game:crankDrop()

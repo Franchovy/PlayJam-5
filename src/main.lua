@@ -6,6 +6,13 @@ import "extensions"
 import "rooms"
 import "sprites"
 
+-- Playdate config
+
+local fontDefault = playdate.graphics.font.new("assets/fonts/m42.TTF-7")
+playdate.graphics.setFont(fontDefault)
+
+playdate.graphics.setBackgroundColor(0)
+playdate.graphics.clear(0)
 
 -- Set up Scene Manager (Roomy)
 
@@ -28,7 +35,7 @@ local last_time = 0
 
 local function updateDeltaTime()
   local current_time = playdate.getCurrentTimeMilliseconds();
-  _G.delta_time = (current_time - last_time)/100;
+  _G.delta_time = (current_time - last_time) / 100;
   last_time = current_time;
 end
 
@@ -38,6 +45,7 @@ function playdate.update()
   -- Update sprites
   playdate.graphics.sprite.update()
   playdate.timer.updateTimers()
+  playdate.graphics.animation.blinker.updateAll()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)

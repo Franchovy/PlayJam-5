@@ -7,12 +7,17 @@ local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
 local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 
--- Level Bounds for camera movement
+-- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
-local levelX
-local levelY
+local levelGX
+local levelGY
 local levelWidth
 local levelHeight
+
+-- Level offset for drawing levels smaller than screen size
+
+local levelOffsetX
+local levelOffsetY
 
 --
 
@@ -58,7 +63,15 @@ local jumpHoldTimeInTicks <const> = 10
 
 class("Player").extends(AnimatedSprite)
 
+-- Reference to player sprite
+
+local _instance
+
+function Player.getInstance() return _instance end
+
 function Player:init(entity)
+    _instance = self
+
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
@@ -67,6 +80,8 @@ function Player:init(entity)
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
     self:playAnimation()
+
+    self:setTag(TAGS.Player)
 
     self.state = STATE.OnGround
     self.isDroppingItem = false
@@ -86,7 +101,11 @@ end
 
 function Player:collisionResponse(other)
     local tag = other:getTag()
-    if tag == TAGS.Wall or tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.DrillableBlock then
+    if tag == TAGS.Wall or
+       tag == TAGS.ConveyorBelt or
+       tag == TAGS.Box or
+       tag == TAGS.DrillableBlock or
+       tag == TAGS.Elevator then
         return gfx.sprite.kCollisionTypeSlide
     else
         return gfx.sprite.kCollisionTypeOverlap
@@ -202,6 +221,7 @@ function Player:update()
     local onGround = false
     local onLadder = false
     local onLadderTop = false
+    local onElevator = false
 
     for _, collisionData in pairs(collisions) do
         local other = collisionData.other
@@ -219,6 +239,7 @@ function Player:update()
 
                 drillableBlockCurrentlyDrilling:activate()
             end
+
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
             local topDetectionRangeMargin = 2.5
@@ -233,7 +254,9 @@ function Player:update()
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
         elseif tag == TAGS.Ability then
-            Manager.emitEvent(EVENTS.Pickup, other)
+            other:pickUp()
+
+            Manager.emitEvent(EVENTS.Pickup, other.abilityName)
 
             if self.abilityCount == 3 then
                 table.remove(self.keys, 1)
@@ -273,28 +296,86 @@ function Player:update()
     local idealX, idealY = playerX - 200, playerY - 100
 
     -- Check for horizontal bounds
-    if idealX < levelX then
-        idealX = levelX
-    elseif idealX + 400 > levelX + levelWidth then
-        idealX = levelX + levelWidth - 400
+    if idealX < 0 then
+        idealX = 0
+    elseif idealX + 400 > 0 + levelWidth then
+        idealX = 0 + levelWidth - 400
     end
 
     -- Check for vertical bounds
-    if idealY < levelY then
-        idealY = levelY
-    elseif idealY + 240 > levelY + levelHeight then
-        idealY = levelY + levelHeight - 240
+    if idealY < 0 then
+        idealY = 0
+    elseif idealY + 240 > 0 + levelHeight then
+        idealY = 0 + levelHeight - 240
     end
 
     --> set screen offset
-    gfx.setDrawOffset(-idealX, -idealY)
+
+    gfx.setDrawOffset(-idealX + levelOffsetX, -idealY + levelOffsetY)
+
+    -- Check if player has moved into another level
+
+    local direction
+
+    if playerX > levelWidth then
+        direction = DIRECTION.RIGHT
+    elseif playerX < 0 then
+        direction = DIRECTION.LEFT
+    end
+
+    if playerY > levelHeight then
+        direction = DIRECTION.BOTTOM
+    elseif playerY < 0 then
+        direction = DIRECTION.TOP
+    end
+
+    if direction then
+        Manager.emitEvent(EVENTS.LevelComplete,
+            { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
+    end
 end
 
-function Player:setLevelBounds(bounds)
-    levelX = 0
-    levelY = 0
-    levelWidth = bounds.width
-    levelHeight = bounds.height
+function Player:enterLevel(direction, levelBounds)
+    local levelGXPrevious = levelGX
+    local levelGYPrevious = levelGY
+    local levelWidthPrevious = levelWidth
+    local levelHeightPrevious = levelHeight
+
+    -- Set persisted variables
+
+    levelGX = levelBounds.x
+    levelGY = levelBounds.y
+    levelWidth = levelBounds.width
+    levelHeight = levelBounds.height
+
+    -- Set level draw offset
+
+    levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
+    levelOffsetY = levelHeight < 240 and (240 - levelBounds.height) / 2 or 0
+
+    -- Position player based on direction of entry
+
+    if direction == DIRECTION.RIGHT then
+        local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.LEFT then
+        local x = levelWidth - 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.BOTTOM then
+        local x = self.x - (levelGX - levelGXPrevious)
+        local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.TOP then
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = levelHeight + 15
+
+        self:moveTo(self.x, levelHeight - 15)
+    end
 end
 
 -- Animation Handling
