@@ -11,18 +11,14 @@ local checkpointHandlers = table.create(0, 32)
 
 function Checkpoint.increment()
     checkpointNumber += 1
-
-    print("Checkpoint number: ", checkpointNumber)
 end
 
 function Checkpoint.goToPrevious()
-    checkpointNumber -= 1
-
-    print("Checkpoint number: ", checkpointNumber)
-
     for _, handler in pairs(checkpointHandlers) do
+        -- ISSUE: See comment.
         handler:revertState()
     end
+    checkpointNumber -= 1
 end
 
 -- Instance methods - individual sprite methods for managing state
@@ -49,11 +45,34 @@ end
 -- State change methods
 
 function CheckpointHandler:pushState(state)
-    self.states[checkpointNumber] = state
+    table.insertUntil(self.states, checkpointNumber, state)
 end
 
 function CheckpointHandler:revertState()
-    local state = self.states[checkpointNumber] or self.initialState
+    local state
+    if checkpointNumber == 0 then
+        state = self.initialState
+    else
+        table.removeUntil(self.states, checkpointNumber)
 
-    self.sprite:handleCheckpointStateUpdate(state)
+        local checkpointNumber = checkpointNumber
+
+        -- Decrement through list until it returns a value for the previous state, and initial state if there is none.
+        while not state and checkpointNumber > 0 do
+            state = self.states[checkpointNumber]
+            checkpointNumber -= 1
+        end
+
+        if checkpointNumber == 0 then
+            state = self.initialState
+        end
+    end
+
+    -- ISSUE HERE:
+    -- The algorithm is returning the most up-to-date checkpoint (e.g. checkpoint no. 3, drilled == true). But actually we want to "pop" the latest checkpoint at checkpoint number
+    -- and get the previous state before that checkpoint number.
+
+    if state then
+        self.sprite:handleCheckpointStateUpdate(state)
+    end
 end
