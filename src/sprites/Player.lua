@@ -102,10 +102,10 @@ end
 function Player:collisionResponse(other)
     local tag = other:getTag()
     if tag == TAGS.Wall or
-       tag == TAGS.ConveyorBelt or
-       tag == TAGS.Box or
-       tag == TAGS.DrillableBlock or
-       tag == TAGS.Elevator then
+        tag == TAGS.ConveyorBelt or
+        tag == TAGS.Box or
+        tag == TAGS.DrillableBlock or
+        tag == TAGS.Elevator then
         return gfx.sprite.kCollisionTypeSlide
     else
         return gfx.sprite.kCollisionTypeOverlap
@@ -153,10 +153,8 @@ function Player:update()
 
     -- Show panel on B
 
-    if self:isShowingInventory() then
-        Manager.emitEvent(EVENTS.ShowPanel, true)
-    else
-        Manager.emitEvent(EVENTS.ShowPanel, false)
+    if self:justPressedCheckpoint() then
+        Manager.emitEvent(EVENTS.CheckpointRevert)
     end
 
 
@@ -239,7 +237,6 @@ function Player:update()
 
                 drillableBlockCurrentlyDrilling:activate()
             end
-
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
             local topDetectionRangeMargin = 2.5
@@ -254,16 +251,7 @@ function Player:update()
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
         elseif tag == TAGS.Ability then
-            other:pickUp()
-
-            Manager.emitEvent(EVENTS.Pickup, other.abilityName)
-
-            if self.abilityCount == 3 then
-                table.remove(self.keys, 1)
-            end
-
-            table.insert(self.keys, other.abilityName)
-            self.abilityCount = #self.keys
+            self:pickUpBlueprint(other)
         elseif tag == TAGS.Door then
             Manager.emitEvent(EVENTS.LevelComplete)
         end
@@ -333,6 +321,29 @@ function Player:update()
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
+end
+
+function Player:pickUpBlueprint(blueprint)
+    -- Update state of blueprint sprite
+
+    blueprint:pickUp()
+
+    -- Emit pickup event for abilty panel
+
+    Manager.emitEvent(EVENTS.Pickup, blueprint.abilityName)
+
+    -- Update internal abilities list
+
+    if self.abilityCount == 3 then
+        table.remove(self.keys, 1)
+    end
+
+    table.insert(self.keys, blueprint.abilityName)
+    self.abilityCount = #self.keys
+
+    -- Update checkpoints
+
+    Manager.emitEvent(EVENTS.CheckpointIncrement)
 end
 
 function Player:enterLevel(direction, levelBounds)
@@ -486,8 +497,9 @@ end
 
 -- Input Handlers
 
-function Player:isShowingInventory()
-    return self:isKeyPressedGated(KEYNAMES.B)
+function Player:justPressedCheckpoint()
+    -- No key gating on checkpoint
+    return pd.buttonJustPressed(KEYNAMES.B)
 end
 
 function Player:isJumping()

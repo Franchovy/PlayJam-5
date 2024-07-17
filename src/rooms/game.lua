@@ -178,10 +178,10 @@ function Game:crankDrop()
     self.abilityPanel:removeRightMost()
 end
 
-function Game:showPanel(isShowing)
-    if forceShowPanel then
-        return
-    end
+function Game:checkpointIncrement()
+    Checkpoint.increment()
+end
 
-    self.abilityPanel:animate(isShowing)
+function Game:checkpointRevert()
+    Checkpoint.goToPrevious()
 end

@@ -1397,7 +1397,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [8,5],
+							"__grid": [4,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1406,17 +1406,17 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 19,
-							"px": [256,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
+							"px": [128,64],
+							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Right"], "__tile": null, "defUid": 40, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Left"]
+								"params": ["Right"]
 							}] }],
-							"__worldX": -544,
-							"__worldY": -672
+							"__worldX": -672,
+							"__worldY": -768
 						},
 						{
 							"__identifier": "ButtonPickup",
-							"__grid": [3,5],
+							"__grid": [7,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -1425,16 +1425,16 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 21,
-							"px": [96,160],
+							"px": [224,64],
 							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Right"]
+									"params": ["Down"]
 								}] },
 								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
 							],
-							"__worldX": -704,
-							"__worldY": -672
+							"__worldX": -576,
+							"__worldY": -768
 						},
 						{
 							"__identifier": "Dialog",
@@ -1454,6 +1454,98 @@
 							}] }],
 							"__worldX": -608,
 							"__worldY": -672
+						},
+						{
+							"__identifier": "DrillableBlock",
+							"__grid": [7,3],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "68f73f80-25d0-11ef-9e56-3ff4b658655a",
+							"width": 32,
+							"height": 32,
+							"defUid": 67,
+							"px": [224,96],
+							"fieldInstances": [],
+							"__worldX": -576,
+							"__worldY": -736
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [8,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "6aa9aa70-25d0-11ef-9e56-99870367ba07",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [256,160],
+							"fieldInstances": [
+								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["A"]
+								}] },
+								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
+							],
+							"__worldX": -544,
+							"__worldY": -672
+						},
+						{
+							"__identifier": "DrillableBlock",
+							"__grid": [10,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "6cd6c3a0-25d0-11ef-9e56-416582cebde3",
+							"width": 32,
+							"height": 32,
+							"defUid": 67,
+							"px": [320,160],
+							"fieldInstances": [],
+							"__worldX": -480,
+							"__worldY": -672
+						},
+						{
+							"__identifier": "DrillableBlock",
+							"__grid": [12,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "6e2def30-25d0-11ef-9e56-c9e50ff33e46",
+							"width": 32,
+							"height": 32,
+							"defUid": 67,
+							"px": [384,192],
+							"fieldInstances": [],
+							"__worldX": -416,
+							"__worldY": -640
+						},
+						{
+							"__identifier": "ButtonPickup",
+							"__grid": [14,6],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#15F1D3",
+							"iid": "7ddb4d10-25d0-11ef-9e56-a9c5d9d0fda9",
+							"width": 32,
+							"height": 32,
+							"defUid": 21,
+							"px": [448,192],
+							"fieldInstances": [
+								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Left"]
+								}] },
+								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
+							],
+							"__worldX": -352,
+							"__worldY": -640
 						}
 					]
 				},
@@ -1477,7 +1569,7 @@
 					"optionalRules": [],
 					"intGridCsv": [
 						1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,0,0,0,1,1,1,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,
 						1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
@@ -1507,11 +1599,7 @@
 						{ "px": [32,96], "src": [0,128], "f": 0, "t": 16, "d": [152,49], "a": 0.4 },
 						{ "px": [64,96], "src": [0,128], "f": 0, "t": 16, "d": [152,50], "a": 0.4 },
 						{ "px": [96,96], "src": [0,128], "f": 0, "t": 16, "d": [152,51], "a": 0.4 },
-						{ "px": [128,96], "src": [0,128], "f": 0, "t": 16, "d": [152,52], "a": 0.4 },
-						{ "px": [160,96], "src": [0,128], "f": 0, "t": 16, "d": [152,53], "a": 0.4 },
-						{ "px": [192,96], "src": [0,128], "f": 0, "t": 16, "d": [152,54], "a": 0.4 },
 						{ "px": [224,96], "src": [0,128], "f": 0, "t": 16, "d": [152,55], "a": 0.4 },
-						{ "px": [256,96], "src": [0,128], "f": 0, "t": 16, "d": [152,56], "a": 0.4 },
 						{ "px": [288,96], "src": [0,128], "f": 0, "t": 16, "d": [152,57], "a": 0.4 },
 						{ "px": [320,96], "src": [0,128], "f": 0, "t": 16, "d": [152,58], "a": 0.4 },
 						{ "px": [352,96], "src": [0,128], "f": 0, "t": 16, "d": [152,59], "a": 0.4 },
@@ -1609,7 +1697,11 @@
 						{ "px": [192,32], "src": [64,64], "f": 0, "t": 10, "d": [197,22], "a": 1 },
 						{ "px": [32,128], "src": [64,0], "f": 0, "t": 2, "d": [196,65], "a": 1 },
 						{ "px": [64,160], "src": [64,0], "f": 0, "t": 2, "d": [196,82], "a": 1 },
-						{ "px": [320,192], "src": [64,0], "f": 0, "t": 2, "d": [196,106], "a": 1 }
+						{ "px": [320,192], "src": [64,0], "f": 0, "t": 2, "d": [196,106], "a": 1 },
+						{ "px": [160,96], "src": [32,96], "f": 0, "t": 13, "d": [191,53], "a": 1 },
+						{ "px": [192,96], "src": [64,96], "f": 0, "t": 14, "d": [190,54], "a": 1 },
+						{ "px": [128,96], "src": [0,96], "f": 0, "t": 12, "d": [189,52], "a": 1 },
+						{ "px": [256,96], "src": [96,96], "f": 0, "t": 15, "d": [188,56], "a": 1 }
 					],
 					"seed": 3024403,
 					"overrideTilesetUid": null,
