@@ -4,6 +4,8 @@
 class("Checkpoint").extends()
 
 local checkpointNumber = 0
+local checkpointHandlers = table.create(0, 32)
+--table.setWeakValueMetatable(checkpointHandlers)
 
 -- Static methods - managing save state at the game level
 
@@ -17,6 +19,10 @@ function Checkpoint.goToPrevious()
     checkpointNumber -= 1
 
     print("Checkpoint number: ", checkpointNumber)
+
+    for _, handler in pairs(checkpointHandlers) do
+        handler:revertState()
+    end
 end
 
 -- Instance methods - individual sprite methods for managing state
@@ -26,6 +32,8 @@ class("CheckpointHandler").extends()
 function CheckpointHandler:init(initialState)
     self.initialState = initialState
     self.states = table.create(0, 6)
+
+    table.insert(checkpointHandlers, self)
 end
 
 -- Init / Setup methods
@@ -45,5 +53,7 @@ function CheckpointHandler:pushState(state)
 end
 
 function CheckpointHandler:revertState()
-    return self.states[checkpointNumber]
+    local state = self.states[checkpointNumber] or self.initialState
+
+    self.sprite:handleCheckpointStateUpdate(state)
 end

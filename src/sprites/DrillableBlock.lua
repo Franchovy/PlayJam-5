@@ -44,7 +44,7 @@ function DrillableBlock:updateStateDrilled()
     self:remove()
 end
 
-function DrillableBlock:updateState(state)
+function DrillableBlock:handleCheckpointStateUpdate(state)
     if state.drilled then
         self:remove()
     else

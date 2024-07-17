@@ -5,6 +5,7 @@ import "playdate"
 import "extensions"
 import "rooms"
 import "sprites"
+import "utils"
 
 -- Playdate config
 
@@ -28,6 +29,8 @@ LDtk.load(assets.levels.test)
 manager.scenes = {
   menu = Menu()
 }
+
+
 
 manager:enter(manager.scenes.menu)
 
