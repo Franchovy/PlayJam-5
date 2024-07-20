@@ -6,11 +6,9 @@ local complexCollision = false
 
 local DEBUG_PRINT = false
 
-
 -- FRANCH: Behaviors to adjust for / fix:
 -- Elevator going into a wall - should stop (wall should have "infinite mass")
 -- Elevator carrying object going into the ceiling - should stop both
-
 
 class("RigidBody").extends(AnimatedSprite)
 
@@ -18,25 +16,30 @@ function RigidBody:init(entity, imageTable)
   RigidBody.super.init(self, imageTable)
 
   self.velocity = gmt.vector2D.new(0, 0)
+  self.g_mult = 1
   self.inv_mass = 0.4
   self.restitution = 0
   self.static_friction = 0
   self.dynamic_friction = .12
   self.air_friction = .14
   self.ground_friction = .3
-  self.kinematic = false
   self.maxFallSpeed = 13
   self.maxConveyorSpeed = 6
+  self.kinematic = false
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
-
   RigidBody.super.update(self)
+
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
+  if self.parent then
+    newPos = newPos + self.parent.velocity
+  end
+
   local newX, newY = newPos:unpack()
   local currentVX, currentVY = self.velocity:unpack()
 
@@ -49,7 +52,7 @@ function RigidBody:update()
     sdkCollisions = collisions
   end
 
-  local elevatorFound = false
+  local parentFound = false
   local onGround = false
 
   for _, c in pairs(sdkCollisions) do
@@ -70,6 +73,11 @@ function RigidBody:update()
           tag == TAGS.Box or
           tag == TAGS.Elevator)
 
+    if onGround and (tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.Elevator) then
+      parentFound = true
+      self.parent = other
+    end
+
     if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxConveyorSpeed then
       if DEBUG_PRINT then print("Applying collision belt logic") end
 
@@ -78,29 +86,15 @@ function RigidBody:update()
 
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
+  end
 
-    if self:getTag() == TAGS.Elevator then
-      self:activate()
-
-      if DEBUG_PRINT then print("Applying elevator logic") end
-
-      if self.orientation == "Horizontal" then
-        if tag == TAGS.Player and (other:isMovingLeft() or other:isMovingRight()) then
-          -- FRANCH: Is this really supposed to be a "return", or a "goto ::continue::"? Why are we interrupting the
-          -- execution flow?
-
-          return
-        end
-        other:moveTo(self.x - 16, other.y)
-      else
-        other:moveTo(other.x, self.y - 40)
-      end
-    end
+  if not parentFound then
+    self.parent = null
+  else
+    return
   end
 
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
-
-  self.onElevator = elevatorFound
 
   -- incorporate gravity
   if (complexCollision or not onGround) and currentVY < self.maxFallSpeed then
@@ -115,6 +109,7 @@ function RigidBody:update()
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
   end
 
+  -- incorporate any ground friction
   if onGround and currentVX ~=0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
   end
