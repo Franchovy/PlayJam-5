@@ -199,9 +199,11 @@ function Game:cleanUp()
     self.abilityPanel:cleanUp()
 end
 
-function Game:pickup(ability)
+function Game:pickup(blueprint)
+    blueprint:updateStatePickedUp()
+
     spCollect:play(1)
-    self.abilityPanel:addItem(ability)
+    self.abilityPanel:addItem(blueprint.ability)
 end
 
 function Game:crankDrop()

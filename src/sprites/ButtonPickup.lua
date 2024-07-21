@@ -12,6 +12,14 @@ local imageTableIndexes = {
   [KEYNAMES.B] = 6,
 }
 
+local stateNotConsumed = {
+  consumed = false
+}
+
+local stateConsumed = {
+  consumed = true
+}
+
 class('ButtonPickup').extends(gfx.sprite)
 
 function ButtonPickup:init(entity)
@@ -25,9 +33,24 @@ function ButtonPickup:init(entity)
   self:setImage(abilityImage)
 
   self:setTag(TAGS.Ability)
+
+  -- Checkpoint (state handling) setup
+
+  self.checkpointHandler = CheckpointHandler()
+  self.checkpointHandler:setInitialState(stateNotConsumed)
+  self.checkpointHandler:setCheckpointStateHandling(self)
 end
 
-function ButtonPickup:pickUp()
-  self.fields.consumed = true
+function ButtonPickup:updateStatePickedUp()
+  self.checkpointHandler:pushState(stateConsumed)
+
   self:remove()
+end
+
+function ButtonPickup:handleCheckpointStateUpdate(state)
+  if state.consumed then
+    self:remove()
+  else
+    self:add()
+  end
 end

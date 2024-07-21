@@ -363,13 +363,9 @@ function Player:update()
 end
 
 function Player:pickUpBlueprint(blueprint)
-    -- Update state of blueprint sprite
-
-    blueprint:pickUp()
-
     -- Emit pickup event for abilty panel
 
-    Manager.emitEvent(EVENTS.Pickup, blueprint.abilityName)
+    Manager.emitEvent(EVENTS.Pickup, blueprint)
 
     -- Update internal abilities list
 
