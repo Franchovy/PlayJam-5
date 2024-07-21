@@ -26,6 +26,7 @@ function RigidBody:init(entity, imageTable)
   self.maxFallSpeed = 13
   self.maxConveyorSpeed = 6
   self.kinematic = false
+  self.onParent = false
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
@@ -36,7 +37,7 @@ function RigidBody:update()
 
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
-  if self.parent then
+  if self.onParent and self.parent then
     newPos = newPos + self.parent.velocity
   end
 
@@ -88,11 +89,7 @@ function RigidBody:update()
     end
   end
 
-  if not parentFound then
-    self.parent = null
-  else
-    return
-  end
+  self.onParent = parentFound
 
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
@@ -118,6 +115,8 @@ function RigidBody:update()
 end
 
 function RigidBody:checkCollision(other)
+  if self.onParent and self.parent == other then return end
+
   local normal = gmt.vector2D.new(0, 0)
   local pen = 0.0
 
