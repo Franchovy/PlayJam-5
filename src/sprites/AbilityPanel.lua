@@ -5,7 +5,6 @@ local gmt <const> = pd.geometry
 class("AbilityPanel").extends(pd.graphics.sprite)
 
 local imagePanel <const> = gfx.image.new(assets.images.hudPanel)
-local emptyImage <const> = gfx.image.new(1, 1)
 
 -- Button images (from imagetable)
 
@@ -21,24 +20,16 @@ local imageTableIndexes = {
 
 local items = {}
 
-local spriteOne = gfx.sprite.new()
-local spriteTwo = gfx.sprite.new()
-local spriteThree = gfx.sprite.new()
+local buttonSprites = table.create(3, 0)
+for i = 1, 3 do
+  table.insert(buttonSprites, gfx.sprite.new())
+end
 
-local panelHiddenY <const> = -60
-local buttonHiddenY <const> = -60
-local panelShownY <const> = 0
-local buttonShownY <const> = 14
-
-local buttonOneX <const> = 16
-local buttonOnePointsShow = gmt.polygon.new(buttonOneX, buttonHiddenY, buttonOneX, buttonShownY)
-local buttonOnePointsHide = gmt.polygon.new(buttonOneX, buttonShownY, buttonOneX, buttonHiddenY)
-local buttonTwoX <const> = 42
-local buttonTwoPointsShow = gmt.polygon.new(buttonTwoX, buttonHiddenY, buttonTwoX, buttonShownY)
-local buttonTwoPointsHide = gmt.polygon.new(buttonTwoX, buttonShownY, buttonTwoX, buttonHiddenY)
-local buttonThreeX <const> = 68
-local buttonThreePointsShow = gmt.polygon.new(buttonThreeX, buttonHiddenY, buttonThreeX, buttonShownY)
-local buttonThreePointsHide = gmt.polygon.new(buttonThreeX, buttonShownY, buttonThreeX, buttonHiddenY)
+local spritePositions = {
+  gmt.point.new(16, 14),
+  gmt.point.new(42, 14),
+  gmt.point.new(68, 14),
+}
 
 -- Static Reference
 
@@ -54,35 +45,30 @@ function AbilityPanel:init()
 
   self:setCenter(0, 0)
   self:moveTo(0, 0)
-
-  self:add()
-
-  spriteOne:moveTo(buttonOneX, buttonShownY)
-  spriteOne:setZIndex(100)
-  spriteOne:add()
-  spriteTwo:moveTo(buttonTwoX, buttonShownY)
-  spriteTwo:setZIndex(100)
-  spriteTwo:add()
-  spriteThree:moveTo(buttonThreeX, buttonShownY)
-  spriteThree:setZIndex(100)
-  spriteThree:add()
-
-  self:setIgnoresDrawOffset(true)
-  spriteOne:setIgnoresDrawOffset(true)
-  spriteTwo:setIgnoresDrawOffset(true)
-  spriteThree:setIgnoresDrawOffset(true)
-
-  self.abilitiesCount = 1
   self:setZIndex(99)
+  self:add()
+  self:setIgnoresDrawOffset(true)
+
+  for i, sprite in ipairs(buttonSprites) do
+    sprite:moveTo(spritePositions[i]:unpack())
+    sprite:setZIndex(100)
+    sprite:add()
+    sprite:setIgnoresDrawOffset(true)
+  end
+
+  -- Add checkpoint state tracking
+
+  self.checkpointHandler = CheckpointHandler()
+  self.checkpointHandler:setCheckpointStateHandling(self)
 end
 
-local _spriteAdd = AbilityPanel.add
+-- Override to add button sprites along with sprite.
 function AbilityPanel:add()
-  _spriteAdd(self)
+  AbilityPanel.super.add(self)
 
-  spriteOne:add()
-  spriteTwo:add()
-  spriteThree:add()
+  for _, sprite in ipairs(buttonSprites) do
+    sprite:add()
+  end
 end
 
 function AbilityPanel:shake(shakeTime, shakeMagnitude)
@@ -101,7 +87,7 @@ function AbilityPanel:shake(shakeTime, shakeMagnitude)
 end
 
 function AbilityPanel:addItem(item)
-  if self.abilitiesCount == 3 then
+  if #items == 3 then
     table.remove(items, 1)
     table.insert(items, item)
 
@@ -109,9 +95,12 @@ function AbilityPanel:addItem(item)
   else
     table.insert(items, item)
 
-    self:updateItemsCount()
     self:updateItemImages()
   end
+
+  -- Update checkpoint state
+
+  self.checkpointHandler:pushState(table.deepcopy(items))
 end
 
 function AbilityPanel:cleanUp()
@@ -121,33 +110,48 @@ function AbilityPanel:cleanUp()
 end
 
 function AbilityPanel:removeRightMost()
-  if self.abilitiesCount == 1 then
+  if #items == 1 then
     items[1] = nil
-  elseif self.abilitiesCount == 2 then
+  elseif #items == 2 then
     items[2] = nil
-  elseif self.abilitiesCount == 3 then
+  elseif #items == 3 then
     items[3] = nil
   end
 
-  self:updateItemsCount()
   self:updateItemImages()
 end
 
+-- This function serves as a "reset state" function, only to be called by classes like Game on level start.
+-- Do not use this to set the items in-game! Instead, set the `items` array directly and call updateItemsCount() & updateItemImages().
 function AbilityPanel:setItems(item1, item2, item3)
   items[1] = item1
   items[2] = item2
   items[3] = item3
 
-  self:updateItemsCount()
+  self:updateItemImages()
+
+  -- Set initial state reference for checkpoint handling
+
+  self.checkpointHandler:setInitialState(table.deepcopy(items))
+end
+
+function AbilityPanel:handleCheckpointStateUpdate(state)
+  items[1] = state[1]
+  items[2] = state[2]
+  items[3] = state[3]
+
   self:updateItemImages()
 end
 
-function AbilityPanel:updateItemsCount()
-  self.abilitiesCount = #items
-end
-
 function AbilityPanel:updateItemImages()
-  spriteOne:setImage(items[1] and imageTableButtons[imageTableIndexes[items[1]]] or emptyImage)
-  spriteTwo:setImage(items[2] and imageTableButtons[imageTableIndexes[items[2]]] or emptyImage)
-  spriteThree:setImage(items[3] and imageTableButtons[imageTableIndexes[items[3]]] or emptyImage)
+  for i, sprite in ipairs(buttonSprites) do
+    if items[i] then
+      sprite:add()
+
+      local image = imageTableButtons[imageTableIndexes[items[i]]]
+      sprite:setImage(image)
+    else
+      sprite:remove()
+    end
+  end
 end

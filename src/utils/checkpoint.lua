@@ -31,6 +31,9 @@ function Checkpoint.goToPrevious()
 
         print("No state changes detected. Decrementing the checkpoint number to: " .. checkpointNumber - 1)
         checkpointNumber -= 1
+
+        -- Recursive call to previous checkpoint.
+        Checkpoint.goToPrevious()
     end
 end
 
@@ -95,6 +98,7 @@ function CheckpointHandler:revertState()
         print("Reverting to state: ")
         printTable(state)
 
+        assert(self.sprite.handleCheckpointStateUpdate, "Sprite did not implement handleCheckpointStateUpdate().")
         self.sprite:handleCheckpointStateUpdate(state)
     end
 
