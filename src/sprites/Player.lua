@@ -6,6 +6,10 @@ local gfx <const> = pd.graphics
 local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
 local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
+local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
+local spDrillLoop = sound.sampleplayer.new("assets/sfx/drill-loop")
+local spDrillEnd = sound.sampleplayer.new("assets/sfx/drill-end")
+local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -209,8 +213,24 @@ function Player:update()
     -- Drilling
 
     if self:isMovingDown() then
+        if self.isDrilling == false then
+            spDrillStart:play(1)
+            spDrillStart:setFinishCallback(function()
+                if self.isDrilling then
+                    -- Play loop
+                    spDrillLoop:play(0)
+                end
+            end)
+        end
+
         self.isDrilling = true
     else
+        if self.isDrilling then
+            -- spDrillStart:stop() -- Until we have better samples, better to cover up the sfx gaps...
+            spDrillLoop:stop()
+            spDrillEnd:play(1)
+        end
+
         self.isDrilling = false
 
         if drillableBlockCurrentlyDrilling ~= nil then
@@ -362,6 +382,7 @@ function Player:update()
 end
 
 function Player:revertCheckpoint()
+    spCheckpointRevert:play(1)
     Manager.emitEvent(EVENTS.CheckpointRevert)
 end
 

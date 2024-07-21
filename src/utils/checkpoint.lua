@@ -10,8 +10,9 @@ local checkpointHandlers = table.create(0, 32)
 -- Insights into the checkpoint system:
 -- DONE: 1 - The checkpoint number increment must be done AFTER the button pickup to ensure correct reset.
 -- TODO: 2 - The checkpoint number should only increment AFTER a pushState update since the last buttonPickup.
--- TODO: 3 - Need to take advantage of the array-style table formatting for proper index management. Stack pushes and store indexes e.g. (1, state).
+-- DONE: 3 - Need to take advantage of the array-style table formatting for proper index management. Stack pushes and store indexes e.g. (1, state).
 
+-- TODO: Move this into another file. Would be great to rewrite data structure code in C or Swift, or at least using a class interface.
 -- linkedlist data structure
 
 -- [last] = 7
