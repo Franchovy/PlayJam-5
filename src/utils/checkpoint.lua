@@ -14,11 +14,28 @@ function Checkpoint.increment()
 end
 
 function Checkpoint.goToPrevious()
+    print("Performing Checkpoint revert operation...")
+
+    local hasChanged = false
     for _, handler in pairs(checkpointHandlers) do
-        -- ISSUE: See comment.
-        handler:revertState()
+        local hasChangedNew = handler:revertState()
+        hasChanged = hasChanged or hasChangedNew
     end
-    checkpointNumber -= 1
+
+    -- Only decrement the checkpoint number if no reset occurred.
+    if not hasChanged then
+        if checkpointNumber == 0 then
+            print("No state changes detected. Cannot decrement checkpoint number 0.")
+            return
+        end
+
+        print("No state changes detected. Decrementing the checkpoint number to: " .. checkpointNumber - 1)
+        checkpointNumber -= 1
+    end
+end
+
+function Checkpoint.getCheckpointNumber()
+    return checkpointNumber
 end
 
 -- Instance methods - individual sprite methods for managing state
@@ -45,34 +62,41 @@ end
 -- State change methods
 
 function CheckpointHandler:pushState(state)
-    table.insertUntil(self.states, checkpointNumber, state)
+    self.states[checkpointNumber] = state
+
+    print("Pushing state: " .. checkpointNumber)
+    printTable(self.states)
 end
 
 function CheckpointHandler:revertState()
-    local state
-    if checkpointNumber == 0 then
-        state = self.initialState
-    else
-        table.removeUntil(self.states, checkpointNumber)
+    local hasChangedState = false
 
-        local checkpointNumber = checkpointNumber
+    -- Check what state needs to be reverted.
 
-        -- Decrement through list until it returns a value for the previous state, and initial state if there is none.
-        while not state and checkpointNumber > 0 do
-            state = self.states[checkpointNumber]
-            checkpointNumber -= 1
-        end
+    print("Checking state to revert: ")
+    printTable(self.states)
 
-        if checkpointNumber == 0 then
-            state = self.initialState
-        end
+    -- Pop all values until the checkpoint number.
+
+    local latestCheckpointNumber = next(self.states) or 0
+    while latestCheckpointNumber and latestCheckpointNumber >= checkpointNumber do
+        self.states[latestCheckpointNumber] = nil
+        latestCheckpointNumber = next(self.states)
+
+        -- Mark if state has changed during this revert operation.
+        hasChangedState = true
     end
 
-    -- ISSUE HERE:
-    -- The algorithm is returning the most up-to-date checkpoint (e.g. checkpoint no. 3, drilled == true). But actually we want to "pop" the latest checkpoint at checkpoint number
-    -- and get the previous state before that checkpoint number.
+    -- If state changes, get latest state since checkpoint
 
-    if state then
+    if hasChangedState then
+        local state = next(self.states) or self.initialState
+
+        print("Reverting to state: ")
+        printTable(state)
+
         self.sprite:handleCheckpointStateUpdate(state)
     end
+
+    return hasChangedState
 end

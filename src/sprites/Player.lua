@@ -195,19 +195,16 @@ end
 local drillableBlockCurrentlyDrilling
 
 function Player:update()
+    -- Checkpoint Handling
+
+    self:handleCheckpoint()
+
     -- Crank
 
     local _, acceleratedChange = pd.getCrankChange()
     if acceleratedChange > 75 and not self.isDroppingItem then
         self:dropLastItem()
     end
-
-    -- Show panel on B
-
-    if self:justPressedCheckpoint() then
-        Manager.emitEvent(EVENTS.CheckpointRevert)
-    end
-
 
     -- Drilling
 
@@ -257,6 +254,8 @@ function Player:update()
     elseif self.state == STATE.Jumping then
         self:handleJump()
     end
+
+    --
 
     if self.state ~= STATE.OnLadder and spLadder:isPlaying() then
         spLadder:stop()
@@ -362,6 +361,10 @@ function Player:update()
     end
 end
 
+function Player:revertCheckpoint()
+    Manager.emitEvent(EVENTS.CheckpointRevert)
+end
+
 function Player:pickUpBlueprint(blueprint)
     -- Emit pickup event for abilty panel
 
@@ -465,7 +468,13 @@ function Player:updateAnimationState(stateCurrent)
     self:changeState(animationState)
 end
 
--- Movement Handlers --
+-- Input Handlers --
+
+function Player:handleCheckpoint()
+    if self:justPressedCheckpoint() then
+        self:revertCheckpoint()
+    end
+end
 
 -- Jump
 

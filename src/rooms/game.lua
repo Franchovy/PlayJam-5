@@ -203,7 +203,7 @@ function Game:pickup(blueprint)
     blueprint:updateStatePickedUp()
 
     spCollect:play(1)
-    self.abilityPanel:addItem(blueprint.ability)
+    self.abilityPanel:addItem(blueprint.abilityName)
 end
 
 function Game:crankDrop()
