@@ -4,16 +4,19 @@ local gmt <const> = pd.geometry
 
 class("AbilityPanel").extends(pd.graphics.sprite)
 
-local imagePanel <const> = gfx.image.new("assets/images/panel")
+local imagePanel <const> = gfx.image.new(assets.images.hudPanel)
 local emptyImage <const> = gfx.image.new(1, 1)
 
-local imageForKey = {
-  [KEYNAMES.Up] = gfx.image.new("assets/images/Up"),
-  [KEYNAMES.Down] = gfx.image.new("assets/images/Down"),
-  [KEYNAMES.Left] = gfx.image.new("assets/images/Left"),
-  [KEYNAMES.Right] = gfx.image.new("assets/images/Right"),
-  [KEYNAMES.A] = gfx.image.new("assets/images/A"),
-  [KEYNAMES.B] = gfx.image.new("assets/images/B")
+-- Button images (from imagetable)
+
+local imageTableButtons = gfx.imagetable.new(assets.imageTables.buttons)
+local imageTableIndexes = {
+  [KEYNAMES.Right] = 1,
+  [KEYNAMES.Left] = 2,
+  [KEYNAMES.Down] = 3,
+  [KEYNAMES.Up] = 4,
+  [KEYNAMES.A] = 5,
+  [KEYNAMES.B] = 6,
 }
 
 local items = {}
@@ -25,15 +28,15 @@ local spriteThree = gfx.sprite.new()
 local panelHiddenY <const> = -60
 local buttonHiddenY <const> = -60
 local panelShownY <const> = 0
-local buttonShownY <const> = 12
+local buttonShownY <const> = 14
 
 local buttonOneX <const> = 16
 local buttonOnePointsShow = gmt.polygon.new(buttonOneX, buttonHiddenY, buttonOneX, buttonShownY)
 local buttonOnePointsHide = gmt.polygon.new(buttonOneX, buttonShownY, buttonOneX, buttonHiddenY)
-local buttonTwoX <const> = 48
+local buttonTwoX <const> = 42
 local buttonTwoPointsShow = gmt.polygon.new(buttonTwoX, buttonHiddenY, buttonTwoX, buttonShownY)
 local buttonTwoPointsHide = gmt.polygon.new(buttonTwoX, buttonShownY, buttonTwoX, buttonHiddenY)
-local buttonThreeX <const> = 80
+local buttonThreeX <const> = 68
 local buttonThreePointsShow = gmt.polygon.new(buttonThreeX, buttonHiddenY, buttonThreeX, buttonShownY)
 local buttonThreePointsHide = gmt.polygon.new(buttonThreeX, buttonShownY, buttonThreeX, buttonHiddenY)
 
@@ -47,19 +50,20 @@ function AbilityPanel.getInstance() return _instance end
 
 function AbilityPanel:init()
   AbilityPanel.super.init(self, imagePanel)
-
   _instance = self
 
-  self:moveTo(0, panelShownY)
+  self:setCenter(0, 0)
+  self:moveTo(0, 0)
+
   self:add()
 
-  spriteOne:moveTo(16, buttonShownY)
+  spriteOne:moveTo(buttonOneX, buttonShownY)
   spriteOne:setZIndex(100)
   spriteOne:add()
-  spriteTwo:moveTo(48, buttonShownY)
+  spriteTwo:moveTo(buttonTwoX, buttonShownY)
   spriteTwo:setZIndex(100)
   spriteTwo:add()
-  spriteThree:moveTo(80, buttonShownY)
+  spriteThree:moveTo(buttonThreeX, buttonShownY)
   spriteThree:setZIndex(100)
   spriteThree:add()
 
@@ -143,7 +147,7 @@ function AbilityPanel:updateItemsCount()
 end
 
 function AbilityPanel:updateItemImages()
-  spriteOne:setImage(items[1] and imageForKey[items[1]] or emptyImage)
-  spriteTwo:setImage(items[2] and imageForKey[items[2]] or emptyImage)
-  spriteThree:setImage(items[3] and imageForKey[items[3]] or emptyImage)
+  spriteOne:setImage(items[1] and imageTableButtons[imageTableIndexes[items[1]]] or emptyImage)
+  spriteTwo:setImage(items[2] and imageTableButtons[imageTableIndexes[items[2]]] or emptyImage)
+  spriteThree:setImage(items[3] and imageTableButtons[imageTableIndexes[items[3]]] or emptyImage)
 end

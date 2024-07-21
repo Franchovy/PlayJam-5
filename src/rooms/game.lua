@@ -209,6 +209,10 @@ function Game:crankDrop()
     self.abilityPanel:removeRightMost()
 end
 
-function Game:checkpoint(spriteCheckpoint)
-    spriteCheckpoint:activate(currentLevelName)
+function Game:checkpointIncrement()
+    Checkpoint.increment()
+end
+
+function Game:checkpointRevert()
+    Checkpoint.goToPrevious()
 end

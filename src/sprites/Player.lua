@@ -204,10 +204,8 @@ function Player:update()
 
     -- Show panel on B
 
-    if self:isShowingInventory() then
-        Manager.emitEvent(EVENTS.ShowPanel, true)
-    else
-        Manager.emitEvent(EVENTS.ShowPanel, false)
+    if self:justPressedCheckpoint() then
+        Manager.emitEvent(EVENTS.CheckpointRevert)
     end
 
 
@@ -304,18 +302,7 @@ function Player:update()
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
         elseif tag == TAGS.Ability then
-            other:pickUp()
-
-            Manager.emitEvent(EVENTS.Pickup, other.abilityName)
-
-            if self.abilityCount == 3 then
-                table.remove(self.keys, 1)
-            end
-
-            table.insert(self.keys, other.abilityName)
-            self.abilityCount = #self.keys
-        elseif tag == TAGS.Checkpoint then
-            Manager.emitEvent(EVENTS.Checkpoint, other)
+            self:pickUpBlueprint(other)
         end
     end
 
@@ -372,6 +359,72 @@ function Player:update()
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
+    end
+end
+
+function Player:pickUpBlueprint(blueprint)
+    -- Update state of blueprint sprite
+
+    blueprint:pickUp()
+
+    -- Emit pickup event for abilty panel
+
+    Manager.emitEvent(EVENTS.Pickup, blueprint.abilityName)
+
+    -- Update internal abilities list
+
+    if self.abilityCount == 3 then
+        table.remove(self.keys, 1)
+    end
+
+    table.insert(self.keys, blueprint.abilityName)
+    self.abilityCount = #self.keys
+
+    -- Update checkpoints
+
+    Manager.emitEvent(EVENTS.CheckpointIncrement)
+end
+
+function Player:enterLevel(direction, levelBounds)
+    local levelGXPrevious = levelGX
+    local levelGYPrevious = levelGY
+    local levelWidthPrevious = levelWidth
+    local levelHeightPrevious = levelHeight
+
+    -- Set persisted variables
+
+    levelGX = levelBounds.x
+    levelGY = levelBounds.y
+    levelWidth = levelBounds.width
+    levelHeight = levelBounds.height
+
+    -- Set level draw offset
+
+    levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
+    levelOffsetY = levelHeight < 240 and (240 - levelBounds.height) / 2 or 0
+
+    -- Position player based on direction of entry
+
+    if direction == DIRECTION.RIGHT then
+        local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.LEFT then
+        local x = levelWidth - 15
+        local y = self.y + (levelGYPrevious - levelGY)
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.BOTTOM then
+        local x = self.x - (levelGX - levelGXPrevious)
+        local y = (levelGYPrevious + levelHeightPrevious) - levelGY + 15
+
+        self:moveTo(x, y)
+    elseif direction == DIRECTION.TOP then
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = levelHeight + 15
+
+        self:moveTo(self.x, levelHeight - 15)
     end
 end
 
@@ -483,8 +536,9 @@ end
 
 -- Input Handlers
 
-function Player:isShowingInventory()
-    return self:isKeyPressedGated(KEYNAMES.B)
+function Player:justPressedCheckpoint()
+    -- No key gating on checkpoint
+    return pd.buttonJustPressed(KEYNAMES.B)
 end
 
 function Player:isJumping()
