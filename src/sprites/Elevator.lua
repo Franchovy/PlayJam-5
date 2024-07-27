@@ -4,7 +4,7 @@ local timer <const> = playdate.timer
 
 class("Elevator").extends(RigidBody)
 
-local maxVelocity = 10
+local maxVelocity = 5
 local speed = 1
 
 function Elevator:init(entity)
@@ -41,7 +41,7 @@ function Elevator:activate()
         self.targetY = self.y + self.actualDistance
       end
     end
-    self.isActivating = false
+    -- self.isActivating = false
   end
   )
 end
@@ -50,27 +50,37 @@ function Elevator:update()
   Elevator.super.update(self)
   local cvx, cvy = self.velocity:unpack()
 
+  local distance = 0
+
   if self.orientation == "Horizontal" then
+    distance = math.abs(self.targetX - self.x)
     if self.targetX > self.x and math.abs(cvx) < maxVelocity then
       self.isMovingToTarget = true
       self.velocity = self.velocity + gmt.vector2D.new(speed, 0);
     elseif self.targetX < self.x and math.abs(cvx) < maxVelocity then
       self.isMovingToTarget = true
       self.velocity = self.velocity + gmt.vector2D.new(-speed, 0);
-    else
+    end
+
+    if distance < math.abs(self.velocity.dx) then
+      self:moveTo(self.targetX, self.targetY);
       self.isMovingToTarget = false
       self.velocity = gmt.vector2D.new(0, 0)
     end
   end
 
   if self.orientation == "Vertical" then
+    distance = math.abs(self.targetY - self.y)
     if self.targetY > self.y and math.abs(cvy) < maxVelocity then
       self.isMovingToTarget = true
       self.velocity = self.velocity + gmt.vector2D.new(0, speed);
     elseif self.targetY < self.y and math.abs(cvy) < maxVelocity then
       self.isMovingToTarget = true
       self.velocity = self.velocity + gmt.vector2D.new(0, -speed);
-    else
+    end
+
+    if distance < math.abs(self.velocity.dy) then
+      self:moveTo(self.targetX, self.targetY);
       self.isMovingToTarget = false
       self.velocity = gmt.vector2D.new(0, 0)
     end

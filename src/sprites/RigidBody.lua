@@ -80,7 +80,7 @@ function RigidBody:update()
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
     if tag == TAGS.Elevator and onGround then
-      -- other:activate()
+      other:activate()
     end
   end
 
