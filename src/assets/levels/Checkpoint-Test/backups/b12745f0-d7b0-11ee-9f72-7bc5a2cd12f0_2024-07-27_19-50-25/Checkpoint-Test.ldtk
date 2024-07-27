@@ -1763,9 +1763,9 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [254,158],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Crank", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Up"]
+								"params": ["Crank"]
 							}] }],
 							"__worldX": -50,
 							"__worldY": -674

@@ -1750,25 +1750,6 @@
 							}] }],
 							"__worldX": -242,
 							"__worldY": -642
-						},
-						{
-							"__identifier": "ButtonPickup",
-							"__grid": [7,4],
-							"__pivot": [-0.071,-0.071],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#15F1D3",
-							"iid": "a28fb680-25d0-11ef-8570-7f76f62234c8",
-							"width": 28,
-							"height": 28,
-							"defUid": 21,
-							"px": [254,158],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Up"]
-							}] }],
-							"__worldX": -50,
-							"__worldY": -674
 						}
 					]
 				},
