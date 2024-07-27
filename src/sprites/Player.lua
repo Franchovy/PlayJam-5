@@ -23,6 +23,14 @@ local levelHeight
 local levelOffsetX
 local levelOffsetY
 
+-- Checkpoint state which monitors position.
+-- Not used for anything other than being passed to checkpoint.
+
+local checkpointState = {
+    x = nil,
+    y = nil
+}
+
 --
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
@@ -101,6 +109,19 @@ function Player:init(entity)
     self.abilityCount = #self.keys
 
     Manager.emitEvent(EVENTS.LoadItems, table.unpack(startingKeys))
+
+    -- Add Checkpoint handling
+
+    checkpointState.x = self.x
+    checkpointState.y = self.y
+
+    self.checkpointHandler = CheckpointHandler()
+    self.checkpointHandler:setInitialState(checkpointState)
+    self.checkpointHandler:setCheckpointStateHandling(self)
+end
+
+function Player:handleCheckpointStateUpdate(state)
+    self:moveTo(state.x, state.y)
 end
 
 -- Enter Level
@@ -275,6 +296,12 @@ function Player:update()
         self:handleJump()
     end
 
+    -- Update state for checkpoint
+
+    checkpointState.x = self.x
+    checkpointState.y = self.y
+    self.checkpointHandler:pushState(checkpointState)
+
     --
 
     if self.state ~= STATE.OnLadder and spLadder:isPlaying() then
@@ -446,6 +473,12 @@ function Player:enterLevel(direction, levelBounds)
 
         self:moveTo(self.x, levelHeight - 15)
     end
+
+    -- Update checkpoint position
+
+    checkpointState.x = self.x
+    checkpointState.y = self.y
+    self.checkpointHandler:pushState(checkpointState)
 end
 
 -- Animation Handling

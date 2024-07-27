@@ -21,12 +21,27 @@ local checkpointHandlers = table.create(0, 32)
 -- [7] = { state, prev = nil }
 
 function createLinkedList(state, index)
-    return { [index] = { [1] = state }, last = index or 1 }
+    return {
+        [index] = {
+            state = state,
+            prev = nil
+        },
+        last = index or 1
+    }
 end
 
 function appendLinkedList(list, state, index)
-    list[index] = { state, prev = list.last }
-    list.last = index
+    if list.last == index then
+        -- Update latest state
+        list[index].state = state
+    else
+        -- Create new state
+        list[index] = {
+            state = state,
+            prev = list.last
+        }
+        list.last = index
+    end
 end
 
 function popLinkedList(list)
@@ -41,7 +56,7 @@ function popLinkedList(list)
 
     list[index] = nil
     list.last = element.prev
-    return element[1]
+    return element.state
 end
 
 function getLastLinkedList(list)
@@ -53,7 +68,7 @@ function getLastLinkedList(list)
     end
 
     local element = list[index]
-    return element[1]
+    return element.state
 end
 
 function testLinkedList()
@@ -68,7 +83,7 @@ function testLinkedList()
 
     appendLinkedList(testList, { "newState4" }, 16)
 
-    assert(testList[16][1][1] == "newState4")
+    assert(testList[16].state[1] == "newState4")
     assert(testList.last == 16)
 
     popLinkedList(testList)
