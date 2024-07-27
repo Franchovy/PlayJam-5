@@ -15,7 +15,7 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
 -- LDtk current level name
 -- use "Physics_test" to load physics test level
-local initialLevelName <const> = "Level_0"
+local initialLevelName <const> = "Physics_test"
 local currentLevelName
 local checkpointPlayerStart
 
