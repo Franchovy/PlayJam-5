@@ -25,7 +25,6 @@ function RigidBody:init(entity, imageTable)
   self.ground_friction = .3
   self.maxFallSpeed = 13
   self.maxConveyorSpeed = 6
-  self.kinematic = false
   self.onParent = false
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
@@ -44,14 +43,7 @@ function RigidBody:update()
   local newX, newY = newPos:unpack()
   local currentVX, currentVY = self.velocity:unpack()
 
-  local sdkCollisions
-  if not self.kinematic then
-    local _, _, collisions = self:moveWithCollisions(newX, newY)
-    sdkCollisions = collisions
-  else
-    local _, _, collisions = self:checkCollisions(self.x, self.y - 1)
-    sdkCollisions = collisions
-  end
+  local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
 
   local parentFound = false
   local onGround = false
@@ -64,7 +56,7 @@ function RigidBody:update()
 
     if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
 
-    if complexCollision and tag ~= TAGS.Player and not self.kinematic then
+    if complexCollision and tag ~= TAGS.Player then
       self:checkCollision(other)
     end
 
@@ -74,7 +66,7 @@ function RigidBody:update()
           tag == TAGS.Box or
           tag == TAGS.Elevator)
 
-    if onGround and (tag == TAGS.ConveyorBelt or tag == TAGS.Box or tag == TAGS.Elevator) then
+    if onGround and (tag == TAGS.Box or tag == TAGS.Elevator) then
       parentFound = true
       self.parent = other
     end
@@ -86,6 +78,9 @@ function RigidBody:update()
       self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
 
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
+    end
+    if tag == TAGS.Elevator and onGround then
+      other:activate()
     end
   end
 

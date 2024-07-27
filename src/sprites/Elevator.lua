@@ -21,7 +21,6 @@ function Elevator:init(entity)
   self.actualDistance = self.fields.distance * 32
   self.orientation = self.fields.orientation
   self.restitution = 0.0
-  self.kinematic = true
 end
 
 function Elevator:activate()
