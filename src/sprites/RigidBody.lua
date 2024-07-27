@@ -37,7 +37,7 @@ function RigidBody:update()
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   if self.onParent and self.parent then
-    newPos = newPos + self.parent.velocity
+    newPos = newPos + self.parent.velocity/2
   end
 
   local newX, newY = newPos:unpack()
@@ -80,7 +80,7 @@ function RigidBody:update()
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
     if tag == TAGS.Elevator and onGround then
-      other:activate()
+      -- other:activate()
     end
   end
 
