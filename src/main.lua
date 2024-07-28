@@ -23,7 +23,7 @@ manager:hook()
 
 -- Pre-load levels data
 
-LDtk.load(assets.levels.checkpointTest)
+LDtk.load(assets.levels.test)
 
 -- Open Menu (& save reference)
 
