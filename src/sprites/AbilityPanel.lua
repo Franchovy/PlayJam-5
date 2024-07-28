@@ -56,10 +56,7 @@ function AbilityPanel:init()
     sprite:setIgnoresDrawOffset(true)
   end
 
-  -- Add checkpoint state tracking
-
-  self.checkpointHandler = CheckpointHandler()
-  self.checkpointHandler:setCheckpointStateHandling(self)
+  self:setUpdatesEnabled(false)
 end
 
 -- Override to add button sprites along with sprite.
@@ -71,84 +68,21 @@ function AbilityPanel:add()
   end
 end
 
-function AbilityPanel:shake(shakeTime, shakeMagnitude)
-  local shakeTimer = pd.timer.new(shakeTime, shakeMagnitude, 0)
-
-  shakeTimer.updateCallback = function(timer)
-    local magnitude = math.floor(timer.value)
-    local shakeX = math.random(-magnitude, magnitude)
-    local shakeY = math.random(-magnitude, magnitude)
-    self:moveTo(self.original_x + shakeX, self.original_y + shakeY)
-  end
-
-  shakeTimer.timerEndedCallback = function()
-    self:moveTo(self.original_x, self.original_y)
-  end
-end
-
-function AbilityPanel:addItem(item)
-  if #items == 3 then
-    table.remove(items, 1)
-    table.insert(items, item)
-
-    self:updateItemImages()
-  else
-    table.insert(items, item)
-
-    self:updateItemImages()
-  end
-
-  -- Update checkpoint state
-
-  self.checkpointHandler:pushState(table.deepcopy(items))
-end
-
 function AbilityPanel:cleanUp()
   self:setItems()
 
   self:remove()
 end
 
-function AbilityPanel:removeRightMost()
-  if #items == 1 then
-    items[1] = nil
-  elseif #items == 2 then
-    items[2] = nil
-  elseif #items == 3 then
-    items[3] = nil
-  end
+function AbilityPanel:updateBlueprints()
+  local blueprints = Player.getInstance().blueprints
+  self.blueprints = blueprints
 
-  self:updateItemImages()
-end
-
--- This function serves as a "reset state" function, only to be called by classes like Game on level start.
--- Do not use this to set the items in-game! Instead, set the `items` array directly and call updateItemsCount() & updateItemImages().
-function AbilityPanel:setItems(item1, item2, item3)
-  items[1] = item1
-  items[2] = item2
-  items[3] = item3
-
-  self:updateItemImages()
-
-  -- Set initial state reference for checkpoint handling
-
-  self.checkpointHandler:setInitialState(table.deepcopy(items))
-end
-
-function AbilityPanel:handleCheckpointStateUpdate(state)
-  items[1] = state[1]
-  items[2] = state[2]
-  items[3] = state[3]
-
-  self:updateItemImages()
-end
-
-function AbilityPanel:updateItemImages()
   for i, sprite in ipairs(buttonSprites) do
-    if items[i] then
+    if blueprints[i] then
       sprite:add()
 
-      local image = imageTableButtons[imageTableIndexes[items[i]]]
+      local image = imageTableButtons[imageTableIndexes[blueprints[i]]]
       sprite:setImage(image)
     else
       sprite:remove()

@@ -9,7 +9,6 @@ local systemMenu <const> = pd.getSystemMenu()
 
 local fileplayer
 
-local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
@@ -87,7 +86,7 @@ function Game:enter(previous, data)
         checkpointPlayerStart = {
             x = player.x,
             y = player.y,
-            blueprints = table.deepcopy(player.keys)
+            blueprints = table.deepcopy(player.blueprints)
         }
     end
 
@@ -191,19 +190,13 @@ function Game:levelComplete(data)
         { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
-function Game:loadItems(item1, item2, item3)
-    self.abilityPanel:setItems(item1, item2, item3)
+function Game:updateBlueprints()
+    local abilityPanel = AbilityPanel.getInstance()
+    abilityPanel:updateBlueprints()
 end
 
 function Game:cleanUp()
     self.abilityPanel:cleanUp()
-end
-
-function Game:pickup(blueprint)
-    blueprint:updateStatePickedUp()
-
-    spCollect:play(1)
-    self.abilityPanel:addItem(blueprint.abilityName)
 end
 
 function Game:crankDrop()

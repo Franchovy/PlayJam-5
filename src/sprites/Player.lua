@@ -10,6 +10,7 @@ local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
 local spDrillLoop = sound.sampleplayer.new("assets/sfx/drill-loop")
 local spDrillEnd = sound.sampleplayer.new("assets/sfx/drill-end")
 local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
+local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -100,26 +101,30 @@ function Player:init(entity)
     self.isDrilling = false
 
     -- Setup keys array and starting keys
-    self.keys = {}
+    self.blueprints = {}
     local startingKeys = entity.fields.blueprints
     for _, key in ipairs(startingKeys) do
-        table.insert(self.keys, key)
+        table.insert(self.blueprints, key)
     end
 
-    self.abilityCount = #self.keys
-
-    Manager.emitEvent(EVENTS.LoadItems, table.unpack(startingKeys))
+    Manager.emitEvent(EVENTS.UpdateBlueprints)
 
     -- Add Checkpoint handling
 
     self.checkpointHandler = CheckpointHandler()
     self.checkpointHandler:setCheckpointStateHandling(self)
+
+    self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
 end
 
 function Player:handleCheckpointStateUpdate(state)
     self:moveTo(state.x, state.y)
 
-    self.latestBlueprintPosition = { x = state.x, y = state.y }
+    self.latestCheckpointPosition.x = state.x
+    self.latestCheckpointPosition.y = state.y
+    self.blueprints = state.blueprints
+
+    Manager.emitEvent(EVENTS.UpdateBlueprints)
 end
 
 -- Enter Level
@@ -168,7 +173,7 @@ function Player:enterLevel(direction, levelBounds)
 end
 
 function Player:setBlueprints(blueprints)
-    self.keys = blueprints
+    self.blueprints = blueprints
 end
 
 -- Collision Response
@@ -191,30 +196,6 @@ end
 local velocityX = 0
 local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
-
-function Player:dropLastItem()
-    if self.abilityCount == 1 then
-        return
-    end
-
-    self.isDroppingItem = true
-    local removed = table.remove(self.keys, #self.keys)
-    self.abilityCount = self.abilityCount - 1;
-    Manager.emitEvent(EVENTS.CrankDrop)
-
-    local dropOffPoints = gmt.polygon.new(self.x + 15, self.y + 15, self.x + 30, self.y + 240)
-    local sprite = gfx.sprite.new(gfx.image.new("assets/images/" .. removed))
-    sprite:setZIndex(100)
-    sprite:add()
-    sprite:setAnimator(gfx.animator.new(800, dropOffPoints, pd.easingFunctions.inBack))
-
-    pd.timer.new(1500, function()
-        self.isDroppingItem = false
-        sprite:removeAnimator()
-        sprite:remove()
-    end)
-end
-
 local drillableBlockCurrentlyDrilling
 
 function Player:update()
@@ -296,23 +277,22 @@ function Player:update()
 
     -- Update state for checkpoint
 
-    -- ISSUE:
-    -- When the player grabs a button, the position might not be on the ground. Thus
-    -- the player immediately falls, updating the state, and cannot go back to the checkpoint before the previous.
-    --
-    -- Update state to use a point struct
-    -- check distance
-
-
     local state = self.checkpointHandler:getStateCurrent()
     if state then
         -- Update the state directly. No need to push new
 
         state.x = self.x
         state.y = self.y
+        state.blueprints = self.blueprints
     else
-        if self.x ~= self.latestBlueprintPosition.x or self.y ~= self.latestBlueprintPosition.y then
-            self.checkpointHandler:pushState(self.latestBlueprintPosition)
+        if self.x ~= self.latestCheckpointPosition.x or self.y ~= self.latestCheckpointPosition.y then
+            self.latestCheckpointPosition.x = self.x
+            self.latestCheckpointPosition.y = self.y
+            self.checkpointHandler:pushState({
+                x = self.latestCheckpointPosition.x,
+                y = self.latestCheckpointPosition.y,
+                blueprints = table.deepcopy(self.blueprints)
+            })
         end
     end
 
@@ -450,24 +430,22 @@ end
 function Player:pickUpBlueprint(blueprint)
     -- Emit pickup event for abilty panel
 
-    Manager.emitEvent(EVENTS.Pickup, blueprint)
+    blueprint:updateStatePickedUp()
+    spCollect:play(1)
 
-    -- Update internal abilities list
+    -- Update blueprints list
 
-    if self.abilityCount == 3 then
-        table.remove(self.keys, 1)
+    if #self.blueprints == 3 then
+        table.remove(self.blueprints, 1)
     end
 
-    table.insert(self.keys, blueprint.abilityName)
-    self.abilityCount = #self.keys
+    table.insert(self.blueprints, blueprint.abilityName)
+
+    Manager.emitEvent(EVENTS.UpdateBlueprints)
 
     -- Update checkpoints
 
     Manager.emitEvent(EVENTS.CheckpointIncrement)
-
-    -- Update player state to blueprint position
-
-    self.latestBlueprintPosition = { x = blueprint.x, y = blueprint.y } -- TODO: [FRANCH] Can remove the extra logic.
 end
 
 function Player:enterLevel(direction, levelBounds)
@@ -513,7 +491,11 @@ function Player:enterLevel(direction, levelBounds)
     end
 
     -- Push level position
-    self.checkpointHandler:pushState({ x = self.x, y = self.y })
+    self.checkpointHandler:pushState({
+        x = self.x,
+        y = self.y,
+        blueprints = table.deepcopy(self.blueprints)
+    })
 end
 
 -- Animation Handling
@@ -664,7 +646,7 @@ function Player:isKeyPressedGated(key)
         return pd.buttonIsPressed(key)
     end
 
-    for _, abilityName in ipairs(self.keys) do
+    for _, abilityName in ipairs(self.blueprints) do
         if abilityName == key then
             return pd.buttonIsPressed(abilityName)
         end
