@@ -1,10 +1,9 @@
+import "checkpoint/linkedList"
+
 -- Checkpoint for Playdate Sprites
 -- Allows the game to manage checkpoints via a save state kept within each sprite.
 
 class("Checkpoint").extends()
-
--- TODO: [FRANCH] - file & API cleanup
--- set sprite in initializer, not in separate fn.
 
 local checkpointNumber = 1
 local checkpointHandlers = table.create(0, 32)
@@ -113,7 +112,6 @@ function CheckpointHandler:revertState()
     -- If state changes, get latest state since checkpoint
 
     if hasChangedState then
-        -- TODO: Handling initial state
         local state = self.states:getLast()
 
         print("Reverting to state: ")
