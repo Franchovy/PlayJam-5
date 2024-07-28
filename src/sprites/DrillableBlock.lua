@@ -21,9 +21,7 @@ function DrillableBlock:init(entity)
 
     -- CheckpointHandler for keeping track of state & checkpoint resets
 
-    self.checkpointHandler = CheckpointHandler()
-    self.checkpointHandler:setInitialState(stateNotDrilled)
-    self.checkpointHandler:setCheckpointStateHandling(self)
+    self.checkpointHandler = CheckpointHandler(self, stateNotDrilled)
 end
 
 function DrillableBlock:activate()

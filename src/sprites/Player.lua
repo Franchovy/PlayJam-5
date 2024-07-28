@@ -111,8 +111,7 @@ function Player:init(entity)
 
     -- Add Checkpoint handling
 
-    self.checkpointHandler = CheckpointHandler()
-    self.checkpointHandler:setCheckpointStateHandling(self)
+    self.checkpointHandler = CheckpointHandler(self)
 
     self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
 end

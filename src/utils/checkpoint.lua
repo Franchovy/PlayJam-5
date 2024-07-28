@@ -5,7 +5,6 @@ class("Checkpoint").extends()
 
 -- TODO: [FRANCH] - file & API cleanup
 -- set sprite in initializer, not in separate fn.
--- separate out linkedlist struct
 
 local checkpointNumber = 1
 local checkpointHandlers = table.create(0, 32)
@@ -48,7 +47,10 @@ end
 
 class("CheckpointHandler").extends()
 
-function CheckpointHandler:init(initialState)
+function CheckpointHandler:init(sprite, initialState)
+    assert(sprite, "Checkpoint handler needs sprite to initialize.")
+    self.sprite = sprite
+
     if initialState ~= nil then
         self.states = LinkedList(initialState, 0)
     end
@@ -57,16 +59,6 @@ function CheckpointHandler:init(initialState)
 end
 
 -- Init / Setup methods
-
-function CheckpointHandler:setInitialState(initialState)
-    assert(initialState, "Initial state must not be null.")
-
-    self.states = LinkedList(initialState, 0)
-end
-
-function CheckpointHandler:setCheckpointStateHandling(sprite)
-    self.sprite = sprite
-end
 
 function CheckpointHandler:getState()
     if self.states then

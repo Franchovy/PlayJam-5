@@ -47,8 +47,7 @@ end
 -- Instance methods
 
 function Game:init()
-    self.checkpointHandler = CheckpointHandler()
-    self.checkpointHandler:setCheckpointStateHandling(self)
+    self.checkpointHandler = CheckpointHandler(self)
 end
 
 function Game:enter(previous, data)

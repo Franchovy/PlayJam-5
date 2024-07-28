@@ -36,9 +36,7 @@ function ButtonPickup:init(entity)
 
   -- Checkpoint (state handling) setup
 
-  self.checkpointHandler = CheckpointHandler()
-  self.checkpointHandler:setInitialState(stateNotConsumed)
-  self.checkpointHandler:setCheckpointStateHandling(self)
+  self.checkpointHandler = CheckpointHandler(self, stateNotConsumed)
 end
 
 function ButtonPickup:updateStatePickedUp()
