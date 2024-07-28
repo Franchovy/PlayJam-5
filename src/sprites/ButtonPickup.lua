@@ -56,7 +56,7 @@ end
 function ButtonPickup:handleCheckpointStateUpdate(state)
   if state.consumed then
     self:remove()
-  else
+  elseif self.levelName == Game.getLevelName() then
     self:add()
   end
 

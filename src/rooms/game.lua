@@ -17,6 +17,14 @@ local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
 
+-- Static methods
+
+function Game.getLevelName()
+    return currentLevelName
+end
+
+-- Private Methods
+
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
@@ -35,6 +43,8 @@ local function restartLevel()
 
     sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
 end
+
+-- Instance methods
 
 function Game:init()
     self.checkpointHandler = CheckpointHandler()

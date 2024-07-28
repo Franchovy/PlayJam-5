@@ -58,6 +58,8 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
 
+        sprite.levelName = levelName
+
         ::continue::
     end
 end
