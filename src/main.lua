@@ -1,4 +1,5 @@
 import "const"
+import "debug"
 import "assets"
 import "libs"
 import "playdate"

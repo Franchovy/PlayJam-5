@@ -1,5 +1,9 @@
 import "checkpoint/linkedList"
 
+-- Debugging
+
+local DEBUG_PRINT <const> = false
+
 -- Checkpoint for Playdate Sprites
 -- Allows the game to manage checkpoints via a save state kept within each sprite.
 
@@ -15,7 +19,7 @@ function Checkpoint.increment()
 end
 
 function Checkpoint.goToPrevious()
-    print("Performing Checkpoint revert operation...")
+    debugPrint("Performing Checkpoint revert operation...", DEBUG_PRINT)
 
     local hasChanged = false
     for _, handler in pairs(checkpointHandlers) do
@@ -26,11 +30,13 @@ function Checkpoint.goToPrevious()
     -- Only decrement the checkpoint number if no reset occurred.
     if not hasChanged then
         if checkpointNumber == 1 then
-            print("No state changes detected. Cannot decrement checkpoint number 1.")
+            debugPrint("No state changes detected. Cannot decrement checkpoint number 1.", DEBUG_PRINT)
             return
         end
 
-        print("No state changes detected. Decrementing the checkpoint number to: " .. checkpointNumber - 1)
+        debugPrint("No state changes detected. Decrementing the checkpoint number to: " .. checkpointNumber - 1,
+            DEBUG_PRINT)
+
         checkpointNumber -= 1
 
         -- Recursive call to previous checkpoint.
@@ -83,8 +89,8 @@ function CheckpointHandler:pushState(state)
 
     self.states:append(state, checkpointNumber)
 
-    print("Pushing state: " .. checkpointNumber)
-    printTable(self.states)
+    debugPrint("Pushing state: " .. checkpointNumber, DEBUG_PRINT)
+    debugPrintTable(self.states, DEBUG_PRINT)
 end
 
 function CheckpointHandler:revertState()
@@ -94,8 +100,8 @@ function CheckpointHandler:revertState()
 
     -- Check what state needs to be reverted.
 
-    print("Checking state to revert: ")
-    printTable(self.states)
+    debugPrint("Checking state to revert: ", DEBUG_PRINT)
+    debugPrintTable(self.states, DEBUG_PRINT)
 
     -- Pop all values until the checkpoint number.
 
@@ -114,8 +120,8 @@ function CheckpointHandler:revertState()
     if hasChangedState then
         local state = self.states:getLast()
 
-        print("Reverting to state: ")
-        printTable(state)
+        debugPrint("Reverting to state: ", DEBUG_PRINT)
+        debugPrintTable(state, DEBUG_PRINT)
 
         assert(self.sprite.handleCheckpointStateUpdate, "Sprite did not implement handleCheckpointStateUpdate().")
         self.sprite:handleCheckpointStateUpdate(state)

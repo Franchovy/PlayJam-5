@@ -34,7 +34,7 @@ function RigidBody:init(entity, imageTable)
 end
 
 function RigidBody:update()
-  if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
+  if DEBUG_PRINT then printDebug("RigidBody:update() for: ", getmetatable(self).className) end
 
   RigidBody.super.update(self)
   -- calculate new position by adding velocity to current position
