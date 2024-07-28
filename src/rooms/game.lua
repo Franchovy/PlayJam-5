@@ -131,7 +131,7 @@ end
 
 -- Checkpoint interface
 
-function Game:handleCheckpointStateUpdate(state)
+function Game:handleCheckpointRevert(state)
     if currentLevelName ~= state.levelName then
         sceneManager:enter(sceneManager.scenes.currentGame,
             { level = { name = state.levelName }, isCheckpointRevert = true })

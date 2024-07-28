@@ -116,7 +116,7 @@ function Player:init(entity)
     self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
 end
 
-function Player:handleCheckpointStateUpdate(state)
+function Player:handleCheckpointRevert(state)
     self:moveTo(state.x, state.y)
 
     self.latestCheckpointPosition.x = state.x

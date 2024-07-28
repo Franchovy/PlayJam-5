@@ -44,7 +44,7 @@ function ConsumableSprite:consume()
     self:remove()
 end
 
-function ConsumableSprite:handleCheckpointStateUpdate(state)
+function ConsumableSprite:handleCheckpointRevert(state)
     if state.consumed then
         self:remove()
     elseif self.levelName == Game.getLevelName() then

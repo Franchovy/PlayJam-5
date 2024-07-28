@@ -123,8 +123,8 @@ function CheckpointHandler:revertState()
         debugPrint("Reverting to state: ", DEBUG_PRINT)
         debugPrintTable(state, DEBUG_PRINT)
 
-        assert(self.sprite.handleCheckpointStateUpdate, "Sprite did not implement handleCheckpointStateUpdate().")
-        self.sprite:handleCheckpointStateUpdate(state)
+        assert(self.sprite.handleCheckpointRevert, "Sprite did not implement handleCheckpointRevert().")
+        self.sprite:handleCheckpointRevert(state)
     end
 
     return hasChangedState

@@ -29,8 +29,8 @@ function DrillableBlock:release()
     self.ticksToDrill = 0
 end
 
-function DrillableBlock:handleCheckpointStateUpdate(state)
-    DrillableBlock.super.handleCheckpointStateUpdate(self, state)
+function DrillableBlock:handleCheckpointRevert(state)
+    DrillableBlock.super.handleCheckpointRevert(self, state)
 
     -- Reset time to drill
     self.ticksToDrill = 0
