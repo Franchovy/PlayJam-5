@@ -435,6 +435,7 @@ function Player:pickUpBlueprint(blueprint)
 
     -- Update blueprints list
 
+    -- Keeping blueprints in separate table for checkpoint state purpose
     local blueprintsNew = table.deepcopy(self.blueprints)
 
     if #blueprintsNew == 3 then
@@ -444,6 +445,12 @@ function Player:pickUpBlueprint(blueprint)
     table.insert(blueprintsNew, blueprint.abilityName)
 
     self.blueprints = blueprintsNew
+
+    self.checkpointHandler:pushState({
+        x = self.x,
+        y = self.y,
+        blueprints = self.blueprints
+    })
 
     Manager.emitEvent(EVENTS.UpdateBlueprints)
 
