@@ -51,8 +51,8 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local maxSpeed <const> = 100
-local maxSpeedVertical <const> = 100
+local maxSpeed <const> = 7.5
+local maxSpeedVertical <const> = 7.5
 local gravity <const> = 2
 local maxFallSpeed <const> = 7.5
 local jumpSpeed <const> = 10
@@ -75,10 +75,10 @@ function Player:init(entity)
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
-    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
-    self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
+    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 4 }).asDefault()
+    self:addState(ANIMATION_STATES.Moving, 8, 11, { tickStep = 4 })
+    self:addState(ANIMATION_STATES.Jumping, 12, 18, { tickStep = 3 })
+    self:addState(ANIMATION_STATES.Drilling, 31, 33, { tickStep = 2 })
     self:playAnimation()
 
     self:setTag(TAGS.Player)
