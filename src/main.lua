@@ -4,8 +4,8 @@ import "libs"
 import "playdate"
 import "extensions"
 import "rooms"
-import "sprites"
 import "utils"
+import "sprites"
 
 -- Playdate config
 

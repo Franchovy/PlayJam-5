@@ -1,9 +1,9 @@
 local gfx <const> = playdate.graphics;
 
 -- FRANCH: This is being initialized twice. What's the best way to have both instances point to the same logic?
+local imageTableButtons <const> = gfx.imagetable.new(assets.imageTables.buttons)
 
-local imageTableButtons = gfx.imagetable.new(assets.imageTables.buttons)
-local imageTableIndexes = {
+local imageTableIndexes <const> = {
   [KEYNAMES.Right] = 1,
   [KEYNAMES.Left] = 2,
   [KEYNAMES.Down] = 3,
@@ -12,53 +12,25 @@ local imageTableIndexes = {
   [KEYNAMES.B] = 6,
 }
 
-local stateNotConsumed = {
-  consumed = false
-}
-
-local stateConsumed = {
-  consumed = true
-}
-
-class('ButtonPickup').extends(gfx.sprite)
+class('ButtonPickup').extends(ConsumableSprite)
 
 function ButtonPickup:init(entity)
-  self.fields = entity.fields
+  ButtonPickup.super.init(self, entity)
+
+  self:setTag(TAGS.Ability)
+
+  -- Set blueprint name from ldtk
 
   self.abilityName = self.fields.blueprint
   assert(KEYNAMES[self.abilityName], "Missing Key name: " .. self.abilityName)
 
+  -- Set blueprint image for name
+
   local abilityImage = imageTableButtons[imageTableIndexes[self.abilityName]]
-  assert(abilityImage)
+  assert(abilityImage, "Missing image for key name: " .. self.abilityName)
   self:setImage(abilityImage)
-
-  self:setTag(TAGS.Ability)
-
-  -- Checkpoint (state handling) setup
-
-  self.checkpointHandler = CheckpointHandler(self, stateNotConsumed)
 end
 
 function ButtonPickup:updateStatePickedUp()
-  -- Update checkpoint state
-
-  self.checkpointHandler:pushState(stateConsumed)
-
-  -- Update load file state
-
-  self.fields.consumed = true
-
-  self:remove()
-end
-
-function ButtonPickup:handleCheckpointStateUpdate(state)
-  if state.consumed then
-    self:remove()
-  elseif self.levelName == Game.getLevelName() then
-    self:add()
-  end
-
-  -- Update load file state
-
-  self.fields.consumed = state.consumed
+  self:consume()
 end

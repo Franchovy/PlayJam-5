@@ -1,1 +1,2 @@
-import "utils/linkedlist"
+import "utils/checkpoint"
+import "utils/consumableSprite"
