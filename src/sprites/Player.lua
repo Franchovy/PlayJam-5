@@ -435,11 +435,15 @@ function Player:pickUpBlueprint(blueprint)
 
     -- Update blueprints list
 
-    if #self.blueprints == 3 then
-        table.remove(self.blueprints, 1)
+    local blueprintsNew = table.deepcopy(self.blueprints)
+
+    if #blueprintsNew == 3 then
+        table.remove(blueprintsNew, 1)
     end
 
-    table.insert(self.blueprints, blueprint.abilityName)
+    table.insert(blueprintsNew, blueprint.abilityName)
+
+    self.blueprints = blueprintsNew
 
     Manager.emitEvent(EVENTS.UpdateBlueprints)
 
