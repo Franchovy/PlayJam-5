@@ -138,7 +138,9 @@ end
 class("CheckpointHandler").extends()
 
 function CheckpointHandler:init(initialState)
-    self.states = createLinkedList(initialState, 0)
+    if initialState ~= nil then
+        self.states = createLinkedList(initialState, 0)
+    end
 
     table.insert(checkpointHandlers, self)
 end
@@ -146,6 +148,8 @@ end
 -- Init / Setup methods
 
 function CheckpointHandler:setInitialState(initialState)
+    assert(initialState, "Initial state must not be null.")
+
     self.states = createLinkedList(initialState, 0)
 end
 
@@ -154,12 +158,14 @@ function CheckpointHandler:setCheckpointStateHandling(sprite)
 end
 
 function CheckpointHandler:getState()
-    return getLastLinkedList(self.states)
+    if self.states then
+        return getLastLinkedList(self.states)
+    end
 end
 
 -- Returns the state for the current checkpoint number, nil if there is no state for that number.
 function CheckpointHandler:getStateCurrent()
-    if self.states.last == checkpointNumber then
+    if self.states and self.states.last == checkpointNumber then
         return getLastLinkedList(self.states)
     else
         return nil
@@ -169,13 +175,18 @@ end
 -- State change methods
 
 function CheckpointHandler:pushState(state)
-    appendLinkedList(self.states, state, checkpointNumber)
+    if not self.states then
+        self.states = createLinkedList(table.deepcopy(state), 0)
+    end
 
+    appendLinkedList(self.states, state, checkpointNumber)
     print("Pushing state: " .. checkpointNumber)
     printTable(self.states)
 end
 
 function CheckpointHandler:revertState()
+    assert(self.states)
+
     local hasChangedState = false
 
     -- Check what state needs to be reverted.

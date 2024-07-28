@@ -63,6 +63,10 @@ local jumpSpeed <const> = 7.5
 local jumpSpeedReleased <const> = 3.5
 local jumpHoldTimeInTicks <const> = 4
 
+-- TODO: [Franch]
+-- Set timer to pause movement when doing checkpoint resets (0.5s probably)
+-- Abilities (blueprints) should come from a single source, read from panel (or game)
+
 -- Setup
 
 class("Player").extends(AnimatedSprite)
@@ -110,6 +114,8 @@ end
 
 function Player:handleCheckpointStateUpdate(state)
     self:moveTo(state.x, state.y)
+
+    self.latestBlueprintPosition = { x = state.x, y = state.y }
 end
 
 -- Enter Level
@@ -300,6 +306,10 @@ function Player:update()
 
         state.x = self.x
         state.y = self.y
+    else
+        if self.x ~= self.latestBlueprintPosition.x or self.y ~= self.latestBlueprintPosition.y then
+            self.checkpointHandler:pushState(self.latestBlueprintPosition)
+        end
     end
 
     --
@@ -433,7 +443,7 @@ function Player:pickUpBlueprint(blueprint)
 
     -- Update player state to blueprint position
 
-    self.checkpointHandler:pushState({ x = blueprint.x, y = blueprint.y })
+    self.latestBlueprintPosition = { x = blueprint.x, y = blueprint.y }
 end
 
 function Player:enterLevel(direction, levelBounds)
@@ -478,8 +488,7 @@ function Player:enterLevel(direction, levelBounds)
         self:moveTo(self.x, levelHeight - 15)
     end
 
-    -- Update checkpoint position
-
+    -- Push level position
     self.checkpointHandler:pushState({ x = self.x, y = self.y })
 end
 
