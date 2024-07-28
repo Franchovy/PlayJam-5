@@ -36,13 +36,17 @@ local function restartLevel()
     sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
 end
 
-function Game:init() end
+function Game:init()
+    self.checkpointHandler = CheckpointHandler()
+    self.checkpointHandler:setCheckpointStateHandling(self)
+end
 
 function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
     local level = data.level
     local checkpoint = data.checkpoint
+    local isCheckpointRevert = data.isCheckpointRevert
 
     -- This should run only once to initialize the game instance.
 
@@ -68,6 +72,10 @@ function Game:enter(previous, data)
 
     currentLevelName = level and level.name or initialLevelName
     local levelBounds = level and level.bounds or LDtk.get_rect(currentLevelName)
+
+    if not isCheckpointRevert then
+        self.checkpointHandler:pushState({ levelName = currentLevelName })
+    end
 
     local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
 
@@ -144,6 +152,15 @@ function Game:leave(next, ...)
 
         fileplayer:stop()
         fileplayer = nil
+    end
+end
+
+-- Checkpoint interface
+
+function Game:handleCheckpointStateUpdate(state)
+    if currentLevelName ~= state.levelName then
+        sceneManager:enter(sceneManager.scenes.currentGame,
+            { level = { name = state.levelName }, isCheckpointRevert = true })
     end
 end
 

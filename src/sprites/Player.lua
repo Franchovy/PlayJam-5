@@ -342,7 +342,13 @@ function Player:update()
                 actualY = otherTop + LADDER_TOP_ADJUSTMENT
             end
         elseif tag == TAGS.Ability then
-            self:pickUpBlueprint(other)
+            -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
+            -- we should be handling the multiple blueprints as a single checkpoint.
+            -- But it's also useful for debugging.
+
+            if not timerCooldownCheckpoint then
+                self:pickUpBlueprint(other)
+            end
         end
     end
 
@@ -380,7 +386,6 @@ function Player:update()
     local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
 
     gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
-    --gfx.setDrawOffset(-cameraOffsetX, -cameraOffsetY)
 
     -- Check if player has moved into another level
 

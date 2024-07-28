@@ -1467,47 +1467,6 @@
 							"__worldY": -642
 						},
 						{
-							"__identifier": "Elevator",
-							"__grid": [11,6],
-							"__pivot": [0.5,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D572E4",
-							"iid": "724df320-25d0-11ef-b1d9-cd667584864b",
-							"width": 32,
-							"height": 16,
-							"defUid": 207,
-							"px": [368,192],
-							"fieldInstances": [
-								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Vertical"]
-								}] },
-								{ "__identifier": "distance", "__type": "Int", "__value": 0, "__tile": null, "defUid": 210, "realEditorValues": [] }
-							],
-							"__worldX": -432,
-							"__worldY": -640
-						},
-						{
-							"__identifier": "ButtonPickup",
-							"__grid": [8,5],
-							"__pivot": [-0.071,-0.071],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#15F1D3",
-							"iid": "7d107760-25d0-11ef-b1d9-8f1ec1516d5e",
-							"width": 28,
-							"height": 28,
-							"defUid": 21,
-							"px": [286,190],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Up"]
-							}] }],
-							"__worldX": -514,
-							"__worldY": -642
-						},
-						{
 							"__identifier": "DrillableBlock",
 							"__grid": [6,3],
 							"__pivot": [0,0],
@@ -1744,9 +1703,9 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [62,190],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["A"]
+								"params": ["Left"]
 							}] }],
 							"__worldX": -242,
 							"__worldY": -642

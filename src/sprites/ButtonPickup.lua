@@ -42,7 +42,13 @@ function ButtonPickup:init(entity)
 end
 
 function ButtonPickup:updateStatePickedUp()
+  -- Update checkpoint state
+
   self.checkpointHandler:pushState(stateConsumed)
+
+  -- Update load file state
+
+  self.fields.consumed = true
 
   self:remove()
 end
@@ -53,4 +59,8 @@ function ButtonPickup:handleCheckpointStateUpdate(state)
   else
     self:add()
   end
+
+  -- Update load file state
+
+  self.fields.consumed = state.consumed
 end

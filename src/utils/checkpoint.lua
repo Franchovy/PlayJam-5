@@ -3,6 +3,10 @@
 
 class("Checkpoint").extends()
 
+-- TODO: [FRANCH] - file & API cleanup
+-- set sprite in initializer, not in separate fn.
+-- separate out linkedlist struct
+
 local checkpointNumber = 1
 local checkpointHandlers = table.create(0, 32)
 
@@ -221,21 +225,3 @@ function CheckpointHandler:revertState()
 
     return hasChangedState
 end
-
---[[ Numerical indexing (works for multiple Ability Panel)
-
-local latestCheckpointNumber = #self.states
-while latestCheckpointNumber >= checkpointNumber do
-    self.states[latestCheckpointNumber] = nil
-    latestCheckpointNumber = #self.states
-
-    -- Mark if state has changed during this revert operation.
-    hasChangedState = true
-end
-
--- If state changes, get latest state since checkpoint
-
-if hasChangedState then
-    local state = self.states[#self.states] or self.initialState
-
---]]
