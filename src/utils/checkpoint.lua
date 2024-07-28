@@ -153,6 +153,19 @@ function CheckpointHandler:setCheckpointStateHandling(sprite)
     self.sprite = sprite
 end
 
+function CheckpointHandler:getState()
+    return getLastLinkedList(self.states)
+end
+
+-- Returns the state for the current checkpoint number, nil if there is no state for that number.
+function CheckpointHandler:getStateCurrent()
+    if self.states.last == checkpointNumber then
+        return getLastLinkedList(self.states)
+    else
+        return nil
+    end
+end
+
 -- State change methods
 
 function CheckpointHandler:pushState(state)
