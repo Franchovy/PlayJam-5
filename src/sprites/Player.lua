@@ -23,6 +23,10 @@ local levelHeight
 local levelOffsetX
 local levelOffsetY
 
+-- Timer for handling cooldown on checkpoint revert
+
+local timerCooldownCheckpoint
+
 --
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
@@ -376,7 +380,9 @@ function Player:update()
 
     -- Movement
 
-    self:moveTo(actualX, actualY)
+    if not timerCooldownCheckpoint then
+        self:moveTo(actualX, actualY)
+    end
 
     -- Animation Handling
 
@@ -419,8 +425,26 @@ function Player:update()
 end
 
 function Player:revertCheckpoint()
+    -- SFX
+
     spCheckpointRevert:play(1)
+
+    -- Emit the event for the rest of the scene
+
     Manager.emitEvent(EVENTS.CheckpointRevert)
+
+    -- Cooldown timer for checkpoint revert
+
+    timerCooldownCheckpoint = playdate.timer.new(500)
+    timerCooldownCheckpoint.timerEndedCallback = function(timer)
+        timer:remove()
+
+        -- Since there can be multiple checkpoint-reverts in sequence, we want to
+        -- ensure we're not removing a timer that's not this one.
+        if timerCooldownCheckpoint == timer then
+            timerCooldownCheckpoint = nil
+        end
+    end
 end
 
 function Player:pickUpBlueprint(blueprint)
@@ -443,7 +467,7 @@ function Player:pickUpBlueprint(blueprint)
 
     -- Update player state to blueprint position
 
-    self.latestBlueprintPosition = { x = blueprint.x, y = blueprint.y }
+    self.latestBlueprintPosition = { x = blueprint.x, y = blueprint.y } -- TODO: [FRANCH] Can remove the extra logic.
 end
 
 function Player:enterLevel(direction, levelBounds)
