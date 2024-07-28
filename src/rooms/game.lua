@@ -15,7 +15,6 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 -- LDtk current level name
 local initialLevelName <const> = "Level_0"
 local currentLevelName
-local checkpointPlayerStart
 
 -- Static methods
 
@@ -29,21 +28,6 @@ local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
 
-local function restartLevel()
-    local level, checkpoint
-
-    local spriteCheckpoint = Checkpoint.getLatestCheckpoint()
-    if spriteCheckpoint then
-        level = { name = spriteCheckpoint.levelName }
-        checkpoint = spriteCheckpoint
-    else
-        level = initialLevelName
-        checkpoint = checkpointPlayerStart
-    end
-
-    sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
-end
-
 -- Instance methods
 
 function Game:init()
@@ -54,7 +38,6 @@ function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
     local level = data.level
-    local checkpoint = data.checkpoint
     local isCheckpointRevert = data.isCheckpointRevert
 
     -- This should run only once to initialize the game instance.
@@ -74,7 +57,6 @@ function Game:enter(previous, data)
         -- Menu items
 
         systemMenu:addMenuItem("main menu", goToMainMenu)
-        systemMenu:addMenuItem("restart", restartLevel)
     end
 
     -- Load level --
@@ -99,21 +81,8 @@ function Game:enter(previous, data)
 
     local player = Player.getInstance()
 
-    if not checkpointPlayerStart then
-        checkpointPlayerStart = {
-            x = player.x,
-            y = player.y,
-            blueprints = table.deepcopy(player.blueprints)
-        }
-    end
-
     if player then
         player:add()
-
-        if checkpoint then
-            player:setBlueprints(checkpoint.blueprints)
-            player:moveTo(checkpoint.x, checkpoint.y)
-        end
 
         player:enterLevel(direction, levelBounds)
     end
@@ -122,10 +91,6 @@ function Game:enter(previous, data)
 
     if abilityPanel then
         abilityPanel:add()
-
-        if checkpoint then
-            abilityPanel:setItems(table.unpack(checkpoint.blueprints))
-        end
     end
 end
 
