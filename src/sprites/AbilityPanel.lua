@@ -18,10 +18,8 @@ local imageTableIndexes = {
   [KEYNAMES.B] = 6,
 }
 
-local items = {}
-
 local buttonSprites = table.create(3, 0)
-for i = 1, 3 do
+for _ = 1, 3 do
   table.insert(buttonSprites, gfx.sprite.new())
 end
 
@@ -59,7 +57,8 @@ function AbilityPanel:init()
   self:setUpdatesEnabled(false)
 end
 
--- Override to add button sprites along with sprite.
+-- gfx.sprite overrides to manage child button sprites along with sprite.
+
 function AbilityPanel:add()
   AbilityPanel.super.add(self)
 
@@ -68,11 +67,15 @@ function AbilityPanel:add()
   end
 end
 
-function AbilityPanel:cleanUp()
-  self:setItems()
+function AbilityPanel:remove()
+  AbilityPanel.super.remove(self)
 
-  self:remove()
+  for _, sprite in ipairs(buttonSprites) do
+    sprite:remove()
+  end
 end
+
+-- Update function - reads player blueprints and updates accordingly.
 
 function AbilityPanel:updateBlueprints()
   local blueprints = Player.getInstance().blueprints

@@ -148,7 +148,8 @@ function Game:setupFilePlayer()
     fileplayer:setPlayConfig(1)
 end
 
--- Events
+-- Event-based methods
+
 
 local maxLevels <const> = 10
 
@@ -160,22 +161,7 @@ function Game:levelComplete(data)
 
     -- Load next level
 
-    function getNeighborLevelForPos(neighbors, position)
-        assert(#neighbors > 0)
-
-        for _, levelName in pairs(neighbors) do
-            local levelBounds = LDtk.get_rect(levelName)
-            if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
-                levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
-                return levelName, levelBounds
-            end
-        end
-    end
-
-    local neighbors = LDtk.get_neighbours(currentLevelName, direction)
-
-    -- Check coordinates function for detecting which neighbor to transition to
-    local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
+    local nextLevel, nextLevelBounds = LDtk.getNeighborLevelForPos(currentLevelName, direction, coordinates)
 
     sceneManager:enter(sceneManager.scenes.currentGame,
         { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
@@ -184,15 +170,6 @@ end
 function Game:updateBlueprints()
     local abilityPanel = AbilityPanel.getInstance()
     abilityPanel:updateBlueprints()
-end
-
-function Game:cleanUp()
-    self.abilityPanel:cleanUp()
-end
-
-function Game:crankDrop()
-    spItemDrop:play()
-    self.abilityPanel:removeRightMost()
 end
 
 function Game:checkpointIncrement()

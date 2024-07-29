@@ -64,3 +64,17 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         ::continue::
     end
 end
+
+function LDtk.getNeighborLevelForPos(levelName, direction, position)
+    local neighbors = LDtk.get_neighbours(levelName, direction)
+
+    assert(#neighbors > 0)
+
+    for _, levelName in pairs(neighbors) do
+        local levelBounds = LDtk.get_rect(levelName)
+        if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
+            levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
+            return levelName, levelBounds
+        end
+    end
+end
