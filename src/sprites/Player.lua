@@ -72,13 +72,13 @@ function Player.getInstance() return _instance end
 function Player:init(entity)
     _instance = self
 
-    local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
+    local playerImageTable = gfx.imagetable.new("assets/images/drillbot")
     Player.super.init(self, playerImageTable)
 
-    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
-    self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
+    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 3 }).asDefault()
+    self:addState(ANIMATION_STATES.Moving, 5, 8, { tickStep = 3 })
+    self:addState(ANIMATION_STATES.Jumping, 9, 12, { tickStep = 3 })
+    self:addState(ANIMATION_STATES.Drilling, 13, 16, { tickStep = 3 })
     self:playAnimation()
 
     self:setTag(TAGS.Player)

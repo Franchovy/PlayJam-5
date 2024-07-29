@@ -14,6 +14,10 @@ local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
+-- Background Sprite
+
+local spriteBackground
+
 -- LDtk current level name
 local initialLevelName <const> = "Level_0"
 local currentLevelName
@@ -80,6 +84,10 @@ function Game:enter(previous, data)
 
     self.abilityPanel:animate(true)
     forceShowPanel = true
+
+    -- Background sprite
+
+    spriteBackground = Background()
 end
 
 function Game:update()

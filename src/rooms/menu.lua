@@ -8,7 +8,7 @@ class("Menu").extends(Room)
 
 local imageSpriteTitle = gfx.image.new("assets/images/title"):invertedImage()
 local spriteTitle
-local imageSpriteRobot = gfx.imagetable.new("assets/images/boseki")
+local imageSpriteRobot = gfx.imagetable.new("assets/images/drillbot")
 local spriteRobot
 local spritePressStart
 local sceneManager
