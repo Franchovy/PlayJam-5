@@ -6,8 +6,10 @@ class("DrillableBlock").extends(gfx.sprite)
 
 local maxTicksToDrill = 15
 
-function DrillableBlock:init()
+function DrillableBlock:init(entity)
     DrillableBlock.super.init(self)
+
+    self.fields = entity.fields
 
     self:setImage(imageSprite)
 
@@ -18,6 +20,7 @@ end
 
 function DrillableBlock:activate()
     if self.ticksToDrill >= maxTicksToDrill then
+        self.fields.consumed = true
         self:remove()
     else
         self.ticksToDrill += 1

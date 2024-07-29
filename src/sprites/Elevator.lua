@@ -24,19 +24,22 @@ function Elevator:activate()
 
   self.active = true
 
-  if self.orientation == "Horizontal" then
-    if self.x == self.initialX then
-      self.targetX = self.x - self.actualDistance
-    else
-      self.targetX = self.x + self.actualDistance
-    end
-  elseif self.orientation == "Vertical" then
-    if self.y == self.initialY then
-      self.targetY = self.y - self.actualDistance
-    else
-      self.targetY = self.y + self.actualDistance
+  playdate.timer.performAfterDelay(400, function()
+    if self.orientation == "Horizontal" then
+      if self.x == self.initialX then
+        self.targetX = self.x - self.actualDistance
+      else
+        self.targetX = self.x + self.actualDistance
+      end
+    elseif self.orientation == "Vertical" then
+      if self.y == self.initialY then
+        self.targetY = self.y - self.actualDistance
+      else
+        self.targetY = self.y + self.actualDistance
+      end
     end
   end
+  )
 end
 
 function Elevator:update()

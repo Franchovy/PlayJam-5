@@ -5,19 +5,37 @@ local gfx <const> = pd.graphics
 local complexCollision = true
 local maxFallSpeed = 13
 
+local DEBUG_PRINT = false
+
+
+-- FRANCH: Behaviors to adjust for / fix:
+-- Elevator going into a wall - should stop (wall should have "infinite mass")
+-- Elevator carrying object going into the ceiling - should stop both
+
+
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
   RigidBody.super.init(self, imageTable)
+
+  -- FROM: FRANCH TO: CALVIN
+  -- How can we remove the "bounce" factor when falling? I think in 95% of cases we don't want any bounce since it
+  -- interferes with horizontal or vertical moving platforms/NPCs. Ideally we could set a threshold on a sprite that
+  -- will limit the "bounciness" to only apply past a certain collision velocity, or be able to turn it off completely.
+
   self.velocity = gmt.vector2D.new(0, 0)
   self.inv_mass = 0.4
   self.restitution = 0.4
   self.static_friction = 0
   self.dynamic_friction = .12
   self.kinematic = false
+
+  self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
 function RigidBody:update()
+  if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
+
   RigidBody.super.update(self)
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
@@ -42,32 +60,44 @@ function RigidBody:update()
     local normal = c.normal
     local _, normalY = normal:unpack()
 
+    if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
+
     if complexCollision and tag ~= TAGS.Player and not self.kinematic then
+      -- FROM: FRANCH TO: CALVIN
+      -- This function does not interact with the self.velocity in a coherent way – we should be *writing* to self.velocity
+      -- as well as reading from it. For example, I would expect friction and collisions to apply to self.velocity.
+
       self:checkCollision(other)
     end
 
     onGround = not onGround and normalY == -1 and
-                (tag == TAGS.Wall or
-                 tag == TAGS.ConveyorBelt or
-                 tag == TAGS.Box or
-                 tag == TAGS.Elevator)
+        (tag == TAGS.Wall or
+          tag == TAGS.ConveyorBelt or
+          tag == TAGS.Box or
+          tag == TAGS.Elevator)
 
     if tag == TAGS.ConveyorBelt and normalY == -1 then
       beltFound = true
-      if not self.onBelt then-- only apply belt velocity once
-        local dir = other:getDirection()
-        if dir == "Right" and self["velocity"] then
-          self.velocity = self.velocity + (gmt.vector2D.new(5, 0) * _G.delta_time)
-        elseif dir == "Left" and self["velocity"] then
-          self.velocity = self.velocity + (gmt.vector2D.new(-5, 0) * _G.delta_time)
-        end
+      if not self.onBelt then -- only apply belt velocity once
+        if DEBUG_PRINT then print("Applying collision belt logic") end
+
+        local conveyorSpeed = other:getAppliedSpeed()
+        self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
+
+        self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
       end
     end
 
     if self:getTag() == TAGS.Elevator then
       self:activate()
+
+      if DEBUG_PRINT then print("Applying elevator logic") end
+
       if self.orientation == "Horizontal" then
-        if tag == TAGS.Player and other:isMovingLeft() or other:isMovingRight() then
+        if tag == TAGS.Player and (other:isMovingLeft() or other:isMovingRight()) then
+          -- FRANCH: Is this really supposed to be a "return", or a "goto ::continue::"? Why are we interrupting the
+          -- execution flow?
+
           return
         end
         other:moveTo(self.x - 16, other.y)
@@ -79,10 +109,15 @@ function RigidBody:update()
 
   local _, currentVY = self.velocity:unpack()
 
+  -- FRANCH: Turned this off since it seemed to be buggy, and we want to conserve some of the x-velocity after an object
+  -- leaves the belt. We would want a low air-friction coefficient and a higher ground-friction coefficient.
+
   -- object left belt, reset x velocity
   if self.onBelt and not beltFound then
-    self.velocity = gmt.vector2D.new(0, currentVY)
+    --self.velocity = gmt.vector2D.new(0, currentVY)
   end
+
+  if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   self.onElevator = elevatorFound
   self.onBelt = beltFound
@@ -90,12 +125,14 @@ function RigidBody:update()
   -- incorporate gravity
   if (complexCollision or not onGround) and currentVY < maxFallSpeed then
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
-   elseif not complexCollision and onGround then
+  elseif not complexCollision and onGround then
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
-   end
+  end
 
   ::continue::
+
+  if DEBUG_PRINT then print("RigidBody:update() finished.") end
 end
 
 function RigidBody:checkCollision(other)
@@ -109,7 +146,7 @@ function RigidBody:checkCollision(other)
   if self.y < other.y then
     yVector = gmt.vector2D.new(0, 1)
     yOverlap = (self.y + self.height) - (other.y)
-  -- other is above self
+    -- other is above self
   else
     yVector = gmt.vector2D.new(0, -1)
     yOverlap = self.y - other.y
@@ -146,7 +183,7 @@ function RigidBody:checkCollision(other)
   -- positional correction for sinking objects
   local percent = 0.2
   local slop = .1
-  local correction = normal * (math.max(pen - slop, 0 ) / (self.inv_mass + other_inv_mass) * percent)
+  local correction = normal * (math.max(pen - slop, 0) / (self.inv_mass + other_inv_mass) * percent)
   local newSelfPos = gmt.vector2D.new(self.x, self.y) + (-correction * self.inv_mass)
   self:moveTo(newSelfPos.x, newSelfPos.y)
   local newOtherPos = gmt.vector2D.new(other.x, other.y) + (correction * other_inv_mass)
@@ -246,7 +283,8 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if math.abs(jt) < j * mu then
     friction_impulse = tangent * jt
   else
-    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) + (other_dynamic_friction * other_dynamic_friction))
+    local dynamicFriction = math.sqrt((self.dynamic_friction * self.dynamic_friction) +
+      (other_dynamic_friction * other_dynamic_friction))
     friction_impulse = tangent * (-j * dynamicFriction)
   end
 

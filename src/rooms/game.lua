@@ -6,7 +6,6 @@ class("Game").extends(Room)
 
 local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
-local forceShowPanel = false
 
 local fileplayer
 
@@ -17,13 +16,25 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 -- LDtk current level name
 local initialLevelName <const> = "Level_0"
 local currentLevelName
+local checkpointPlayerStart
 
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
 
 local function restartLevel()
-    sceneManager:enter(sceneManager.scenes.currentGame)
+    local level, checkpoint
+
+    local spriteCheckpoint = Checkpoint.getLatestCheckpoint()
+    if spriteCheckpoint then
+        level = { name = spriteCheckpoint.levelName }
+        checkpoint = spriteCheckpoint
+    else
+        level = initialLevelName
+        checkpoint = checkpointPlayerStart
+    end
+
+    sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
 end
 
 function Game:init() end
@@ -31,7 +42,8 @@ function Game:init() end
 function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
-    local nextLevel = data.nextLevel
+    local level = data.level
+    local checkpoint = data.checkpoint
 
     -- This should run only once to initialize the game instance.
 
@@ -55,8 +67,8 @@ function Game:enter(previous, data)
 
     -- Load level --
 
-    currentLevelName = nextLevel and nextLevel.name or initialLevelName
-    local levelBounds = nextLevel and nextLevel.bounds or LDtk.get_rect(currentLevelName)
+    currentLevelName = level and level.name or initialLevelName
+    local levelBounds = level and level.bounds or LDtk.get_rect(currentLevelName)
 
     local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
 
@@ -70,16 +82,35 @@ function Game:enter(previous, data)
     LDtk.loadAllEntitiesAsSprites(currentLevelName)
 
     local player = Player.getInstance()
-    if player ~= nil then
+
+    if not checkpointPlayerStart then
+        checkpointPlayerStart = {
+            x = player.x,
+            y = player.y,
+            blueprints = table.deepcopy(player.keys)
+        }
+    end
+
+    if player then
         player:add()
+
+        if checkpoint then
+            player:setBlueprints(checkpoint.blueprints)
+            player:moveTo(checkpoint.x, checkpoint.y)
+        end
 
         player:enterLevel(direction, levelBounds)
     end
 
-    -- Show ability Panel (3s)
+    local abilityPanel = AbilityPanel.getInstance()
 
-    self.abilityPanel:animate(true)
-    forceShowPanel = true
+    if abilityPanel then
+        abilityPanel:add()
+
+        if checkpoint then
+            abilityPanel:setItems(table.unpack(checkpoint.blueprints))
+        end
+    end
 end
 
 function Game:update()
@@ -102,7 +133,7 @@ function Game:leave(next, ...)
 
     --
 
-    if next.super.className == "Menu" or next.super.className == "GameComplete" then
+    if next.super.className == "Menu" then
         -- Remove system/PD menu items
 
         systemMenu:removeAllMenuItems()
@@ -153,11 +184,11 @@ function Game:levelComplete(data)
 
     local neighbors = LDtk.get_neighbours(currentLevelName, direction)
 
-    -- For now, just get the first neightbor. For handling multiple neighbors we'll have to do a coordinates check.
+    -- Check coordinates function for detecting which neighbor to transition to
     local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
 
     sceneManager:enter(sceneManager.scenes.currentGame,
-        { direction = direction, nextLevel = { name = nextLevel, bounds = nextLevelBounds } })
+        { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
 function Game:loadItems(item1, item2, item3)
@@ -178,10 +209,6 @@ function Game:crankDrop()
     self.abilityPanel:removeRightMost()
 end
 
-function Game:showPanel(isShowing)
-    if forceShowPanel then
-        return
-    end
-
-    self.abilityPanel:animate(isShowing)
+function Game:checkpoint(spriteCheckpoint)
+    spriteCheckpoint:activate(currentLevelName)
 end
