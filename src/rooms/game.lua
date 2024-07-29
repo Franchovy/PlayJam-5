@@ -14,8 +14,8 @@ local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
 -- LDtk current level name
--- use "Physics_test" to load physics test level
-local initialLevelName <const> = "Physics_test"
+
+local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
 
@@ -184,7 +184,7 @@ function Game:levelComplete(data)
     end
 
     local neighbors = LDtk.get_neighbours(currentLevelName, direction)
-   
+
     if not neighbors then return end
 
     -- Check coordinates function for detecting which neighbor to transition to
