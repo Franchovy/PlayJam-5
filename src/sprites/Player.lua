@@ -76,9 +76,9 @@ function Player:init(entity)
     Player.super.init(self, playerImageTable)
 
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 3 }).asDefault()
-    self:addState(ANIMATION_STATES.Moving, 5, 8, { tickStep = 3 })
-    self:addState(ANIMATION_STATES.Jumping, 9, 12, { tickStep = 3 })
-    self:addState(ANIMATION_STATES.Drilling, 13, 16, { tickStep = 3 })
+    self:addState(ANIMATION_STATES.Moving, 5, 8, { tickStep = 2 })
+    self:addState(ANIMATION_STATES.Jumping, 9, 12, { onLoopFinishedEvent = function() self:pauseAnimation() end })
+    self:addState(ANIMATION_STATES.Drilling, 13, 16, { tickStep = 2 })
     self:playAnimation()
 
     self:setTag(TAGS.Player)
