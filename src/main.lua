@@ -30,8 +30,6 @@ manager.scenes = {
   menu = Menu()
 }
 
-
-
 manager:enter(manager.scenes.menu)
 
 local last_time = 0

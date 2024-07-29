@@ -15,7 +15,6 @@ function ConveyorBelt:init(entity)
 
   self:setTag(TAGS.ConveyorBelt)
   self.fields = table.deepcopy(entity.fields)
-  self.direction = self.fields.ConveyorDirection
   self.restitution = .3
 
   local tilemap = gfx.tilemap.new()
@@ -23,7 +22,7 @@ function ConveyorBelt:init(entity)
 
   local a = {}
   local tileCount = entity.size.width / width
-  for i=1, tileCount do
+  for i = 1, tileCount do
     if i == 1 then
       a[i] = 1
     elseif i == tileCount then
@@ -36,6 +35,6 @@ function ConveyorBelt:init(entity)
   self:setTilemap(tilemap);
 end
 
-function ConveyorBelt:getDirection()
-  return self.direction;
+function ConveyorBelt:getAppliedSpeed()
+  return self.fields.direction == "Right" and 5 or -5;
 end

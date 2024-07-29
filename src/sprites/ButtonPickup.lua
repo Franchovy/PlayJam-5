@@ -17,12 +17,8 @@ class('ButtonPickup').extends(gfx.sprite)
 function ButtonPickup:init(entity)
   self.fields = entity.fields
 
-  if self.fields.pickedUp then
-    return
-  end
-
-  self.abilityName = self.fields.button
-  assert(KEYNAMES[self.fields.button], "Missing Key name.")
+  self.abilityName = self.fields.blueprint
+  assert(KEYNAMES[self.abilityName], "Missing Key name.")
 
   local abilityImage = imageTableButtons[imageTableIndexes[self.abilityName]]
   assert(abilityImage)
@@ -32,6 +28,6 @@ function ButtonPickup:init(entity)
 end
 
 function ButtonPickup:pickUp()
-  self.fields.pickedUp = true
+  self.fields.consumed = true
   self:remove()
 end

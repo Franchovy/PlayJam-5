@@ -39,6 +39,11 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             goto continue
         end
 
+        -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. DrillableBlock, ButtonPickup)
+        if entity.fields.consumed == true then
+            goto continue
+        end
+
         local sprite = _G[entity.name](entity)
         sprite:moveTo(entity.position.x, entity.position.y)
 

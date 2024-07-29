@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 228,
+	"nextUid": 229,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -338,10 +338,10 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "type",
+					"identifier": "blueprints",
 					"doc": null,
 					"__type": "Array<LocalEnum.ObjectEnum>",
-					"uid": 40,
+					"uid": 228,
 					"type": "F_Enum(37)",
 					"isArray": true,
 					"canBeNull": false,
@@ -411,7 +411,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "button",
+					"identifier": "blueprint",
 					"doc": null,
 					"__type": "LocalEnum.ObjectEnum",
 					"uid": 38,
@@ -438,46 +438,6 @@
 					"regex": null,
 					"acceptFileTypes": null,
 					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "pickedUp",
-					"doc": null,
-					"__type": "Bool",
-					"uid": 206,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": {
-						"id": "V_Bool",
-						"params": [ false ]
-					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -1049,7 +1009,7 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [256,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 228, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Left"]
 							}] }],
@@ -1087,13 +1047,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [128,160],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Right"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
 							"__worldX": -672,
 							"__worldY": -672
 						}
@@ -1269,13 +1226,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [96,192],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["A"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["A"]
+							}] }],
 							"__worldX": -208,
 							"__worldY": -640
 						}
@@ -1300,12 +1254,12 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,2,2,2,1,1,2,2,2,0,
-						0,0,2,2,1,1,1,1,1,1,0,1,1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,1,1,0,1,
-						2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
+						1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,2,2,2,0,
+						0,0,2,2,1,1,1,1,1,1,1,1,1,2,2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,1,1,1,1,
+						2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,1,1,1,1,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
-						1,1,1,1,1,1,1,1,0
+						1,1,1,1,1,1,1,1,1
 					],
 					"autoLayerTiles": [
 						{ "px": [32,0], "src": [0,32], "f": 0, "t": 12, "d": [227,1], "a": 1 },
@@ -1318,6 +1272,7 @@
 						{ "px": [512,0], "src": [0,32], "f": 0, "t": 12, "d": [227,16], "a": 1 },
 						{ "px": [544,0], "src": [0,32], "f": 0, "t": 12, "d": [227,17], "a": 1 },
 						{ "px": [576,0], "src": [0,32], "f": 0, "t": 12, "d": [227,18], "a": 1 },
+						{ "px": [704,0], "src": [0,32], "f": 0, "t": 12, "d": [227,22], "a": 1 },
 						{ "px": [0,32], "src": [0,32], "f": 0, "t": 12, "d": [227,23], "a": 1 },
 						{ "px": [32,32], "src": [0,32], "f": 0, "t": 12, "d": [227,24], "a": 1 },
 						{ "px": [64,32], "src": [0,32], "f": 0, "t": 12, "d": [227,25], "a": 1 },
@@ -1328,10 +1283,13 @@
 						{ "px": [608,32], "src": [0,32], "f": 0, "t": 12, "d": [227,42], "a": 1 },
 						{ "px": [640,32], "src": [0,32], "f": 0, "t": 12, "d": [227,43], "a": 1 },
 						{ "px": [672,32], "src": [0,32], "f": 0, "t": 12, "d": [227,44], "a": 1 },
+						{ "px": [704,32], "src": [0,32], "f": 0, "t": 12, "d": [227,45], "a": 1 },
 						{ "px": [0,64], "src": [0,32], "f": 0, "t": 12, "d": [227,46], "a": 1 },
 						{ "px": [32,64], "src": [0,32], "f": 0, "t": 12, "d": [227,47], "a": 1 },
 						{ "px": [640,64], "src": [0,32], "f": 0, "t": 12, "d": [227,66], "a": 1 },
 						{ "px": [672,64], "src": [0,32], "f": 0, "t": 12, "d": [227,67], "a": 1 },
+						{ "px": [704,64], "src": [0,32], "f": 0, "t": 12, "d": [227,68], "a": 1 },
+						{ "px": [704,96], "src": [0,32], "f": 0, "t": 12, "d": [227,91], "a": 1 },
 						{ "px": [224,160], "src": [0,32], "f": 0, "t": 12, "d": [227,122], "a": 1 },
 						{ "px": [256,160], "src": [0,32], "f": 0, "t": 12, "d": [227,123], "a": 1 },
 						{ "px": [384,160], "src": [0,32], "f": 0, "t": 12, "d": [227,127], "a": 1 },
@@ -1354,6 +1312,7 @@
 						{ "px": [544,224], "src": [0,32], "f": 0, "t": 12, "d": [227,178], "a": 1 },
 						{ "px": [576,224], "src": [0,32], "f": 0, "t": 12, "d": [227,179], "a": 1 },
 						{ "px": [640,224], "src": [0,32], "f": 0, "t": 12, "d": [227,181], "a": 1 },
+						{ "px": [704,224], "src": [0,32], "f": 0, "t": 12, "d": [227,183], "a": 1 },
 						{ "px": [0,0], "src": [0,192], "f": 0, "t": 72, "d": [226,0], "a": 1 },
 						{ "px": [64,0], "src": [0,192], "f": 0, "t": 72, "d": [226,2], "a": 1 },
 						{ "px": [96,0], "src": [0,192], "f": 0, "t": 72, "d": [226,3], "a": 1 },
@@ -1401,7 +1360,8 @@
 						{ "px": [608,64], "src": [224,64], "f": 0, "t": 31, "d": [222,65], "a": 1 },
 						{ "px": [32,96], "src": [224,64], "f": 0, "t": 31, "d": [222,70], "a": 1 },
 						{ "px": [64,96], "src": [224,64], "f": 0, "t": 31, "d": [222,71], "a": 1 },
-						{ "px": [608,96], "src": [224,64], "f": 0, "t": 31, "d": [222,88], "a": 1 }
+						{ "px": [608,96], "src": [224,64], "f": 0, "t": 31, "d": [222,88], "a": 1 },
+						{ "px": [704,128], "src": [224,64], "f": 0, "t": 31, "d": [222,114], "a": 1 }
 					],
 					"seed": 7952932,
 					"overrideTilesetUid": null,
@@ -1468,13 +1428,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [192,128],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Down"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
 							"__worldX": 608,
 							"__worldY": -704
 						},
@@ -1490,13 +1447,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [288,192],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Left"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
 							"__worldX": 704,
 							"__worldY": -640
 						},
@@ -1537,9 +1491,9 @@
 					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [
-						1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,2,2,2,2,2,1,1,1,0,0,0,1,1,2,2,2,0,0,0,2,
-						1,1,0,0,1,2,0,0,0,0,0,0,0,2,1,0,0,2,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,
-						1,1,0,0,1,2,1,0,0,0,0,0,1,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,0
+						1,1,1,1,1,1,1,1,2,2,0,0,0,1,1,2,2,2,2,2,1,1,1,2,2,0,1,1,2,2,2,0,0,0,2,
+						1,1,2,2,1,2,0,0,0,0,0,0,0,2,1,2,2,2,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,
+						1,1,0,0,1,2,1,1,0,0,0,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
 					"autoLayerTiles": [
 						{ "px": [32,0], "src": [0,32], "f": 0, "t": 12, "d": [227,1], "a": 1 },
@@ -1557,18 +1511,22 @@
 						{ "px": [288,128], "src": [0,32], "f": 0, "t": 12, "d": [227,61], "a": 1 },
 						{ "px": [320,128], "src": [0,32], "f": 0, "t": 12, "d": [227,62], "a": 1 },
 						{ "px": [352,128], "src": [0,32], "f": 0, "t": 12, "d": [227,63], "a": 1 },
+						{ "px": [384,128], "src": [0,32], "f": 0, "t": 12, "d": [227,64], "a": 1 },
 						{ "px": [160,160], "src": [0,32], "f": 0, "t": 12, "d": [227,70], "a": 1 },
 						{ "px": [192,160], "src": [0,32], "f": 0, "t": 12, "d": [227,71], "a": 1 },
+						{ "px": [384,160], "src": [0,32], "f": 0, "t": 12, "d": [227,77], "a": 1 },
 						{ "px": [160,192], "src": [0,32], "f": 0, "t": 12, "d": [227,83], "a": 1 },
 						{ "px": [192,192], "src": [0,32], "f": 0, "t": 12, "d": [227,84], "a": 1 },
 						{ "px": [224,192], "src": [0,32], "f": 0, "t": 12, "d": [227,85], "a": 1 },
 						{ "px": [320,192], "src": [0,32], "f": 0, "t": 12, "d": [227,88], "a": 1 },
 						{ "px": [352,192], "src": [0,32], "f": 0, "t": 12, "d": [227,89], "a": 1 },
+						{ "px": [384,192], "src": [0,32], "f": 0, "t": 12, "d": [227,90], "a": 1 },
 						{ "px": [64,224], "src": [0,32], "f": 0, "t": 12, "d": [227,93], "a": 1 },
 						{ "px": [96,224], "src": [0,32], "f": 0, "t": 12, "d": [227,94], "a": 1 },
 						{ "px": [128,224], "src": [0,32], "f": 0, "t": 12, "d": [227,95], "a": 1 },
 						{ "px": [224,224], "src": [0,32], "f": 0, "t": 12, "d": [227,98], "a": 1 },
 						{ "px": [352,224], "src": [0,32], "f": 0, "t": 12, "d": [227,102], "a": 1 },
+						{ "px": [384,224], "src": [0,32], "f": 0, "t": 12, "d": [227,103], "a": 1 },
 						{ "px": [0,0], "src": [0,192], "f": 0, "t": 72, "d": [226,0], "a": 1 },
 						{ "px": [64,0], "src": [0,192], "f": 0, "t": 72, "d": [226,2], "a": 1 },
 						{ "px": [128,0], "src": [0,192], "f": 0, "t": 72, "d": [226,4], "a": 1 },
@@ -1589,14 +1547,22 @@
 						{ "px": [64,32], "src": [256,128], "f": 0, "t": 56, "d": [223,15], "a": 1 },
 						{ "px": [160,32], "src": [256,128], "f": 0, "t": 56, "d": [223,18], "a": 1 },
 						{ "px": [128,64], "src": [256,128], "f": 0, "t": 56, "d": [223,30], "a": 1 },
+						{ "px": [384,64], "src": [256,128], "f": 0, "t": 56, "d": [223,38], "a": 1 },
 						{ "px": [288,96], "src": [256,128], "f": 0, "t": 56, "d": [223,48], "a": 1 },
+						{ "px": [352,96], "src": [256,128], "f": 0, "t": 56, "d": [223,50], "a": 1 },
+						{ "px": [256,0], "src": [224,64], "f": 0, "t": 31, "d": [222,8], "a": 1 },
+						{ "px": [288,0], "src": [224,64], "f": 0, "t": 31, "d": [222,9], "a": 1 },
 						{ "px": [96,32], "src": [224,64], "f": 0, "t": 31, "d": [222,16], "a": 1 },
 						{ "px": [128,32], "src": [224,64], "f": 0, "t": 31, "d": [222,17], "a": 1 },
 						{ "px": [192,32], "src": [224,64], "f": 0, "t": 31, "d": [222,19], "a": 1 },
+						{ "px": [320,32], "src": [224,64], "f": 0, "t": 31, "d": [222,23], "a": 1 },
+						{ "px": [352,32], "src": [224,64], "f": 0, "t": 31, "d": [222,24], "a": 1 },
 						{ "px": [64,64], "src": [224,64], "f": 0, "t": 31, "d": [222,28], "a": 1 },
 						{ "px": [96,64], "src": [224,64], "f": 0, "t": 31, "d": [222,29], "a": 1 },
 						{ "px": [256,64], "src": [224,64], "f": 0, "t": 31, "d": [222,34], "a": 1 },
+						{ "px": [352,64], "src": [224,64], "f": 0, "t": 31, "d": [222,37], "a": 1 },
 						{ "px": [32,96], "src": [224,64], "f": 0, "t": 31, "d": [222,40], "a": 1 },
+						{ "px": [384,96], "src": [224,64], "f": 0, "t": 31, "d": [222,51], "a": 1 },
 						{ "px": [0,128], "src": [224,64], "f": 0, "t": 31, "d": [222,52], "a": 1 },
 						{ "px": [320,160], "src": [224,64], "f": 0, "t": 31, "d": [222,75], "a": 1 }
 					],

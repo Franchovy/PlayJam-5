@@ -8,6 +8,7 @@ _G.assets = {
     },
     levels = {
         test = "assets/levels/PlaydateProjectTest.ldtk",
-        artTest = "assets/levels/Art-Test.ldtk"
+        artTest = "assets/levels/Art-Test.ldtk",
+        physicsTest = "assets/levels/PlaydateProjectPhysicsTest.ldtk"
     }
 }

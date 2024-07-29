@@ -6,13 +6,12 @@ class("DrillableBlock").extends(gfx.sprite)
 
 local maxTicksToDrill = 15
 
-local stateNotDrilled = { drilled = false }
-local stateDrilled = { drilled = true }
-
 function DrillableBlock:init(entity)
     DrillableBlock.super.init(self)
 
-    -- Persistent sprite data
+    self.fields = entity.fields
+
+    self:setImage(imageSprite)
 
     self:setImage(imageSprite)
     self:setTag(TAGS.DrillableBlock)
@@ -28,7 +27,8 @@ end
 
 function DrillableBlock:activate()
     if self.ticksToDrill >= maxTicksToDrill then
-        self:updateStateDrilled()
+        self.fields.consumed = true
+        self:remove()
     else
         self.ticksToDrill += 1
     end
