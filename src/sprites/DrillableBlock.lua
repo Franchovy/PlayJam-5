@@ -11,6 +11,8 @@ function DrillableBlock:init(entity)
 
     -- Persistent sprite data
 
+    self.fields = entity.fields
+
     self:setImage(imageSprite)
     self:setTag(TAGS.DrillableBlock)
 

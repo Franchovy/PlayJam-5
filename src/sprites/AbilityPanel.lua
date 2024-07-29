@@ -37,6 +37,14 @@ function AbilityPanel.getInstance() return _instance end
 
 --
 
+-- Static Reference
+
+local _instance
+
+function AbilityPanel.getInstance() return _instance end
+
+--
+
 function AbilityPanel:init()
   AbilityPanel.super.init(self, imagePanel)
   _instance = self

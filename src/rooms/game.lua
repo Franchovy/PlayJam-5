@@ -15,6 +15,7 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 -- LDtk current level name
 local initialLevelName <const> = "Level_0"
 local currentLevelName
+local checkpointPlayerStart
 
 -- Static methods
 
@@ -83,6 +84,11 @@ function Game:enter(previous, data)
 
     if player then
         player:add()
+
+        if checkpoint then
+            player:setBlueprints(checkpoint.blueprints)
+            player:moveTo(checkpoint.x, checkpoint.y)
+        end
 
         player:enterLevel(direction, levelBounds)
     end

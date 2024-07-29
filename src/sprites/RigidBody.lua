@@ -34,8 +34,6 @@ function RigidBody:init(entity, imageTable)
 end
 
 function RigidBody:update()
-  if DEBUG_PRINT then printDebug("RigidBody:update() for: ", getmetatable(self).className) end
-
   RigidBody.super.update(self)
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
