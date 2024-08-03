@@ -2,56 +2,50 @@ local pd <const> = playdate
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local complexCollision = true
-local maxFallSpeed = 13
+local complexCollision = false
 
 local DEBUG_PRINT = false
-
 
 -- FRANCH: Behaviors to adjust for / fix:
 -- Elevator going into a wall - should stop (wall should have "infinite mass")
 -- Elevator carrying object going into the ceiling - should stop both
-
 
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
   RigidBody.super.init(self, imageTable)
 
-  -- FROM: FRANCH TO: CALVIN
-  -- How can we remove the "bounce" factor when falling? I think in 95% of cases we don't want any bounce since it
-  -- interferes with horizontal or vertical moving platforms/NPCs. Ideally we could set a threshold on a sprite that
-  -- will limit the "bounciness" to only apply past a certain collision velocity, or be able to turn it off completely.
-
   self.velocity = gmt.vector2D.new(0, 0)
+  self.g_mult = 1
   self.inv_mass = 0.4
-  self.restitution = 0.4
+  self.restitution = 0
   self.static_friction = 0
   self.dynamic_friction = .12
-  self.kinematic = false
+  self.air_friction = .14
+  self.ground_friction = .3
+  self.maxFallSpeed = 13
+  self.maxConveyorSpeed = 6
+  self.onParent = false
 
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
-
   RigidBody.super.update(self)
+
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
-  local newX, newY = newPos:unpack()
-
-  local sdkCollisions
-  if not self.kinematic then
-    local _, _, collisions = self:moveWithCollisions(newX, newY)
-    sdkCollisions = collisions
-  else
-    local _, _, collisions = self:checkCollisions(self.x, self.y - 1)
-    sdkCollisions = collisions
+  if self.onParent and self.parent then
+    newPos = newPos + self.parent.velocity/2
   end
 
-  local beltFound = false
-  local elevatorFound = false
+  local newX, newY = newPos:unpack()
+  local currentVX, currentVY = self.velocity:unpack()
+
+  local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
+
+  local parentFound = false
   local onGround = false
 
   for _, c in pairs(sdkCollisions) do
@@ -62,11 +56,7 @@ function RigidBody:update()
 
     if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
 
-    if complexCollision and tag ~= TAGS.Player and not self.kinematic then
-      -- FROM: FRANCH TO: CALVIN
-      -- This function does not interact with the self.velocity in a coherent way – we should be *writing* to self.velocity
-      -- as well as reading from it. For example, I would expect friction and collisions to apply to self.velocity.
-
+    if complexCollision and tag ~= TAGS.Player then
       self:checkCollision(other)
     end
 
@@ -76,66 +66,52 @@ function RigidBody:update()
           tag == TAGS.Box or
           tag == TAGS.Elevator)
 
-    if tag == TAGS.ConveyorBelt and normalY == -1 then
-      beltFound = true
-      if not self.onBelt then -- only apply belt velocity once
-        if DEBUG_PRINT then print("Applying collision belt logic") end
-
-        local conveyorSpeed = other:getAppliedSpeed()
-        self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
-
-        self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
-      end
+    if onGround and (tag == TAGS.Box or tag == TAGS.Elevator) then
+      parentFound = true
+      self.parent = other
     end
 
-    if self:getTag() == TAGS.Elevator then
-      self:activate()
+    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxConveyorSpeed then
+      if DEBUG_PRINT then print("Applying collision belt logic") end
 
-      if DEBUG_PRINT then print("Applying elevator logic") end
+      local conveyorSpeed = other:getAppliedSpeed()
+      self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
 
-      if self.orientation == "Horizontal" then
-        if tag == TAGS.Player and (other:isMovingLeft() or other:isMovingRight()) then
-          -- FRANCH: Is this really supposed to be a "return", or a "goto ::continue::"? Why are we interrupting the
-          -- execution flow?
-
-          return
-        end
-        other:moveTo(self.x - 16, other.y)
-      else
-        other:moveTo(other.x, self.y - 40)
-      end
+      self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
+    end
+    if tag == TAGS.Elevator and onGround then
+      other:activate()
     end
   end
 
-  local _, currentVY = self.velocity:unpack()
-
-  -- FRANCH: Turned this off since it seemed to be buggy, and we want to conserve some of the x-velocity after an object
-  -- leaves the belt. We would want a low air-friction coefficient and a higher ground-friction coefficient.
-
-  -- object left belt, reset x velocity
-  if self.onBelt and not beltFound then
-    --self.velocity = gmt.vector2D.new(0, currentVY)
-  end
+  self.onParent = parentFound
 
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
-  self.onElevator = elevatorFound
-  self.onBelt = beltFound
-
   -- incorporate gravity
-  if (complexCollision or not onGround) and currentVY < maxFallSpeed then
+  if (complexCollision or not onGround) and currentVY < self.maxFallSpeed then
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
   elseif not complexCollision and onGround then
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
   end
 
-  ::continue::
+  -- incorporate any in-air drag
+  if not onGround and currentVX ~= 0 then
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
+  end
+
+  -- incorporate any ground friction
+  if onGround and currentVX ~=0 then
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
+  end
 
   if DEBUG_PRINT then print("RigidBody:update() finished.") end
 end
 
 function RigidBody:checkCollision(other)
+  if self.onParent and self.parent == other then return end
+
   local normal = gmt.vector2D.new(0, 0)
   local pen = 0.0
 
@@ -156,11 +132,12 @@ function RigidBody:checkCollision(other)
   local xVector = gmt.vector2D.new(0, 0)
 
   if self.x < other.x then
-    xVector = gmt.vector2D.new(-1, 0)
-    xOverlap = (self.x + self.width) - other.x
-  else
     xVector = gmt.vector2D.new(1, 0)
     xOverlap = (other.x + other.width) - (self.x)
+  else
+    xVector = gmt.vector2D.new(-1, 0)
+    xOverlap = (self.x + self.width) - other.x
+
   end
 
   if yOverlap < xOverlap then
@@ -207,7 +184,7 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if other["velocity"] then
     relative_velocity = other.velocity - self.velocity
   else
-    relative_velocity = -self.velocity
+    relative_velocity = self.velocity:scaledBy(-1)
   end
 
   -- put it in terms of the collision normal direction
@@ -245,7 +222,7 @@ function RigidBody:collide(other, normal, other_inv_mass)
   if other["velocity"] then
     relative_velocity = other.velocity - self.velocity
   else
-    relative_velocity = -self.velocity
+    relative_velocity = self.velocity:scaledBy(-1)
   end
 
   -- Solve for the tangent vector

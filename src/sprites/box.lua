@@ -12,5 +12,6 @@ function Box:init(entity)
     self:playAnimation()
     self.g_mult = 1
     self.inv_mass = .2
-    self.dynamic_friction = 0
+    self.dynamic_friction =.1
+    self.static_friction = .3
 end

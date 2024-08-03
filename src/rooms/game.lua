@@ -18,6 +18,7 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 local spriteBackground
 
 -- LDtk current level name
+
 local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
@@ -193,6 +194,8 @@ function Game:levelComplete(data)
     end
 
     local neighbors = LDtk.get_neighbours(currentLevelName, direction)
+
+    if not neighbors then return end
 
     -- Check coordinates function for detecting which neighbor to transition to
     local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)

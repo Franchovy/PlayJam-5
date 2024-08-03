@@ -12,6 +12,7 @@ function ConveyorBelt:init(entity)
   self.g_mult = 0
   self.inv_mass = 0
   self.dynamic_friction = 0
+  self.static_friction = 0
 
   self:setTag(TAGS.ConveyorBelt)
   self.fields = table.deepcopy(entity.fields)
@@ -36,5 +37,5 @@ function ConveyorBelt:init(entity)
 end
 
 function ConveyorBelt:getAppliedSpeed()
-  return self.fields.direction == "Right" and 5 or -5;
+  return self.fields.direction == "Right" and 1 or -1;
 end
