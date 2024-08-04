@@ -13,6 +13,7 @@ local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
 -- LDtk current level name
+
 local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
