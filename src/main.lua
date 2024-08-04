@@ -23,7 +23,7 @@ manager:hook()
 
 -- Pre-load levels data
 
-LDtk.load(assets.levels.physicsTest)
+LDtk.load(assets.levels.test)
 
 -- Open Menu (& save reference)
 
