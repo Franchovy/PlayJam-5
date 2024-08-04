@@ -3,9 +3,13 @@ local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local spJump = sound.sampleplayer.new("assets/sfx/Jump")
-local spError = sound.sampleplayer.new("assets/sfx/Error")
-local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
+-- SFX Assets
+
+local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
+local spError <const> = sound.sampleplayer.new("assets/sfx/Error")
+local spLadder <const> = sound.sampleplayer.new("assets/sfx/Ladder")
+
+-- Local Variables
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -19,18 +23,22 @@ local levelHeight
 local levelOffsetX
 local levelOffsetY
 
---
+-- Code Sequences for double-key presses
+
+local doubleKeySequences = {}
+
+-- Local Constants
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 
-local ANIMATION_STATES = {
+local ANIMATION_STATES <const> = {
     Idle = 1,
     Moving = 2,
     Jumping = 3,
     Drilling = 4
 }
 
-local STATE = {
+local STATE <const> = {
     InAir = 1,
     Jumping = 2,
     OnGround = 3,
@@ -38,11 +46,7 @@ local STATE = {
     OnLadder = 5,
 }
 
--- debug
-local debugStateReverse = {}
-for k, state in pairs(STATE) do debugStateReverse[state] = k end
-
-KEYS = {
+local KEYS <const> = {
     [KEYNAMES.Up] = pd.kButtonUp,
     [KEYNAMES.Down] = pd.kButtonDown,
     [KEYNAMES.Left] = pd.kButtonLeft,
@@ -59,11 +63,11 @@ local jumpSpeed <const> = 7.5
 local jumpSpeedReleased <const> = 3.5
 local jumpHoldTimeInTicks <const> = 4
 
--- Setup
+-- Player Class
 
 class("Player").extends(AnimatedSprite)
 
--- Static Reference
+-- Static Reference to Player
 
 local _instance
 
@@ -75,11 +79,25 @@ function Player:init(entity)
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
     Player.super.init(self, playerImageTable)
 
+    -- [AnimatedSprite] Animation States
+
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
     self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
     self:playAnimation()
+
+    -- [TanukCodeSequence] Code Sequences for double-key presses
+    -- (For now just left and right)
+
+    local possibleDoubleKeySequences = {
+        KEYNAMES.Right,
+        KEYNAMES.Left
+    }
+
+    for _, key in pairs(possibleDoubleKeySequences) do
+        local sequence = CodeSequence() -- sequence, callbackReward, isAllowMultipleCalls
+    end
 
     self:setTag(TAGS.Player)
 
