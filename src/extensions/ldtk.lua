@@ -45,7 +45,7 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         end
 
         local sprite = _G[entity.name](entity)
-        sprite:moveTo(entity.position.x, entity.position.y)
+        local tileCenterX, tileCenterY = entity.position.x + 16, entity.position.y + 16
 
         if entity.name == "Player" then
             -- Reduce hitbox sizes
@@ -54,10 +54,27 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         else
             sprite:setCollideRect(0, 0, entity.size.width, entity.size.height)
         end
-        sprite:setCenter(entity.center.x, entity.center.y)
+        sprite:moveTo(tileCenterX, tileCenterY)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
 
+        -- Give sprite a reference to its level name.
+        sprite.levelName = levelName
+
         ::continue::
+    end
+end
+
+function LDtk.getNeighborLevelForPos(levelName, direction, position)
+    local neighbors = LDtk.get_neighbours(levelName, direction)
+
+    assert(#neighbors > 0)
+
+    for _, levelName in pairs(neighbors) do
+        local levelBounds = LDtk.get_rect(levelName)
+        if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
+            levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
+            return levelName, levelBounds
+        end
     end
 end

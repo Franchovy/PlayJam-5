@@ -1,9 +1,11 @@
 import "const"
+import "debug"
 import "assets"
 import "libs"
 import "playdate"
 import "extensions"
 import "rooms"
+import "utils"
 import "sprites"
 
 -- Playdate config
@@ -21,7 +23,7 @@ manager:hook()
 
 -- Pre-load levels data
 
-LDtk.load(assets.levels.test)
+LDtk.load(assets.levels.main)
 
 -- Open Menu (& save reference)
 

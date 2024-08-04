@@ -1,9 +1,7 @@
 EVENTS = {
     Update = 'update',
     LevelComplete = 'levelComplete',
-    Pickup = 'pickup',
-    CrankDrop = 'crankDrop',
-    LoadItems = 'loadItems',
-    ShowPanel = 'showPanel',
-    Checkpoint = 'checkpoint'
+    UpdateBlueprints = 'updateBlueprints',
+    CheckpointRevert = 'checkpointRevert',
+    CheckpointIncrement = 'checkpointIncrement',
 }

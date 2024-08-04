@@ -37,7 +37,7 @@ function RigidBody:update()
   -- calculate new position by adding velocity to current position
   local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   if self.onParent and self.parent then
-    newPos = newPos + self.parent.velocity/2
+    newPos = newPos + self.parent.velocity / 2
   end
 
   local newX, newY = newPos:unpack()
@@ -102,7 +102,7 @@ function RigidBody:update()
   end
 
   -- incorporate any ground friction
-  if onGround and currentVX ~=0 then
+  if onGround and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
   end
 
@@ -137,7 +137,6 @@ function RigidBody:checkCollision(other)
   else
     xVector = gmt.vector2D.new(-1, 0)
     xOverlap = (self.x + self.width) - other.x
-
   end
 
   if yOverlap < xOverlap then

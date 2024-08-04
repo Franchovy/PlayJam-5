@@ -9,7 +9,6 @@ local systemMenu <const> = pd.getSystemMenu()
 
 local fileplayer
 
-local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 local spWin = sound.sampleplayer.new("assets/sfx/Win")
 local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 
@@ -19,32 +18,29 @@ local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
 
+-- Static methods
+
+function Game.getLevelName()
+    return currentLevelName
+end
+
+-- Private Methods
+
 local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
 
-local function restartLevel()
-    local level, checkpoint
+-- Instance methods
 
-    local spriteCheckpoint = Checkpoint.getLatestCheckpoint()
-    if spriteCheckpoint then
-        level = { name = spriteCheckpoint.levelName }
-        checkpoint = spriteCheckpoint
-    else
-        level = initialLevelName
-        checkpoint = checkpointPlayerStart
-    end
-
-    sceneManager:enter(sceneManager.scenes.currentGame, { level = level, checkpoint = checkpoint })
+function Game:init()
+    self.checkpointHandler = CheckpointHandler(self)
 end
-
-function Game:init() end
 
 function Game:enter(previous, data)
     data = data or {}
     local direction = data.direction
     local level = data.level
-    local checkpoint = data.checkpoint
+    local isCheckpointRevert = data.isCheckpointRevert
 
     -- This should run only once to initialize the game instance.
 
@@ -63,13 +59,16 @@ function Game:enter(previous, data)
         -- Menu items
 
         systemMenu:addMenuItem("main menu", goToMainMenu)
-        systemMenu:addMenuItem("restart", restartLevel)
     end
 
     -- Load level --
 
     currentLevelName = level and level.name or initialLevelName
     local levelBounds = level and level.bounds or LDtk.get_rect(currentLevelName)
+
+    if not isCheckpointRevert then
+        self.checkpointHandler:pushState({ levelName = currentLevelName })
+    end
 
     local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
 
@@ -83,14 +82,6 @@ function Game:enter(previous, data)
     LDtk.loadAllEntitiesAsSprites(currentLevelName)
 
     local player = Player.getInstance()
-
-    if not checkpointPlayerStart then
-        checkpointPlayerStart = {
-            x = player.x,
-            y = player.y,
-            blueprints = table.deepcopy(player.keys)
-        }
-    end
 
     if player then
         player:add()
@@ -107,10 +98,6 @@ function Game:enter(previous, data)
 
     if abilityPanel then
         abilityPanel:add()
-
-        if checkpoint then
-            abilityPanel:setItems(table.unpack(checkpoint.blueprints))
-        end
     end
 end
 
@@ -149,6 +136,15 @@ function Game:leave(next, ...)
     end
 end
 
+-- Checkpoint interface
+
+function Game:handleCheckpointRevert(state)
+    if currentLevelName ~= state.levelName then
+        sceneManager:enter(sceneManager.scenes.currentGame,
+            { level = { name = state.levelName }, isCheckpointRevert = true })
+    end
+end
+
 -- Fileplayer
 
 function Game:setupFilePlayer()
@@ -159,7 +155,8 @@ function Game:setupFilePlayer()
     fileplayer:setPlayConfig(1)
 end
 
--- Events
+-- Event-based methods
+
 
 local maxLevels <const> = 10
 
@@ -171,47 +168,21 @@ function Game:levelComplete(data)
 
     -- Load next level
 
-    function getNeighborLevelForPos(neighbors, position)
-        assert(#neighbors > 0)
-
-        for _, levelName in pairs(neighbors) do
-            local levelBounds = LDtk.get_rect(levelName)
-            if levelBounds.x < position.x and levelBounds.x + levelBounds.width > position.x and
-                levelBounds.y < position.y and levelBounds.y + levelBounds.height > position.y then
-                return levelName, levelBounds
-            end
-        end
-    end
-
-    local neighbors = LDtk.get_neighbours(currentLevelName, direction)
-
-    if not neighbors then return end
-
-    -- Check coordinates function for detecting which neighbor to transition to
-    local nextLevel, nextLevelBounds = getNeighborLevelForPos(neighbors, coordinates)
+    local nextLevel, nextLevelBounds = LDtk.getNeighborLevelForPos(currentLevelName, direction, coordinates)
 
     sceneManager:enter(sceneManager.scenes.currentGame,
         { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
 end
 
-function Game:loadItems(item1, item2, item3)
-    self.abilityPanel:setItems(item1, item2, item3)
+function Game:updateBlueprints()
+    local abilityPanel = AbilityPanel.getInstance()
+    abilityPanel:updateBlueprints()
 end
 
-function Game:cleanUp()
-    self.abilityPanel:cleanUp()
+function Game:checkpointIncrement()
+    Checkpoint.increment()
 end
 
-function Game:pickup(ability)
-    spCollect:play(1)
-    self.abilityPanel:addItem(ability)
-end
-
-function Game:crankDrop()
-    spItemDrop:play()
-    self.abilityPanel:removeRightMost()
-end
-
-function Game:checkpoint(spriteCheckpoint)
-    spriteCheckpoint:activate(currentLevelName)
+function Game:checkpointRevert()
+    Checkpoint.goToPrevious()
 end
