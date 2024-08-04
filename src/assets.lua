@@ -7,9 +7,9 @@ _G.assets = {
         buttons = "assets/images/buttons"
     },
     levels = {
-        test = "assets/levels/PlaydateProjectTest.ldtk",
-        artTest = "assets/levels/Art-Test.ldtk",
-        checkpointTest = "assets/levels/Checkpoint-Test.ldtk",
-        physicsTest = "assets/levels/PlaydateProjectPhysicsTest.ldtk"
+        main = "assets/levels/Main.ldtk",
+        art = "assets/levels/Art.ldtk",
+        checkpoint = "assets/levels/Checkpoint.ldtk",
+        physics = "assets/levels/Physics.ldtk"
     }
 }
