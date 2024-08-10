@@ -7,14 +7,15 @@ local gfx <const> = playdate.graphics
 
 local imageSpeech <const> = gfx.image.new(assets.images.speech)
 local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17, 17)
+local spSpeech <const> = playdate.sound.sampleplayer.new(assets.sounds.speech)
 
 -- Constants
 
 local defaultSize <const> = 16
 local textMarginX <const>, textMarginY <const> = 10, 2
-local durationDialog <const> = 2000
+local durationDialog <const> = 3000
 local collideRectSize <const> = 90
-local yOffset <const> = 8
+local yOffset <const> = 16
 
 -- Child class functions
 
@@ -149,6 +150,9 @@ function Dialog:expand()
     end
 
     self.isStateExpanded = true
+
+    -- Play SFX
+    spSpeech:play(1)
 end
 
 function Dialog:collapse()
