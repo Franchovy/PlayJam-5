@@ -398,7 +398,7 @@ function Player:update()
 
     if playerY > levelHeight then
         direction = DIRECTION.BOTTOM
-    elseif playerY + 24 < 0 then -- Add a margin to not trigger level change so easily.
+    elseif playerY < 0 then -- Add a margin to not trigger level change so easily.
         direction = DIRECTION.TOP
     end
 
@@ -500,9 +500,9 @@ function Player:enterLevel(direction, levelBounds)
         self:moveTo(x, y)
     elseif direction == DIRECTION.TOP then
         local x = self.x + (levelGXPrevious - levelGX)
-        local y = levelHeight + 15
+        local y = levelHeight - 15
 
-        self:moveTo(self.x, levelHeight - 15)
+        self:moveTo(x, y)
     end
 
     -- Push level position
