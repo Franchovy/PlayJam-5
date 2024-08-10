@@ -10,6 +10,7 @@ _G.assets = {
         main = "assets/levels/Main.ldtk",
         art = "assets/levels/Art.ldtk",
         checkpoint = "assets/levels/Checkpoint.ldtk",
-        physics = "assets/levels/Physics.ldtk"
+        physics = "assets/levels/Physics.ldtk",
+        scott = "assets/levels/Scott.ldtk"
     }
 }
