@@ -58,6 +58,11 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
 
+        -- Optional Post-init call for overriding default configurations
+        if sprite.postInit then
+            sprite:postInit()
+        end
+
         -- Give sprite a reference to its level name.
         sprite.levelName = levelName
 

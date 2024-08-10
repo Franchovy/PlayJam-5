@@ -352,6 +352,8 @@ function Player:update()
             if not timerCooldownCheckpoint then
                 self:pickUpBlueprint(other)
             end
+        elseif tag == TAGS.Dialog then
+            other:expand()
         end
     end
 
