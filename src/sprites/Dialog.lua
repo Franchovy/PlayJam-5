@@ -9,8 +9,9 @@ local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17
 
 local defaultSize = 16
 local textMarginX, textMarginY = 10, 2
-local durationDialog = 3000
-
+local durationDialog = 2000
+local collideRectSize = 90
+local yOffsetExpanded = 36
 --
 
 class("Dialog").extends(gfx.sprite)
@@ -66,10 +67,6 @@ function Dialog:init(entity)
     self.currentLine = 1
 end
 
-function Dialog:postInit()
-    self:setCollideRect(-30, -30, defaultSize + 60, defaultSize + 60)
-end
-
 function Dialog:draw(x, y, w, h)
     nineSliceSpeech:drawInRect(0, 0, self.width, self.height)
 
@@ -84,15 +81,24 @@ function Dialog:draw(x, y, w, h)
 end
 
 function Dialog:updateDialog()
+    local width, height
     if self.isStateExpanded then
+        -- Update sprite size using dialog size
+
         local dialog = self.dialogs[self.currentLine]
-        self:setSize(dialog.width + textMarginX * 2, dialog.height + textMarginY * 2)
+        width, height = dialog.width + textMarginX * 2, dialog.height + textMarginY * 2
 
         -- Set timer to handle next line / collapse
         self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLineOrCollapse, self)
     else
-        self:setSize(defaultSize, defaultSize)
+        width, height = defaultSize, defaultSize
     end
+
+    self:setSize(width, height)
+
+    -- Update collision rect to keep in the same place
+    self:setCollideRect((width - collideRectSize) / 2, (height - collideRectSize) / 2, collideRectSize,
+        collideRectSize)
 
     -- Mark dirty for redraw
     self:markDirty()
@@ -103,11 +109,8 @@ function Dialog:showNextLineOrCollapse()
         -- Show next line
         self.currentLine += 1
     else
-        -- Collapse & Reset
-        self.isStateExpanded = false
-        self.currentLine = 1
-
-        self:reset()
+        -- Collapse
+        self:collapse()
     end
 end
 
@@ -117,6 +120,17 @@ function Dialog:expand()
     end
 
     self.isStateExpanded = true
+end
+
+function Dialog:collapse()
+    -- Set state to collapsed
+
+    self.isStateExpanded = false
+    self.currentLine = 1
+
+    -- Stop any ongoing timers
+
+    self.timer:pause()
 end
 
 function Dialog:update()

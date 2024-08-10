@@ -199,7 +199,8 @@ end
 local velocityX = 0
 local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
-local drillableBlockCurrentlyDrilling
+local activeDrillableBlock
+local activeDialog
 
 function Player:update()
     -- Checkpoint Handling
@@ -236,9 +237,9 @@ function Player:update()
 
         self.isDrilling = false
 
-        if drillableBlockCurrentlyDrilling ~= nil then
-            drillableBlockCurrentlyDrilling:release()
-            drillableBlockCurrentlyDrilling = nil
+        if activeDrillableBlock ~= nil then
+            activeDrillableBlock:release()
+            activeDrillableBlock = nil
         end
     end
 
@@ -315,6 +316,8 @@ function Player:update()
     local onLadderTop = false
     local onElevator = false
 
+    local dialog
+
     for _, collisionData in pairs(collisions) do
         local other = collisionData.other
         local tag = other:getTag()
@@ -327,9 +330,9 @@ function Player:update()
             onGround = true
 
             if self.isDrilling and other:getTag() == TAGS.DrillableBlock then
-                drillableBlockCurrentlyDrilling = other
+                activeDrillableBlock = other
 
-                drillableBlockCurrentlyDrilling:activate()
+                activeDrillableBlock:activate()
             end
         elseif tag == TAGS.Ladder then
             local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
@@ -353,8 +356,18 @@ function Player:update()
                 self:pickUpBlueprint(other)
             end
         elseif tag == TAGS.Dialog then
-            other:expand()
+            dialog = other
         end
+    end
+
+    if dialog ~= activeDialog then
+        if dialog == nil then
+            activeDialog:collapse()
+        else
+            dialog:expand()
+        end
+
+        activeDialog = dialog
     end
 
     if onLadder then
