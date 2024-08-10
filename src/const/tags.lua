@@ -10,3 +10,17 @@ TAGS = {
     Elevator = 9,
     Checkpoint = 10,
 }
+
+PROPS = {
+    Ground = {
+        [TAGS.Wall] = 1,
+        [TAGS.Box] = 1,
+        [TAGS.ConveyorBelt] = 1,
+        [TAGS.DrillableBlock] = 1,
+        [TAGS.Elevator] = 1
+    },
+    Parent = {
+        [TAGS.Box] = 1,
+        [TAGS.ConveyorBelt] = 1
+    }
+}

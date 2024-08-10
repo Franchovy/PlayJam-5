@@ -186,9 +186,8 @@ function Player:handleCollisionExtra(collisionData)
     local tag = other:getTag()
 
     if self.onGround and
-       self.isDrilling and
-       other:getTag() == TAGS.DrillableBlock then
-
+        self.isDrilling and
+        other:getTag() == TAGS.DrillableBlock then
         drillableBlockCurrentlyDrilling = other
 
         drillableBlockCurrentlyDrilling:activate()
@@ -411,7 +410,6 @@ function Player:enterLevel(direction, levelBounds)
 
         self:moveTo(x, y)
     elseif direction == DIRECTION.TOP then
-
         self:moveTo(self.x, levelHeight - 15)
     end
 

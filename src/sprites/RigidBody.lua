@@ -6,10 +6,6 @@ local complexCollision = false
 
 local DEBUG_PRINT = false
 
--- FRANCH: Behaviors to adjust for / fix:
--- Elevator going into a wall - should stop (wall should have "infinite mass")
--- Elevator carrying object going into the ceiling - should stop both
-
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
@@ -64,15 +60,11 @@ function RigidBody:update()
       self:checkCollision(other)
     end
 
-    if normalY == -1 and
-        (tag == TAGS.Wall or
-          tag == TAGS.ConveyorBelt or
-          tag == TAGS.Box or
-          tag == TAGS.Elevator) then
+    if normalY == -1 and PROPS.Ground[tag] then
       groundFound = true
     end
 
-    if groundFound and (tag == TAGS.Box or tag == TAGS.Elevator) then
+    if groundFound and PROPS.Parent[tag] then
       parentFound = true
       self.parent = other
     end
