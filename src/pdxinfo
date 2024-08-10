@@ -3,5 +3,5 @@ author=TeamNameHere
 description=Find your buttons in... Discontrolled!
 bundleID=io.franchovy.discontrolled
 version=0.0.1
-buildNumber=1
+buildNumber=2
 imagePath=assets
