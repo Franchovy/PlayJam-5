@@ -30,6 +30,10 @@ function RigidBody:init(entity, imageTable)
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
+-- override this in subclasses to handle collisions outside of basic physics
+function RigidBody:handleCollisionExtra(collisionData)
+end
+
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
   RigidBody.super.update(self)
@@ -46,7 +50,7 @@ function RigidBody:update()
   local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
 
   local parentFound = false
-  local onGround = false
+  local groundFound = false
 
   for _, c in pairs(sdkCollisions) do
     local other = c.other
@@ -60,13 +64,15 @@ function RigidBody:update()
       self:checkCollision(other)
     end
 
-    onGround = not onGround and normalY == -1 and
+    if normalY == -1 and
         (tag == TAGS.Wall or
           tag == TAGS.ConveyorBelt or
           tag == TAGS.Box or
-          tag == TAGS.Elevator)
+          tag == TAGS.Elevator) then
+      groundFound = true
+    end
 
-    if onGround and (tag == TAGS.Box or tag == TAGS.Elevator) then
+    if groundFound and (tag == TAGS.Box or tag == TAGS.Elevator) then
       parentFound = true
       self.parent = other
     end
@@ -79,30 +85,30 @@ function RigidBody:update()
 
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
-    if tag == TAGS.Elevator and onGround then
-      other:activate()
-    end
+
+    self:handleCollisionExtra(c)
   end
 
+  self.onGround = groundFound
   self.onParent = parentFound
 
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   -- incorporate gravity
-  if (complexCollision or not onGround) and currentVY < self.maxFallSpeed then
+  if (complexCollision or not groundFound) and currentVY < self.maxFallSpeed then
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
-  elseif not complexCollision and onGround then
+  elseif not complexCollision and groundFound then
     local dx, _ = self.velocity:unpack()
     self.velocity = gmt.vector2D.new(dx, 0)
   end
 
   -- incorporate any in-air drag
-  if not onGround and currentVX ~= 0 then
+  if not groundFound and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
   end
 
   -- incorporate any ground friction
-  if onGround and currentVX ~= 0 then
+  if groundFound and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
   end
 
