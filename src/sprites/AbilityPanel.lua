@@ -59,7 +59,7 @@ function AbilityPanel:init()
   self:setIgnoresDrawOffset(true)
   self:setUpdatesEnabled(false)
 
-  for i, sprite in ipairs(buttonSprites) do
+  for _, sprite in pairs(buttonSprites) do
     sprite:setZIndex(100)
     sprite:setIgnoresDrawOffset(true)
   end
