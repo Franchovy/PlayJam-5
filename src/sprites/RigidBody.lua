@@ -88,7 +88,16 @@ function RigidBody:update()
 
   -- incorporate gravity
 
-  self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
+  if not groundFound then
+    -- Adds gravity vector to current velocity
+
+    self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
+  elseif groundFound then
+    -- Resets velocity (still applying gravity)
+
+    local dx, _ = self.velocity:unpack()
+    self.velocity = gmt.vector2D.new(dx, self.g_mult * _G.delta_time)
+  end
 
   -- incorporate any in-air drag
   if not groundFound and currentVX ~= 0 then
