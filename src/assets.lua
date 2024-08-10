@@ -1,7 +1,8 @@
 _G.assets = {
     images = {
         tileset = "assets/images/tileset",
-        hudPanel = "assets/images/hud-panel"
+        hudPanel = "assets/images/hud-panel",
+        speech = "assets/images/speech"
     },
     imageTables = {
         buttons = "assets/images/buttons"

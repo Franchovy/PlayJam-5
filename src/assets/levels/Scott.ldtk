@@ -1042,7 +1042,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "Text",
+					"identifier": "text",
 					"doc": null,
 					"__type": "String",
 					"uid": 205,
@@ -1443,7 +1443,7 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [672,288],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "Looks like the exit is to the right!\nIf only you could get up there...", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "Looks like the exit is to the right!\nIf only you could get up there...", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Looks like the exit is to the right!\\nIf only you could get up there..."]
 							}] }],
@@ -1979,7 +1979,7 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [672,192],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "If you get stuck, press B to hop back to the previous checkpoint.", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "If you get stuck, press B to hop back to the previous checkpoint.", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["If you get stuck, press B to hop back to the previous checkpoint."]
 							}] }],
@@ -2395,7 +2395,7 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [160,128],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "Looks like there's a choice to make here...", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "Looks like there's a choice to make here...", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Looks like there's a choice to make here..."]
 							}] }],
@@ -5491,7 +5491,7 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [192,256],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "Congrats on finishing the game until now!", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "Congrats on finishing the game until now!", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Congrats on finishing the game until now!"]
 							}] }],
