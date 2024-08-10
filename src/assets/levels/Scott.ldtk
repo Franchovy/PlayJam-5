@@ -1443,9 +1443,9 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [672,288],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "Looks like the exit is to the right!\nIf only you could get up there...", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "Looks like the exit/is to the right!\nIf only you could/get up there...", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Looks like the exit is to the right!\\nIf only you could get up there..."]
+								"params": ["Looks like the exit/is to the right!\\nIf only you could/get up there..."]
 							}] }],
 							"__worldX": -416,
 							"__worldY": -256

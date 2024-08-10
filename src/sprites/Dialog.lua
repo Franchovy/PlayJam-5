@@ -8,7 +8,8 @@ local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17
 --
 
 local defaultSize = 16
-local textMarginX, textMarginY = 6, 3
+local textMarginX, textMarginY = 10, 2
+local maxTextWidth = 200
 
 --
 
@@ -22,29 +23,33 @@ function Dialog:init(entity)
     local text = entity.fields.text
     assert(text)
 
-    -- Break up text into lines
-
-    self.lines = {}
-    for line in string.gmatch(text, "([^\n]+)") do
-        table.insert(self.lines, line)
-    end
-
-    -- Calculate text size using font
+    -- Get font used for calculating text size
 
     local font = gfx.getFont()
 
-    -- Getting height is easy
+    -- Break up text into lines
 
-    self.textHeight = font:getHeight() * #self.lines
+    self.dialogs = {}
+    for text in string.gmatch(text, "([^\n]+)") do
+        local dialog = { text = text, lines = {} }
 
-    -- Get max width by line
+        local maxWidth = 0
+        for text in string.gmatch(text, "([^/]+)") do
+            -- Get dialog width by getting max width of all lines
+            local textWidth = font:getTextWidth(text)
+            if maxWidth < textWidth then
+                dialog.width = textWidth
+            end
 
-    self.textWidth = 0
-    for _, line in pairs(self.lines) do
-        local lineWidth = font:getTextWidth(line)
-        if lineWidth > self.textWidth then
-            self.textWidth = lineWidth
+            -- Add line to dialog lines
+            table.insert(dialog.lines, text)
         end
+
+        -- Add dialog height based on num. lines
+        dialog.height = font:getHeight() * #dialog.lines
+
+        -- Add dialog to list
+        table.insert(self.dialogs, dialog)
     end
 
     -- Set state
@@ -54,25 +59,24 @@ function Dialog:init(entity)
 end
 
 function Dialog:draw(x, y, w, h)
-    if isStateCollapsed then
-        nineSliceSpeech:drawInRect(0, 0, self.width, self.height)
-    else
-        nineSliceSpeech:drawInRect(0, 0, self.textWidth, self.textHeight)
+    nineSliceSpeech:drawInRect(0, 0, self.width, self.height)
 
+    if not isStateCollapsed then
         local font = gfx.getFont()
-        font:drawText(self.lines[1], textMarginX, textMarginY)
-    end
-end
 
-function Dialog:update()
-    --self:markDirty()
+        local dialog = self.dialogs[1]
+        for i, line in ipairs(dialog.lines) do
+            font:drawText(line, textMarginX, textMarginY + (i - 1) * font:getHeight())
+        end
+    end
 end
 
 function Dialog:setIsCollapsed(isCollapsed)
     if isCollapsed then
         self:setSize(defaultSize, defaultSize)
     else
-        self:setSize(self.textWidth + textMarginX * 2, self.textHeight + textMarginY * 2)
+        local dialog = self.dialogs[1]
+        self:setSize(dialog.width + textMarginX * 2, dialog.height + textMarginY * 2)
     end
 
     self.isStateCollapsed = isCollapsed
