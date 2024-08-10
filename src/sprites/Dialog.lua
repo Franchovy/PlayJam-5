@@ -1,23 +1,46 @@
 local gfx <const> = playdate.graphics
 
 
--- Local Constants
+-- Local Variables
 
+-- Assets
+
+local imageSpeech <const> = gfx.image.new(assets.images.speech)
 local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17, 17)
 
---
+-- Constants
 
-local defaultSize = 16
-local textMarginX, textMarginY = 10, 2
-local durationDialog = 2000
-local collideRectSize = 90
-local yOffsetExpanded = 36
+local defaultSize <const> = 16
+local textMarginX <const>, textMarginY <const> = 10, 2
+local durationDialog <const> = 2000
+local collideRectSize <const> = 90
+local yOffset <const> = 8
+
+-- Child class functions
+
+local function drawSpeechBubble(self, x, y, w, h)
+    -- Draw Speech Bubble
+
+    nineSliceSpeech:drawInRect(0, 0, self.width, self.height)
+
+    -- Draw Text
+
+    if self.dialog then
+        local font = gfx.getFont()
+
+        for i, line in ipairs(self.dialog.lines) do
+            font:drawText(line, textMarginX, textMarginY + (i - 1) * font:getHeight())
+        end
+    end
+end
+
+
 --
 
 class("Dialog").extends(gfx.sprite)
 
 function Dialog:init(entity)
-    Dialog.super.init(self)
+    Dialog.super.init(self, imageSpeech)
 
     -- Sprite setup
 
@@ -61,47 +84,53 @@ function Dialog:init(entity)
         table.insert(self.dialogs, dialog)
     end
 
+    -- Set up child sprite
+
+    self.spriteBubble = gfx.sprite.new()
+    self.spriteBubble.draw = drawSpeechBubble
+    self.spriteBubble:moveTo(self.x, self.y)
+    self.spriteBubble:add()
+
     -- Set state
 
     self.isStateExpanded = false
     self.currentLine = 1
 end
 
-function Dialog:draw(x, y, w, h)
-    nineSliceSpeech:drawInRect(0, 0, self.width, self.height)
-
-    if self.isStateExpanded then
-        local font = gfx.getFont()
-
-        local dialog = self.dialogs[self.currentLine]
-        for i, line in ipairs(dialog.lines) do
-            font:drawText(line, textMarginX, textMarginY + (i - 1) * font:getHeight())
-        end
-    end
+function Dialog:postInit()
+    -- Set collide rect to full size, centered on current center.
+    self:setCollideRect(
+        (self.width - collideRectSize) / 2,
+        (self.height - collideRectSize) / 2,
+        collideRectSize,
+        collideRectSize
+    )
 end
 
 function Dialog:updateDialog()
-    local width, height
     if self.isStateExpanded then
         -- Update sprite size using dialog size
 
         local dialog = self.dialogs[self.currentLine]
-        width, height = dialog.width + textMarginX * 2, dialog.height + textMarginY * 2
 
         -- Set timer to handle next line / collapse
         self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLineOrCollapse, self)
+
+        -- Update child sprite dialog
+        self.spriteBubble.dialog = dialog
+
+        -- Set size and position
+        local width, height = dialog.width + textMarginX * 2, dialog.height + textMarginY * 2
+        self.spriteBubble:setSize(width, height)
+        self.spriteBubble:moveTo(self.x, self.y - height - yOffset)
     else
-        width, height = defaultSize, defaultSize
+        self.spriteBubble.dialog = nil
+        self.spriteBubble:setSize(defaultSize, defaultSize)
+        self.spriteBubble:moveTo(self.x, self.y)
     end
 
-    self:setSize(width, height)
-
-    -- Update collision rect to keep in the same place
-    self:setCollideRect((width - collideRectSize) / 2, (height - collideRectSize) / 2, collideRectSize,
-        collideRectSize)
-
     -- Mark dirty for redraw
-    self:markDirty()
+    self.spriteBubble:markDirty()
 end
 
 function Dialog:showNextLineOrCollapse()
