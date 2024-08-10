@@ -95,12 +95,8 @@ function RigidBody:update()
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   -- incorporate gravity
-  if (complexCollision or not groundFound) and currentVY < self.maxFallSpeed then
-    self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
-  elseif not complexCollision and groundFound then
-    local dx, _ = self.velocity:unpack()
-    self.velocity = gmt.vector2D.new(dx, 0)
-  end
+
+  self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
 
   -- incorporate any in-air drag
   if not groundFound and currentVX ~= 0 then
