@@ -29,6 +29,11 @@ local spritePositions = {
   gmt.point.new(68, 14),
 }
 
+-- Static Variables
+
+local isHidden = false
+local timerAnimation = nil
+
 -- Static Reference
 
 local _instance
@@ -50,22 +55,24 @@ function AbilityPanel:init()
   _instance = self
 
   self:setCenter(0, 0)
-  self:moveTo(0, 0)
   self:setZIndex(99)
-  self:add()
   self:setIgnoresDrawOffset(true)
+  self:setUpdatesEnabled(false)
 
   for i, sprite in ipairs(buttonSprites) do
-    sprite:moveTo(spritePositions[i]:unpack())
     sprite:setZIndex(100)
-    sprite:add()
     sprite:setIgnoresDrawOffset(true)
   end
 
-  self:setUpdatesEnabled(false)
+  -- These calls affect both this sprite and the children. See overrides below
+
+  self:moveTo(0, 0)
+  self:add()
+
+  isHidden = true
 end
 
--- gfx.sprite overrides to manage child button sprites along with sprite.
+-- Playdate Sprite Overrides
 
 function AbilityPanel:add()
   AbilityPanel.super.add(self)
@@ -80,6 +87,44 @@ function AbilityPanel:remove()
 
   for _, sprite in ipairs(buttonSprites) do
     sprite:remove()
+  end
+end
+
+function AbilityPanel:moveTo(x, y)
+  AbilityPanel.super.moveTo(self, x, y)
+  for i, sprite in ipairs(buttonSprites) do
+    local xSprite, ySprite = spritePositions[i]:unpack()
+    sprite:moveTo(x + xSprite, y + ySprite)
+  end
+end
+
+-- Public Methods
+
+function AbilityPanel:hide()
+  if isHidden then
+    return
+  end
+
+  isHidden = true
+
+  local startPos = timerAnimation ~= nil and timerAnimation.value or 0
+  timerAnimation = playdate.timer.new(300, startPos, -self.height, playdate.easingFunctions.inQuad)
+  timerAnimation.updateCallback = function(timer)
+    self:moveTo(0, timer.value)
+  end
+end
+
+function AbilityPanel:show()
+  if not isHidden then
+    return
+  end
+
+  isHidden = false
+
+  local startPos = timerAnimation ~= nil and timerAnimation.value or -self.height
+  timerAnimation = playdate.timer.new(300, startPos, 0, playdate.easingFunctions.outQuad)
+  timerAnimation.updateCallback = function(timer)
+    self:moveTo(0, timer.value)
   end
 end
 

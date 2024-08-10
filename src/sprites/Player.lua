@@ -28,6 +28,10 @@ local levelOffsetY
 
 local timerCooldownCheckpoint
 
+-- Boolean to keep overlapping with GUI state
+
+local isOverlappingWithGUI = false
+
 --
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
@@ -385,6 +389,21 @@ function Player:update()
     local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
 
     gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+
+    -- Check if player is in top-left of level (overlap with GUI)
+
+    local isOverlappingWithGUIPrevious = isOverlappingWithGUI
+
+    if playerX < 100 and playerY < 40 then
+        isOverlappingWithGUI = true
+    else
+        isOverlappingWithGUI = false
+    end
+
+    if isOverlappingWithGUI ~= isOverlappingWithGUIPrevious then
+        -- Signal to hide or show GUI based on overlap
+        Manager.emitEvent(EVENTS.HideOrShowGUI, isOverlappingWithGUI)
+    end
 
     -- Check if player has moved into another level
 
