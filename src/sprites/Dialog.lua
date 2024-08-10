@@ -90,6 +90,7 @@ function Dialog:init(entity)
     self.spriteBubble = gfx.sprite.new()
     self.spriteBubble.draw = drawSpeechBubble
     self.spriteBubble:moveTo(self.x, self.y)
+    self.spriteBubble:setZIndex(2)
     self.spriteBubble:add()
 
     -- Set state
