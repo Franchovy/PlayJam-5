@@ -21,6 +21,6 @@ PROPS = {
     },
     Parent = {
         [TAGS.Box] = 1,
-        [TAGS.ConveyorBelt] = 1
+        [TAGS.Elevator] = 1
     }
 }
