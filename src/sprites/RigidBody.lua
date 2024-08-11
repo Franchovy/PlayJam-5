@@ -38,12 +38,12 @@ function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
   RigidBody.super.update(self)
 
-  local exitParent = self.parent and self:exitParent()
+  local exitParent = self:exitParent()
 
   -- calculate new position by adding velocity to current position
   local newPos
-  if self.onParent and self.parent then
-    newPos = gmt.vector2D.new(self.parent.x, self.parent.y + self.parent.height/2) + (self.velocity * _G.delta_time)
+  if self.onParent and self.parent and not exitParent then
+    newPos = gmt.vector2D.new(self.parent.x, self.parent.y - self.parent.height/2) + (self.velocity * _G.delta_time)
   else
     newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   end

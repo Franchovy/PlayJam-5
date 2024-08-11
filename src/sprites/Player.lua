@@ -182,7 +182,7 @@ local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 local drillableBlockCurrentlyDrilling
 
 function Player:exitParent()
-  return self:isJumping()
+  return pd.buttonJustPressed(KEYNAMES.A) and self:isJumping()
 end
 
 function Player:handleCollisionExtra(collisionData)
