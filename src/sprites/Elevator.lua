@@ -41,13 +41,18 @@ function Elevator:activate()
         self.targetY = self.y + self.actualDistance
       end
     end
-    -- self.isActivating = false
+    self.isActivating = false
   end
   )
 end
 
 function Elevator:update()
-  Elevator.super.update(self)
+  -- don't call SUPER update here, as that does collision work
+  -- and we just want to call `moveTo` for the elevator
+  -- Elevator.super.update(self)
+
+  local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
+  self:moveTo(newPos.dx, newPos.dy)
   local cvx, cvy = self.velocity:unpack()
 
   local distance = 0

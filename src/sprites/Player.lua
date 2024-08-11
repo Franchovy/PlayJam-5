@@ -181,9 +181,52 @@ end
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 local drillableBlockCurrentlyDrilling
 
+function Player:exitParent()
+  return self:isJumping()
+end
+
 function Player:handleCollisionExtra(collisionData)
     local other = collisionData.other
     local tag = other:getTag()
+
+    if tag == TAGS.DrillableBlock and self:isMovingDown() then
+        if self.isDrilling == false then
+            spDrillStart:play(1)
+            spDrillStart:setFinishCallback(function()
+                if self.isDrilling then
+                    -- Play loop
+                    spDrillLoop:play(0)
+                end
+            end)
+        end
+
+        self.isDrilling = true
+    else
+        if self.isDrilling then
+            -- spDrillStart:stop() -- Until we have better samples, better to cover up the sfx gaps...
+            spDrillLoop:stop()
+            spDrillEnd:play(1)
+        end
+
+        self.isDrilling = false
+
+        if drillableBlockCurrentlyDrilling ~= nil then
+            drillableBlockCurrentlyDrilling:release()
+            drillableBlockCurrentlyDrilling = nil
+        end
+    end
+
+    -- TODO: proper direction per orientation
+    if tag == TAGS.Elevator then
+        if other.orientation == "Vertical" and
+           (self:isMovingDown() or self:isMovingUp()) then
+            other:activate();
+        elseif other.orientation == "Horizontal" and
+               (self:isMovingLeft() or self:isMovingRight()) then
+            other:activate();
+        end
+    end
+
 
     if self.onGround and
         self.isDrilling and
@@ -213,35 +256,6 @@ function Player:update()
     local _, acceleratedChange = pd.getCrankChange()
     if acceleratedChange > 75 and not self.isDroppingItem then
         self:dropLastItem()
-    end
-
-    -- Drilling
-
-    if self:isMovingDown() then
-        if self.isDrilling == false then
-            spDrillStart:play(1)
-            spDrillStart:setFinishCallback(function()
-                if self.isDrilling then
-                    -- Play loop
-                    spDrillLoop:play(0)
-                end
-            end)
-        end
-
-        self.isDrilling = true
-    else
-        if self.isDrilling then
-            -- spDrillStart:stop() -- Until we have better samples, better to cover up the sfx gaps...
-            spDrillLoop:stop()
-            spDrillEnd:play(1)
-        end
-
-        self.isDrilling = false
-
-        if drillableBlockCurrentlyDrilling ~= nil then
-            drillableBlockCurrentlyDrilling:release()
-            drillableBlockCurrentlyDrilling = nil
-        end
     end
 
     -- Movement handling (update velocity X and Y)

@@ -30,18 +30,26 @@ end
 function RigidBody:handleCollisionExtra(collisionData)
 end
 
+function RigidBody:exitParent()
+  return false
+end
+
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
   RigidBody.super.update(self)
 
+  local exitParent = self.parent and self:exitParent()
+
   -- calculate new position by adding velocity to current position
-  local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
+  local newPos
   if self.onParent and self.parent then
-    newPos = newPos + self.parent.velocity / 2
+    newPos = gmt.vector2D.new(self.parent.x, self.parent.y + self.parent.height/2) + (self.velocity * _G.delta_time)
+  else
+    newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   end
 
   local newX, newY = newPos:unpack()
-  local currentVX, currentVY = self.velocity:unpack()
+  local currentVX, _ = self.velocity:unpack()
 
   local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
 
@@ -60,11 +68,11 @@ function RigidBody:update()
       self:checkCollision(other)
     end
 
-    if normalY == -1 and PROPS.Ground[tag] then
+    if normalY == -1 and PROPS.Ground[tag] and not groundFound then
       groundFound = true
     end
 
-    if groundFound and PROPS.Parent[tag] then
+    if groundFound and PROPS.Parent[tag] and not parentFound and not exitParent then
       parentFound = true
       self.parent = other
     end
