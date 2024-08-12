@@ -9,6 +9,7 @@ TAGS = {
     DrillableBlock = 8,
     Elevator = 9,
     Checkpoint = 10,
+    Dialog = 11
 }
 
 PROPS = {

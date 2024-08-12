@@ -27,6 +27,13 @@ local levelOffsetY
 
 local timerCooldownCheckpoint
 
+-- Boolean to keep overlapping with GUI state
+
+local isOverlappingWithGUI = false
+
+--
+
+local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
 
 local ANIMATION_STATES = {
     Idle = 1,
@@ -179,7 +186,8 @@ end
 -- Update Method
 
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
-local drillableBlockCurrentlyDrilling
+local activeDrillableBlock
+local activeDialog
 
 function Player:exitParent()
   return pd.buttonJustPressed(KEYNAMES.A) and self:isJumping()
@@ -210,9 +218,9 @@ function Player:handleCollisionExtra(collisionData)
 
         self.isDrilling = false
 
-        if drillableBlockCurrentlyDrilling ~= nil then
-            drillableBlockCurrentlyDrilling:release()
-            drillableBlockCurrentlyDrilling = nil
+        if activeDrillableBlock ~= nil then
+            activeDrillableBlock:release()
+            activeDrillableBlock = nil
         end
     end
 
@@ -311,6 +319,21 @@ function Player:update()
 
     gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
 
+    -- Check if player is in top-left of level (overlap with GUI)
+
+    local isOverlappingWithGUIPrevious = isOverlappingWithGUI
+
+    if playerX < 100 and playerY < 40 then
+        isOverlappingWithGUI = true
+    else
+        isOverlappingWithGUI = false
+    end
+
+    if isOverlappingWithGUI ~= isOverlappingWithGUIPrevious then
+        -- Signal to hide or show GUI based on overlap
+        Manager.emitEvent(EVENTS.HideOrShowGUI, isOverlappingWithGUI)
+    end
+
     -- Check if player has moved into another level
 
     local direction
@@ -323,7 +346,7 @@ function Player:update()
 
     if playerY > levelHeight then
         direction = DIRECTION.BOTTOM
-    elseif playerY + 24 < 0 then -- Add a margin to not trigger level change so easily.
+    elseif playerY < 0 then -- Add a margin to not trigger level change so easily.
         direction = DIRECTION.TOP
     end
 
@@ -424,7 +447,10 @@ function Player:enterLevel(direction, levelBounds)
 
         self:moveTo(x, y)
     elseif direction == DIRECTION.TOP then
-        self:moveTo(self.x, levelHeight - 15)
+        local x = self.x + (levelGXPrevious - levelGX)
+        local y = levelHeight - 15
+
+        self:moveTo(x, y)
     end
 
     -- Push level position

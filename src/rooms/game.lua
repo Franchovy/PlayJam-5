@@ -186,3 +186,13 @@ end
 function Game:checkpointRevert()
     Checkpoint.goToPrevious()
 end
+
+function Game:hideOrShowGui(shouldHide)
+    local abilityPanel = AbilityPanel.getInstance()
+
+    if shouldHide then
+        abilityPanel:hide()
+    else
+        abilityPanel:show()
+    end
+end

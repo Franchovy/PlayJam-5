@@ -4,4 +4,5 @@ EVENTS = {
     UpdateBlueprints = 'updateBlueprints',
     CheckpointRevert = 'checkpointRevert',
     CheckpointIncrement = 'checkpointIncrement',
+    HideOrShowGUI = 'hideOrShowGui'
 }
