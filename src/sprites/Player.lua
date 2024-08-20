@@ -211,7 +211,7 @@ function Player:handleCollisionExtra(collisionData)
         self.isDrilling = true
     else
         if self.isDrilling then
-            -- spDrillStart:stop() -- Until we have better samples, better to cover up the sfx gaps...
+            -- spDrillStart:stop() -- [Franch] Until we have better samples, better to cover up the sfx gaps...
             spDrillLoop:stop()
             spDrillEnd:play(1)
         end
@@ -226,15 +226,21 @@ function Player:handleCollisionExtra(collisionData)
 
     -- TODO: proper direction per orientation
     if tag == TAGS.Elevator then
-        if other.orientation == "Vertical" and
-           (self:isMovingDown() or self:isMovingUp()) then
-            other:activate();
-        elseif other.orientation == "Horizontal" and
-               (self:isMovingLeft() or self:isMovingRight()) then
-            other:activate();
+        local key
+        if self:isMovingDown() then
+            key = KEYNAMES.Down
+        elseif self:isMovingUp() then
+            key = KEYNAMES.Up
+        elseif self:isMovingLeft() then
+            key = KEYNAMES.Left
+        elseif self:isMovingRight() then
+            key = KEYNAMES.Right
+        end
+
+        if key then
+            other:activate(key)
         end
     end
-
 
     if self.onGround and
         self.isDrilling and

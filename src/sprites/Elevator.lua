@@ -1,6 +1,19 @@
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
 local timer <const> = playdate.timer
+local vector2D <const> = gmt.vector2D
+
+local ORIENTATION <const> = {
+  Horizontal = "Horizontal",
+  Vertical = "Vertical"
+}
+
+-- Private Static methods
+
+--- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
+local function isInverseDirection(key)
+  return key == KEYNAMES.Up or key == KEYNAMES.Left
+end
 
 class("Elevator").extends(RigidBody)
 
@@ -14,126 +27,91 @@ function Elevator:init(entity)
   self.fields = table.deepcopy(entity.fields)
   self:setTag(TAGS.Elevator)
 
+  -- Set start and end position based on orientation & distance
+
+  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
+  
+  self.displacementStart = 0
+  self.displacementEnd = self.fields.distance * TILE_SIZE
+
+  -- AnimatedSprite config
+
   self:addState("n", 1, 1).asDefault()
   self:playAnimation()
+
+  -- RigidBody config
+
   self.g_mult = 0
   self.inv_mass = 0
-  self.actualDistance = self.fields.distance * 32
-  self.orientation = self.fields.orientation
   self.restitution = 0.0
+
+  -- Elevator-specific fields
+
+  self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
+  self.movement = vector2D.ZERO
 end
 
-function Elevator:activate()
-  if self.isActivating or self.isMovingToTarget or self.isDeactivating then return end
-  self.isActivating = true
+-- Private class methods
 
-  local slop = 7
+--- Get remaining movement based on direction and displacement
+local function getMovementRemaining(self, key)
+  -- Get inverted direction boolean
+  local isInverseDirection = isInverseDirection(key)
 
-  timer.performAfterDelay(400, function()
-    if self.orientation == "Horizontal" then
-      if math.abs(self.x - self.initialX) <= slop then
-        self.targetX = self.x - self.actualDistance
-      else
-        self.targetX = self.x + self.actualDistance
-      end
-    elseif self.orientation == "Vertical" then
-      if math.abs(self.y - self.initialY) <= slop then
-        self.targetY = self.y - self.actualDistance
-      else
-        self.targetY = self.y + self.actualDistance
-      end
-    end
-    self.isActivating = false
+  -- Remaining displacement - either towards displacementEnd or displacementStart if inverse direction
+  local displacementRemaining = isInverseDirection 
+    and self.displacement - self.displacementStart
+    or self.displacementEnd - self.displacement
+  
+  -- Create 2D vector used in update() call for movement, invert speed if inverse direction
+
+  local movement = math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
+
+  return movement
+end
+
+-- Public class Methods
+
+--- Sets movement to be executed in the next update() call using vector.
+--- *param* key - the input Key direction
+function Elevator:activate(key)
+  local movement = 0
+
+  if (key == KEYNAMES.Left or key == KEYNAMES.Right) 
+  and self.fields.orientation == ORIENTATION.Horizontal then
+    -- Horizontal movement - get distance remaining
+    movement = getMovementRemaining(self, key)
+
+    -- Set movement vector
+    self.movement = vector2D.new(movement, 0)
+elseif (key == KEYNAMES.Down or key == KEYNAMES.Up) 
+  and self.fields.orientation == ORIENTATION.Vertical then
+    -- Vertical movement - get distance remaining
+    movement = getMovementRemaining(self, key)
+
+    -- Set movement vector
+    self.movement = vector2D.new(0, movement)
   end
-  )
+
+  -- Update displacement
+
+  self.displacement += movement
+
+  -- Return boolean - did activation call capture movement
+
+  return movement ~= 0
 end
 
 function Elevator:update()
   -- don't call SUPER update here, as that does collision work
   -- and we just want to call `moveTo` for the elevator
   -- Elevator.super.update(self)
-  if self.isDeactivating or self.isActivating then return end
 
-  local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
+  local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+
   self:moveTo(newPos.dx, newPos.dy)
-  local cvx, cvy = self.velocity:unpack()
 
-  local distance = 0
-  local slop = 1
-
-  if self.orientation == "Horizontal" then
-    if self.currentDirection == 1 then
-      distance = self.targetX - self.x
-    else
-      distance = self.x - self.targetX
-    end
-    if distance <= slop and self.isMovingToTarget then
-      self:deactivate()
-      return
-    end
-
-    if self.targetX > self.x and math.abs(cvx) < maxVelocity then
-      self.isMovingToTarget = true
-      self.currentDirection = 1
-      self.velocity = self.velocity + gmt.vector2D.new(speed, 0);
-    elseif self.targetX < self.x and math.abs(cvx) < maxVelocity then
-      self.isMovingToTarget = true
-      self.currentDirection = -1
-      self.velocity = self.velocity + gmt.vector2D.new(-speed, 0);
-    end
-  end
-
-  if self.orientation == "Vertical" then
-    if self.currentDirection == 1 then
-      distance = self.targetY - self.y
-    else
-      distance = self.y - self.targetY
-    end
-    if distance <= slop and self.isMovingToTarget then
-      self:deactivate()
-      return
-    end
-
-    if self.targetY > self.y and math.abs(cvy) < maxVelocity then
-      self.isMovingToTarget = true
-      self.currentDirection = 1
-      self.velocity = self.velocity + gmt.vector2D.new(0, speed);
-    elseif self.targetY < self.y and math.abs(cvy) < maxVelocity then
-      self.isMovingToTarget = true
-      self.currentDirection = -1
-      self.velocity = self.velocity + gmt.vector2D.new(0, -speed);
-    end
-  end
-
-  if not self.isMovingToTarget and (self.targetY ~= self.y or self.targetX ~= self.x) then
-    self:deactivate();
-  end
-end
-
-function Elevator:deactivate()
-  local slop = 3
-  if math.abs(self.x - self.initialX) <= slop and math.abs(self.y - self.initialY) <= slop then
-    self:moveTo(self.initialX, self.initialY)
-  else
-    if self.orientation == "Horizontal" then
-      self:moveTo(self.initialX + self.actualDistance * self.currentDirection, self.initialY);
-    else
-      self:moveTo(self.initialX, self.initialY + self.actualDistance * self.currentDirection);
-    end
-  end
-  self.velocity = gmt.vector2D.new(0, 0)
-
-  self.isDeactivating = true
-  timer.performAfterDelay(400, function()
-    self.isMovingToTarget = false
-    self.isDeactivating = false
-  end)
-end
-
-function Elevator:add()
-  Elevator.super.add(self)
-  self.initialX = self.x
-  self.initialY = self.y
-  self.targetX = self.x
-  self.targetY = self.y
+  -- Reset movement vector
+  
+  self.movement = vector2D.ZERO
 end
