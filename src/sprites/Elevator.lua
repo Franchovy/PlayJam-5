@@ -1,6 +1,5 @@
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
-local timer <const> = playdate.timer
 local vector2D <const> = gmt.vector2D
 
 local ORIENTATION <const> = {
@@ -16,9 +15,6 @@ local function isInverseDirection(key)
 end
 
 class("Elevator").extends(RigidBody)
-
-local maxVelocity = 5
-local speed = 1
 
 function Elevator:init(entity)
   local imageElevator = gfx.imagetable.new("assets/images/elevator")
@@ -75,14 +71,14 @@ end
 function Elevator:activate(key)
   local movement = 0
 
-  if (key == KEYNAMES.Left or key == KEYNAMES.Right) 
+  if (key == KEYNAMES.Left or key == KEYNAMES.Right)
   and self.fields.orientation == ORIENTATION.Horizontal then
     -- Horizontal movement - get distance remaining
     movement = getMovementRemaining(self, key)
 
     -- Update movement update vector applying orientation
     self.movement = vector2D.new(movement, 0)
-elseif (key == KEYNAMES.Down or key == KEYNAMES.Up) 
+elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
   and self.fields.orientation == ORIENTATION.Vertical then
     -- Vertical movement - get distance remaining
     movement = getMovementRemaining(self, key)
