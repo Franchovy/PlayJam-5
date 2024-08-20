@@ -195,7 +195,7 @@ function Player:exitParent()
     -- Consume `shouldExitParent` variable and reset to false.
     local shouldExitParent = self.shouldExitParent
     self.shouldExitParent = false
-    
+
     return shouldExitParent
 end
 
@@ -246,11 +246,10 @@ function Player:handleCollisionExtra(collisionData)
     
             if key then
                 self.isActivatingElevator = other:activate(key)
-
-                if not self.isActivatingElevator then
-                    self.shouldExitParent = true
-                end
             end
+
+            -- Do not parent if there is no activation
+            self.shouldExitParent = not self.isActivatingElevator
         end
     end
 
