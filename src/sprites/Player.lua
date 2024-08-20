@@ -92,6 +92,8 @@ function Player:init(entity)
 
     self.isDroppingItem = false
     self.isDrilling = false
+    self.isActivatingElevator = false
+    self.shouldExitParent = false
 
     -- Setup keys array and starting keys
     self.blueprints = {}
@@ -190,7 +192,11 @@ local activeDrillableBlock
 local activeDialog
 
 function Player:exitParent()
-  return pd.buttonJustPressed(KEYNAMES.A) and self:isJumping()
+    -- Consume `shouldExitParent` variable and reset to false.
+    local shouldExitParent = self.shouldExitParent
+    self.shouldExitParent = false
+    
+    return shouldExitParent
 end
 
 function Player:handleCollisionExtra(collisionData)
@@ -226,19 +232,25 @@ function Player:handleCollisionExtra(collisionData)
 
     -- TODO: proper direction per orientation
     if tag == TAGS.Elevator then
-        local key
-        if self:isMovingDown() then
-            key = KEYNAMES.Down
-        elseif self:isMovingUp() then
-            key = KEYNAMES.Up
-        elseif self:isMovingLeft() then
-            key = KEYNAMES.Left
-        elseif self:isMovingRight() then
-            key = KEYNAMES.Right
-        end
+        if collisionData.normal.y == -1 then
+            local key
+            if self:isMovingDown() then
+                key = KEYNAMES.Down
+            elseif self:isMovingUp() then
+                key = KEYNAMES.Up
+            elseif self:isMovingLeft() then
+                key = KEYNAMES.Left
+            elseif self:isMovingRight() then
+                key = KEYNAMES.Right
+            end
+    
+            if key then
+                self.isActivatingElevator = other:activate(key)
 
-        if key then
-            other:activate(key)
+                if not self.isActivatingElevator then
+                    self.shouldExitParent = true
+                end
+            end
         end
     end
 
@@ -261,6 +273,7 @@ end
 
 function Player:update()
     Player.super.update(self)
+
     -- Checkpoint Handling
 
     self:handleCheckpoint()
@@ -276,14 +289,19 @@ function Player:update()
 
     -- Velocity X
 
-    if not self.isDrilling then
+    if not self.isDrilling and not self.isActivatingElevator then
         self:handleHorizontalMovement()
     end
 
     -- Velocity Y
 
     if self.onGround then
-        self:handleJumpStart()
+        local isJumpStart = self:handleJumpStart()
+
+        if isJumpStart then
+            -- Detach from parent (Elevator, ConveyorBelt, Box) on jump starts.
+            self.shouldExitParent = true
+        end
     else
         self:handleJump()
     end
@@ -360,6 +378,10 @@ function Player:update()
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
+
+    -- Reset update states (Post-update)
+
+    self.isActivatingElevator = false
 end
 
 function Player:revertCheckpoint()
@@ -514,7 +536,11 @@ function Player:handleJumpStart()
         spJump:play(1)
         self.velocity.dy = -jumpSpeed
         jumpTimeLeftInTicks -= 1
+
+        return true
     end
+
+    return false
 end
 
 function Player:handleJump()
