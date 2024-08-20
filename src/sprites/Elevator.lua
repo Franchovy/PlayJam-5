@@ -27,10 +27,9 @@ function Elevator:init(entity)
   self.fields = table.deepcopy(entity.fields)
   self:setTag(TAGS.Elevator)
 
-  -- Set start and end position based on orientation & distance
+  -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
   self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
-  
   self.displacementStart = 0
   self.displacementEnd = self.fields.distance * TILE_SIZE
 
@@ -48,7 +47,7 @@ function Elevator:init(entity)
   -- Elevator-specific fields
 
   self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = vector2D.ZERO
+  self.movement = vector2D.ZERO -- 2D update vector for movement. 
 end
 
 -- Private class methods
@@ -63,17 +62,16 @@ local function getMovementRemaining(self, key)
     and self.displacement - self.displacementStart
     or self.displacementEnd - self.displacement
   
-  -- Create 2D vector used in update() call for movement, invert speed if inverse direction
+  -- Calculate movement as scalar value, invert speed if inverse direction
 
-  local movement = math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
-
-  return movement
+  return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
 end
 
 -- Public class Methods
 
 --- Sets movement to be executed in the next update() call using vector.
---- *param* key - the input Key direction
+--- *param* key - the player input key direction (KEYNAMES)
+--- *returns* whether an activation occurred based on key press.
 function Elevator:activate(key)
   local movement = 0
 
@@ -82,18 +80,18 @@ function Elevator:activate(key)
     -- Horizontal movement - get distance remaining
     movement = getMovementRemaining(self, key)
 
-    -- Set movement vector
+    -- Update movement update vector applying orientation
     self.movement = vector2D.new(movement, 0)
 elseif (key == KEYNAMES.Down or key == KEYNAMES.Up) 
   and self.fields.orientation == ORIENTATION.Vertical then
     -- Vertical movement - get distance remaining
     movement = getMovementRemaining(self, key)
 
-    -- Set movement vector
+    -- Update movement update vector applying orientation
     self.movement = vector2D.new(0, movement)
   end
 
-  -- Update displacement
+  -- Update displacement scalar
 
   self.displacement += movement
 
