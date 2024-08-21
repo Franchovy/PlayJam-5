@@ -57,7 +57,7 @@ function WarpTransition:update()
     local index = math.floor(self.percentageCompleteInDegrees / 360 * #imageTable) + 1
 
     -- If crankCooldown is in progress, end cooldown if index is 0.
-    if crankCooldown and index == 1 then
+    if not timerCooldownCheckpoint and crankCooldown and index == 1 then
         crankCooldown = false
 
         -- Emit event
