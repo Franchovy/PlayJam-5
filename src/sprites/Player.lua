@@ -27,6 +27,10 @@ local levelOffsetY
 
 local isOverlappingWithGUI = false
 
+-- Checkpoint Revert cooldown - pauses movement / pick-ups until cooldown is over
+
+local isInProgressCheckpointCooldown = false
+
 --
 
 local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
@@ -66,10 +70,6 @@ local maxFallSpeed <const> = 7.5
 local jumpSpeed <const> = 7.5
 local jumpSpeedReleased <const> = 3.5
 local jumpHoldTimeInTicks <const> = 4
-
--- TODO: [Franch]
--- Set timer to pause movement when doing checkpoint resets (0.5s probably)
--- Abilities (blueprints) should come from a single source, read from panel (or game)
 
 -- Setup
 
@@ -123,6 +123,13 @@ function Player:handleCheckpointRevert(state)
     self.blueprints = state.blueprints
 
     Manager.emitEvent(EVENTS.UpdateBlueprints)
+
+    -- Set checkpoint revert cooldown to true (pauses movement)
+    isInProgressCheckpointCooldown = true
+end
+
+function Player:setCheckpointCooldownFinished()
+    isInProgressCheckpointCooldown = false
 end
 
 -- Enter Level
@@ -336,9 +343,9 @@ function Player:update()
             -- we should be handling the multiple blueprints as a single checkpoint.
             -- But it's also useful for debugging.
 
-            --if not timerCooldownCheckpoint then
+            if not isInProgressCheckpointCooldown then
                 self:pickUpBlueprint(other)
-            --end
+            end
         elseif tag == TAGS.Dialog then
             dialog = other
         end
@@ -368,7 +375,7 @@ function Player:update()
 
     -- Movement
 
-    if not timerCooldownCheckpoint then
+    if not isInProgressCheckpointCooldown then
         self:moveTo(actualX, actualY)
     end
 

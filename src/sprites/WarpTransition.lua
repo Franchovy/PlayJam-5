@@ -8,6 +8,7 @@ local imageTable <const> = gfx.imagetable.new(assets.imageTables.warpTransition)
 -- Timer for handling cooldown on checkpoint revert
 
 local timerCooldownCheckpoint
+local crankCooldown = false
 
 local numberOfFullCrankRotationsForWarp <const> = 2
 local cooldownAmountInDegreesPerSecond <const> = 20
@@ -26,7 +27,6 @@ function WarpTransition:init()
     self.index = 1
 
     self:updateImage()
-
 end
 
 function WarpTransition:updateImage()
@@ -37,6 +37,8 @@ end
 
 function WarpTransition:update()
     local rotationChangeInDegrees = playdate.getCrankChange() / numberOfFullCrankRotationsForWarp
+
+    -- Update rotation percentage complete 
 
     if rotationChangeInDegrees > 0 then
         -- Add crank change to percentage complete
@@ -50,16 +52,32 @@ function WarpTransition:update()
         )
     end
 
+    -- Translate rotation in percentage to an index for imageTable
+
     local index = math.floor(self.percentageCompleteInDegrees / 360 * #imageTable) + 1
 
+    -- If crankCooldown is in progress, end cooldown if index is 0.
+    if crankCooldown and index == 1 then
+        crankCooldown = false
+
+        -- Emit event
+        Manager.emitEvent(EVENTS.CheckpointRevertCooldownFinished)
+    end
+
     if index == #imageTable then
+        -- If max index is reached, trigger revert checkpoint
+
         self:revertCheckpoint()
+
+        -- Reset index and percentage complete
 
         self.index = 0
         self.percentageCompleteInDegrees = 0
-    elseif index ~= self.index then
-        self.index = index
 
+    elseif index ~= self.index then
+        -- Else if index has changed, update the image accordingly
+
+        self.index = index
         self:updateImage()
     end
 end
@@ -85,6 +103,7 @@ function WarpTransition:revertCheckpoint()
         -- ensure we're not removing a timer that's not this one.
         if timerCooldownCheckpoint == timer then
             timerCooldownCheckpoint = nil
+            crankCooldown = true
         end
     end
 end

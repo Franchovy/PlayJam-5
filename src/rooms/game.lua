@@ -198,6 +198,12 @@ function Game:checkpointRevert()
     Checkpoint.goToPrevious()
 end
 
+function Game:checkpointRevertCooldownFinished()
+    local player = Player.getInstance()
+    
+    player:setCheckpointCooldownFinished()
+end
+
 function Game:hideOrShowGui(shouldHide)
     local abilityPanel = AbilityPanel.getInstance()
 
