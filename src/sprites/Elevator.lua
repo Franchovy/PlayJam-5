@@ -22,6 +22,7 @@ function Elevator:init(entity)
 
   self.fields = table.deepcopy(entity.fields)
   self:setTag(TAGS.Elevator)
+  self:setCenter(0.5, 1)
 
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
@@ -101,7 +102,7 @@ function Elevator:update()
   -- and we just want to call `moveTo` for the elevator
   -- Elevator.super.update(self)
 
-  local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+  local newPos = vector2D.new(self.x, self.y) + (self.movement)
 
   self:moveTo(newPos.dx, newPos.dy)
 
