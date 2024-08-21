@@ -9,7 +9,6 @@ local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
 local spDrillLoop = sound.sampleplayer.new("assets/sfx/drill-loop")
 local spDrillEnd = sound.sampleplayer.new("assets/sfx/drill-end")
-local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
 local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
@@ -23,10 +22,6 @@ local levelHeight
 
 local levelOffsetX
 local levelOffsetY
-
--- Timer for handling cooldown on checkpoint revert
-
-local timerCooldownCheckpoint
 
 -- Boolean to keep overlapping with GUI state
 
@@ -203,17 +198,6 @@ local activeDrillableBlock
 local activeDialog
 
 function Player:update()
-    -- Checkpoint Handling
-
-    self:handleCheckpoint()
-
-    -- Crank
-
-    local _, acceleratedChange = pd.getCrankChange()
-    if acceleratedChange > 75 and not self.isDroppingItem then
-        self:dropLastItem()
-    end
-
     -- Drilling
 
     if self:isMovingDown() then
@@ -352,9 +336,9 @@ function Player:update()
             -- we should be handling the multiple blueprints as a single checkpoint.
             -- But it's also useful for debugging.
 
-            if not timerCooldownCheckpoint then
+            --if not timerCooldownCheckpoint then
                 self:pickUpBlueprint(other)
-            end
+            --end
         elseif tag == TAGS.Dialog then
             dialog = other
         end
@@ -439,29 +423,6 @@ function Player:update()
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
-    end
-end
-
-function Player:revertCheckpoint()
-    -- SFX
-
-    spCheckpointRevert:play(1)
-
-    -- Emit the event for the rest of the scene
-
-    Manager.emitEvent(EVENTS.CheckpointRevert)
-
-    -- Cooldown timer for checkpoint revert
-
-    timerCooldownCheckpoint = playdate.timer.new(500)
-    timerCooldownCheckpoint.timerEndedCallback = function(timer)
-        timer:remove()
-
-        -- Since there can be multiple checkpoint-reverts in sequence, we want to
-        -- ensure we're not removing a timer that's not this one.
-        if timerCooldownCheckpoint == timer then
-            timerCooldownCheckpoint = nil
-        end
     end
 end
 
@@ -590,12 +551,6 @@ end
 
 -- Input Handlers --
 
-function Player:handleCheckpoint()
-    if self:justPressedCheckpoint() then
-        self:revertCheckpoint()
-    end
-end
-
 -- Jump
 
 function Player:handleJumpStart()
@@ -660,11 +615,6 @@ function Player:handleDownMovement()
 end
 
 -- Input Handlers
-
-function Player:justPressedCheckpoint()
-    -- No key gating on checkpoint
-    return pd.buttonJustPressed(KEYNAMES.B)
-end
 
 function Player:isJumping()
     return self:isKeyPressedGated(KEYNAMES.A)

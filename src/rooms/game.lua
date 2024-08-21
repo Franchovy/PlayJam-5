@@ -18,6 +18,10 @@ local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
 
+-- Static Sprites
+
+local warpTransition
+
 -- Static methods
 
 function Game.getLevelName()
@@ -34,6 +38,9 @@ end
 
 function Game:init()
     self.checkpointHandler = CheckpointHandler(self)
+
+    warpTransition = WarpTransition()
+    warpTransition:add()
 end
 
 function Game:enter(previous, data)
@@ -94,11 +101,15 @@ function Game:enter(previous, data)
         player:enterLevel(direction, levelBounds)
     end
 
+    -- Add static sprites back in
+
     local abilityPanel = AbilityPanel.getInstance()
 
     if abilityPanel then
         abilityPanel:add()
     end
+
+    warpTransition:add()
 end
 
 function Game:update()

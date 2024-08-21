@@ -2,10 +2,11 @@ _G.assets = {
     images = {
         tileset = "assets/images/tileset",
         hudPanel = "assets/images/hud-panel",
-        speech = "assets/images/speech"
+        speech = "assets/images/speech",
     },
     imageTables = {
-        buttons = "assets/images/buttons"
+        buttons = "assets/images/buttons",
+        warpTransition = "assets/images/warp-transition"
     },
     levels = {
         main = "assets/levels/Main.ldtk",
@@ -15,6 +16,7 @@ _G.assets = {
         scott = "assets/levels/Scott.ldtk"
     },
     sounds = {
-        speech = "assets/sfx/speech"
+        speech = "assets/sfx/speech",
+        checkpointRevert = "assets/sfx/checkpoint-revert"
     }
 }
