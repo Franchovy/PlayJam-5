@@ -41,6 +41,10 @@ function Elevator:init(entity)
   self.inv_mass = 0
   self.restitution = 0.0
 
+  -- Checkpoint Handling setup
+
+  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
+
   -- Elevator-specific fields
 
   self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
@@ -101,16 +105,28 @@ function Elevator:update()
   local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
 
   self:moveTo(newPos.dx, newPos.dy)
-
+  
   -- Update displacement to match movement
-
+  
   if self.fields.orientation == ORIENTATION.Horizontal then
     self.displacement += self.movement.x * _G.delta_time
   else
     self.displacement += self.movement.y * _G.delta_time
   end
+  
+  -- Update checkpoint state
+
+  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
 
   -- Reset movement vector
   
   self.movement = vector2D.ZERO
+end
+
+function Elevator:handleCheckpointRevert(state)
+  self.movement = vector2D.ZERO
+
+  self:moveTo(state.x, state.y)
+
+  self.displacement = state.displacement
 end
