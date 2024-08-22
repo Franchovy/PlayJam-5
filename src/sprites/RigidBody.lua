@@ -34,9 +34,20 @@ function RigidBody:exitParent()
   return false
 end
 
+--- Skips physics handling for one frame.
+function RigidBody:skipPhysicsHandling()
+  self.shouldSkipPhysicsHandling = true
+end
+
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
   RigidBody.super.update(self)
+
+  if self.shouldSkipPhysicsHandling then
+    self.shouldSkipPhysicsHandling = nil
+
+    return
+  end
 
   local exitParent = self:exitParent()
 

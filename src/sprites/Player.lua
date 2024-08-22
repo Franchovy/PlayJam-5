@@ -271,18 +271,18 @@ function Player:handleCollisionExtra(collisionData)
 end
 
 function Player:update()
-    Player.super.update(self)
-
+    
     -- Checkpoint Handling
-
+    
     self:handleCheckpoint()
-
-    -- Crank
-
-    local _, acceleratedChange = pd.getCrankChange()
-    if acceleratedChange > 75 and not self.isDroppingItem then
-        self:dropLastItem()
+    
+    if timerCooldownCheckpoint then
+        self:skipPhysicsHandling()
     end
+
+    -- RigidBody & Sprite update
+    
+    Player.super.update(self)
 
     -- Movement handling (update velocity X and Y)
 
@@ -325,7 +325,7 @@ function Player:update()
             })
         end
     end
-
+    
     -- Animation Handling
 
     self:updateAnimationState()

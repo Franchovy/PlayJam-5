@@ -41,14 +41,17 @@ function Elevator:init(entity)
   self.inv_mass = 0
   self.restitution = 0.0
 
-  -- Checkpoint Handling setup
-
-  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
-
   -- Elevator-specific fields
 
   self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
   self.movement = vector2D.ZERO -- 2D update vector for movement. 
+end
+
+function Elevator:postInit()
+  -- Checkpoint Handling setup
+
+  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
+  
 end
 
 -- Private class methods
