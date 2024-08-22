@@ -1394,7 +1394,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [5,5],
+							"__grid": [4,5],
 							"__pivot": [-0.3,-0.333],
 							"__tags": [],
 							"__tile": null,
@@ -1403,7 +1403,7 @@
 							"width": 20,
 							"height": 24,
 							"defUid": 19,
-							"px": [160,160],
+							"px": [128,160],
 							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Right", "Down", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Right"]
@@ -1414,7 +1414,7 @@
 								"id": "V_String",
 								"params": ["A"]
 							} ] }],
-							"__worldX": -640,
+							"__worldX": -672,
 							"__worldY": -672
 						},
 						{
