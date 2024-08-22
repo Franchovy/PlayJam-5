@@ -61,7 +61,7 @@ local function getMovementRemaining(self, key)
   
   -- Calculate movement as scalar value, invert speed if inverse direction
 
-  return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
+  return math.floor(math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1))
 end
 
 -- Public class Methods
