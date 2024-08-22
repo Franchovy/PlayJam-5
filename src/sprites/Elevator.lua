@@ -27,8 +27,8 @@ function Elevator:init(entity)
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
   self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
-  self.displacementStart = 0
-  self.displacementEnd = self.fields.distance * TILE_SIZE
+  self.displacementStart = -1 -- Add extra pixel for smooth platforming
+  self.displacementEnd = self.fields.distance * TILE_SIZE + 1
 
   -- AnimatedSprite config
 
@@ -88,10 +88,6 @@ elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
     self.movement = vector2D.new(0, movement)
   end
 
-  -- Update displacement scalar
-
-  self.displacement += movement
-
   -- Return boolean - did activation call capture movement
 
   return movement ~= 0
@@ -102,9 +98,17 @@ function Elevator:update()
   -- and we just want to call `moveTo` for the elevator
   -- Elevator.super.update(self)
 
-  local newPos = vector2D.new(self.x, self.y) + (self.movement)
+  local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
 
   self:moveTo(newPos.dx, newPos.dy)
+
+  -- Update displacement to match movement
+
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    self.displacement += self.movement.x * _G.delta_time
+  else
+    self.displacement += self.movement.y * _G.delta_time
+  end
 
   -- Reset movement vector
   
