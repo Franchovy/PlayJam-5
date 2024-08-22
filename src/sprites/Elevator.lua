@@ -7,7 +7,7 @@ local ORIENTATION <const> = {
   Vertical = "Vertical"
 }
 
-local imageElevator <const> = gfx.image.new("assets/images/elevator")
+local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
 -- Private Static methods
 
@@ -31,8 +31,8 @@ function Elevator:init(entity)
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
   self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
-  self.displacementStart = -1 -- Add extra pixel for smooth platforming
-  self.displacementEnd = self.fields.distance * TILE_SIZE + 1
+  self.displacementStart = 0 -- Add extra pixel for smooth platforming
+  self.displacementEnd = self.fields.distance * TILE_SIZE
 
   -- RigidBody config
 
@@ -101,9 +101,12 @@ elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
 end
 
 function Elevator:update()
-  -- don't call SUPER update here, as that does collision work
+  Elevator.super.update(self)
+  
+  -- Don't call RigidBody update here, as that does collision work
   -- and we just want to call `moveTo` for the elevator
-  -- Elevator.super.update(self)
+
+  -- self.rigidBody:update()
 
   -- Move elevator if update vector has been set
 

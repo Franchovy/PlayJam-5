@@ -3,7 +3,7 @@ local gfx <const> = playdate.graphics
 class("Box").extends(gfx.sprite)
 
 function Box:init(entity)
-    Box.super.init(self, entity, gfx.image.new("assets/images/box"))
+    Box.super.init(self, entity, gfx.image.new(assets.images.box))
 
     self:setTag(TAGS.Box)
 

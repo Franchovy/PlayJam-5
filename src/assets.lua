@@ -2,7 +2,9 @@ _G.assets = {
     images = {
         tileset = "assets/images/tileset",
         hudPanel = "assets/images/hud-panel",
-        speech = "assets/images/speech"
+        speech = "assets/images/speech",
+        elevator = "assets/images/elevator",
+        box = "assets/images/box",
     },
     imageTables = {
         buttons = "assets/images/buttons"
