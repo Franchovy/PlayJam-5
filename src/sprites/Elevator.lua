@@ -102,25 +102,30 @@ function Elevator:update()
   -- and we just want to call `moveTo` for the elevator
   -- Elevator.super.update(self)
 
-  local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+  -- Move elevator if update vector has been set
 
-  self:moveTo(newPos.dx, newPos.dy)
-  
-  -- Update displacement to match movement
-  
-  if self.fields.orientation == ORIENTATION.Horizontal then
-    self.displacement += self.movement.x * _G.delta_time
-  else
-    self.displacement += self.movement.y * _G.delta_time
+  if self.movement ~= vector2D.ZERO then
+
+    local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+
+    self:moveTo(newPos.dx, newPos.dy)
+    
+    -- Update displacement to match movement
+    
+    if self.fields.orientation == ORIENTATION.Horizontal then
+      self.displacement += self.movement.x * _G.delta_time
+    else
+      self.displacement += self.movement.y * _G.delta_time
+    end
+    
+    -- Update checkpoint state
+
+    self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+
+    -- Reset movement vector
+    
+    self.movement = vector2D.ZERO
   end
-  
-  -- Update checkpoint state
-
-  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
-
-  -- Reset movement vector
-  
-  self.movement = vector2D.ZERO
 end
 
 function Elevator:handleCheckpointRevert(state)
