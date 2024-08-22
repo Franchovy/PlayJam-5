@@ -1,28 +1,25 @@
 local pd <const> = playdate
 local gfx <const> = pd.graphics
 
-class("ConveyorBelt").extends(RigidBody)
-
-local width <const> = 32
+class("ConveyorBelt").extends(AnimatedSprite)
 
 function ConveyorBelt:init(entity)
   local imageTable = gfx.imagetable.new("assets/images/conveyorbelt")
   ConveyorBelt.super.init(self, entity, imageTable)
 
-  self.g_mult = 0
-  self.inv_mass = 0
-  self.dynamic_friction = 0
-  self.static_friction = 0
-
   self:setTag(TAGS.ConveyorBelt)
+
+  -- LDtk fields
+
   self.fields = table.deepcopy(entity.fields)
-  self.restitution = .3
+
+  -- Create tilemap from imagetable
 
   local tilemap = gfx.tilemap.new()
   tilemap:setImageTable(imageTable)
 
   local a = {}
-  local tileCount = entity.size.width / width
+  local tileCount = entity.size.width / TILE_SIZE
   for i = 1, tileCount do
     if i == 1 then
       a[i] = 1
@@ -32,10 +29,24 @@ function ConveyorBelt:init(entity)
       a[i] = 2
     end
   end
+
   tilemap:setTiles(a, entity.size.width)
+
   self:setTilemap(tilemap);
+
+  -- RigidBody config -- TODO - switch to RigidBodyInteractible
+
+  self.rigidBody = RigidBody(self)
+end
+
+function ConveyorBelt:collisionResponse(_)
+  return gfx.sprite.kCollisionTypeSlide
 end
 
 function ConveyorBelt:getAppliedSpeed()
   return self.fields.direction == "Right" and 1 or -1;
+end
+
+function ConveyorBelt:update()
+  self.rigidBody:update()
 end

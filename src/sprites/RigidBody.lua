@@ -2,38 +2,55 @@ local pd <const> = playdate
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local DEBUG_PRINT = false
+class("RigidBody").extends()
 
-class("RigidBody").extends(AnimatedSprite)
+local gravity <const> = 1
+local airFriction <const> = .14
+local groundFriction <const> = .3
+local maxFallSpeed <const> = 13 -- TODO - remove
+local maxConveyorSpeed <const> = 6 -- TODO - remove
 
-function RigidBody:init(entity, imageTable)
-  RigidBody.super.init(self, imageTable)
+function RigidBody:init(sprite, config)
+  self.sprite = sprite
+
+  -- Config
+
+  if config then
+    self.gravity = config.gravity or gravity -- TODO - remove
+    self.airFriction = config.airFriction or airFriction
+    self.groundFriction = config.groundFriction or groundFriction
+    self.maxFallSpeed = config.maxFallSpeed or maxFallSpeed-- TODO - remove
+    self.maxConveyorSpeed = config.maxConveyorSpeed or maxConveyorSpeed -- TODO - remove
+  end
+
+  -- Dynamic variables
 
   self.velocity = gmt.vector2D.new(0, 0)
-  self.g_mult = 1
-  self.inv_mass = 0.4
-  self.restitution = 0
-  self.static_friction = 0
-  self.dynamic_friction = .12
-  self.air_friction = .14
-  self.ground_friction = .3
-  self.maxFallSpeed = 13
-  self.maxConveyorSpeed = 6
   self.onParent = false
-
-  self.DEBUG_SHOULD_PRINT_VELOCITY = false
+  self.shouldSkipPhysicsHandling = false
+  self.shouldExitParent = false
+  self.onGround = false
+  self.parent = nil
 end
 
-function RigidBody:collisionResponse(_)
-  return gfx.sprite.kCollisionTypeSlide
+function RigidBody:getIsTouchingGround()
+  return self.onGround
 end
 
--- override this in subclasses to handle collisions outside of basic physics
-function RigidBody:handleCollisionExtra(collisionData)
+function RigidBody:getCurrentVelocity()
+  return self.velocity
 end
 
-function RigidBody:exitParent()
-  return false
+function RigidBody:addVelocityX(dX)
+  self.velocity.dx += dX
+end
+
+function RigidBody:setVelocityY(dY)
+  self.velocity.dy = dY
+end
+
+function RigidBody:setExitParent()
+  self.shouldExitParent = true
 end
 
 --- Skips physics handling for one frame.
@@ -42,29 +59,36 @@ function RigidBody:skipPhysicsHandling()
 end
 
 function RigidBody:update()
-  if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
-  RigidBody.super.update(self)
+  local sprite = self.sprite
 
   if self.shouldSkipPhysicsHandling then
-    self.shouldSkipPhysicsHandling = nil
+    self.shouldSkipPhysicsHandling = false
 
+    -- Skip physics handling
     return
   end
 
-  local exitParent = self:exitParent()
+  local shouldExitParent = false
+  if self.shouldExitParent then
+    -- Consume shouldExitParent if set
+    
+    self.shouldExitParent = false
+
+    shouldExitParent = true
+  end
 
   -- calculate new position by adding velocity to current position
   local newPos
-  if self.onParent and self.parent and not exitParent then
+  if self.onParent and self.parent and not shouldExitParent then
     newPos = gmt.vector2D.new(self.parent.x, self.parent.y - self.parent.height/2) + (self.velocity * _G.delta_time)
   else
-    newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
+    newPos = gmt.vector2D.new(sprite.x, sprite.y) + (self.velocity * _G.delta_time)
   end
 
   local newX, newY = newPos:unpack()
   local currentVX, _ = self.velocity:unpack()
 
-  local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
+  local _, _, sdkCollisions = sprite:moveWithCollisions(newX, newY)
 
   local parentFound = false
   local groundFound = false
@@ -75,56 +99,58 @@ function RigidBody:update()
     local normal = c.normal
     local _, normalY = normal:unpack()
 
-    if DEBUG_PRINT then print("Found collision with: ", getmetatable(other).className) end
+    -- Detect if ground collision
 
     if normalY == -1 and PROPS.Ground[tag] and not groundFound then
       groundFound = true
     end
 
-    if groundFound and PROPS.Parent[tag] and not parentFound and not exitParent then
+    -- Detect if ground collision creates parent
+
+    -- TODO - simplify conditional
+    if groundFound and PROPS.Parent[tag] and not parentFound and not shouldExitParent then
       parentFound = true
       self.parent = other
     end
 
-    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxConveyorSpeed then
-      if DEBUG_PRINT then print("Applying collision belt logic") end
+    -- Conveyor Belt movement handling
 
+    -- TODO - see if this can be extracted to the collision belt itself
+    if tag == TAGS.ConveyorBelt and normalY == -1 and math.abs(currentVX) < self.maxConveyorSpeed then
       local conveyorSpeed = other:getAppliedSpeed()
       self.velocity = self.velocity + (gmt.vector2D.new(conveyorSpeed, 0) * _G.delta_time)
-
-      self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
 
-    self:handleCollisionExtra(c)
+    -- Call sprite's extra collision handling if available
+
+    if sprite.handleCollision then
+      sprite:handleCollision(c)
+    end
   end
 
   self.onGround = groundFound
   self.onParent = parentFound
-
-  if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   -- incorporate gravity
 
   if not groundFound then
     -- Adds gravity vector to current velocity
 
-    self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
+    self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.gravity
   elseif groundFound then
     -- Resets velocity (still applying gravity)
 
     local dx, _ = self.velocity:unpack()
-    self.velocity = gmt.vector2D.new(dx, self.g_mult * _G.delta_time)
+    self.velocity = gmt.vector2D.new(dx, self.gravity * _G.delta_time)
   end
 
   -- incorporate any in-air drag
   if not groundFound and currentVX ~= 0 then
-    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.airFriction) * _G.delta_time, 0))
   end
 
   -- incorporate any ground friction
   if groundFound and currentVX ~= 0 then
-    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
+    self.velocity:addVector(gmt.vector2D.new((-currentVX * self.groundFriction) * _G.delta_time, 0))
   end
-
-  if DEBUG_PRINT then print("RigidBody:update() finished.") end
 end

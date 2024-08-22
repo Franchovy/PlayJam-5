@@ -7,6 +7,8 @@ local ORIENTATION <const> = {
   Vertical = "Vertical"
 }
 
+local imageElevator <const> = gfx.image.new("assets/images/elevator")
+
 -- Private Static methods
 
 --- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
@@ -14,15 +16,17 @@ local function isInverseDirection(key)
   return key == KEYNAMES.Up or key == KEYNAMES.Left
 end
 
-class("Elevator").extends(RigidBody)
+class("Elevator").extends(gfx.sprite)
 
 function Elevator:init(entity)
-  local imageElevator = gfx.imagetable.new("assets/images/elevator")
-  Elevator.super.init(self, entity, imageElevator)
+  Elevator.super.init(self, imageElevator)
 
-  self.fields = table.deepcopy(entity.fields)
   self:setTag(TAGS.Elevator)
   self:setCenter(0.5, 1)
+
+  -- LDtk fields
+
+  self.fields = table.deepcopy(entity.fields)
 
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
@@ -30,16 +34,9 @@ function Elevator:init(entity)
   self.displacementStart = -1 -- Add extra pixel for smooth platforming
   self.displacementEnd = self.fields.distance * TILE_SIZE + 1
 
-  -- AnimatedSprite config
-
-  self:addState("n", 1, 1).asDefault()
-  self:playAnimation()
-
   -- RigidBody config
 
-  self.g_mult = 0
-  self.inv_mass = 0
-  self.restitution = 0.0
+  self.rigidBody = RigidBody(self, {gravity = 0})
 
   -- Elevator-specific fields
 
@@ -51,7 +48,10 @@ function Elevator:postInit()
   -- Checkpoint Handling setup
 
   self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
-  
+end
+
+function Elevator:collisionResponse(_)
+  return gfx.sprite.kCollisionTypeSlide
 end
 
 -- Private class methods

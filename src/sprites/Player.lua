@@ -62,7 +62,7 @@ local jumpHoldTimeInTicks <const> = 4
 
 -- Setup
 
-class("Player").extends(RigidBody)
+class("Player").extends(AnimatedSprite)
 
 -- Static Reference
 
@@ -74,14 +74,10 @@ function Player:init(entity)
     _instance = self
 
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
-    Player.super.init(self, entity, playerImageTable)
-
-    -- RigidBody overrides/config
-    self.ground_friction = 2
-    self.air_friction = 2
-    self.g_mult = 5
+    Player.super.init(self, playerImageTable)
 
     -- AnimatedSprite states
+
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
     self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
@@ -93,16 +89,27 @@ function Player:init(entity)
     self.isDroppingItem = false
     self.isDrilling = false
     self.isActivatingElevator = false
-    self.shouldExitParent = false
 
     -- Setup keys array and starting keys
+
     self.blueprints = {}
+
     local startingKeys = entity.fields.blueprints
     for _, key in ipairs(startingKeys) do
         table.insert(self.blueprints, key)
     end
 
     Manager.emitEvent(EVENTS.UpdateBlueprints)
+
+    -- RigidBody config
+    
+    local rigidBodyConfig = {
+        groundFriction = 2,
+        airFriction = 2,
+        gravity = 5
+    }
+    
+    self.rigidBody = RigidBody(self, rigidBodyConfig)
 
     -- Add Checkpoint handling
 
@@ -191,15 +198,7 @@ local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 local activeDrillableBlock
 local activeDialog
 
-function Player:exitParent()
-    -- Consume `shouldExitParent` variable and reset to false.
-    local shouldExitParent = self.shouldExitParent
-    self.shouldExitParent = false
-
-    return shouldExitParent
-end
-
-function Player:handleCollisionExtra(collisionData)
+function Player:handleCollision(collisionData)
     local other = collisionData.other
     local tag = other:getTag()
 
@@ -249,11 +248,17 @@ function Player:handleCollisionExtra(collisionData)
             end
 
             -- Do not parent if there is no activation
-            self.shouldExitParent = not self.isActivatingElevator
+            if not self.isActivatingElevator then
+                self.rigidBody:setExitParent()
+            end
+            
         end
     end
 
-    if self.onGround and
+    -- TODO - We should register the sprites the player can interact with here,
+    -- but not handle the interaction itself. That should come after the movement/collisions.
+
+    if self.rigidBody:getIsTouchingGround() and
         self.isDrilling and
         other:getTag() == TAGS.DrillableBlock then
         drillableBlockCurrentlyDrilling = other
@@ -271,18 +276,21 @@ function Player:handleCollisionExtra(collisionData)
 end
 
 function Player:update()
+    -- Sprite update
+
+    Player.super.update(self)
     
     -- Checkpoint Handling
     
     self:handleCheckpoint()
     
     if timerCooldownCheckpoint then
-        self:skipPhysicsHandling()
+        self.rigidBody:skipPhysicsHandling()
     end
 
-    -- RigidBody & Sprite update
-    
-    Player.super.update(self)
+    -- RigidBody update
+
+    self.rigidBody:update()
 
     -- Movement handling (update velocity X and Y)
 
@@ -294,12 +302,12 @@ function Player:update()
 
     -- Velocity Y
 
-    if self.onGround then
+    if self.rigidBody:getIsTouchingGround() then
         local isJumpStart = self:handleJumpStart()
 
         if isJumpStart then
             -- Detach from parent (Elevator, ConveyorBelt, Box) on jump starts.
-            self.shouldExitParent = true
+            self.rigidBody:setExitParent()
         end
     else
         self:handleJump()
@@ -494,11 +502,12 @@ local flip
 
 function Player:updateAnimationState()
     local animationState
+    local velocity = self.rigidBody:getCurrentVelocity()
 
-    if self.onGround then
+    if self.rigidBody:getIsTouchingGround() then
         if self.isDrilling then
             animationState = ANIMATION_STATES.Drilling
-        elseif math.floor(math.abs(self.velocity.dx)) > 0 then
+        elseif math.floor(math.abs(velocity.dx)) > 0 then
             animationState = ANIMATION_STATES.Moving
         else
             animationState = ANIMATION_STATES.Idle
@@ -510,9 +519,9 @@ function Player:updateAnimationState()
     -- Handle direction (flip)
 
     flip = 0
-    if self.velocity.dx < 0 then
+    if velocity.dx < 0 then
         flip = 1
-    elseif self.velocity.dx > 0 then
+    elseif velocity.dx > 0 then
         flip = 0
     end
 
@@ -533,7 +542,9 @@ end
 function Player:handleJumpStart()
     if pd.buttonJustPressed(KEYNAMES.A) and self:isJumping() then
         spJump:play(1)
-        self.velocity.dy = -jumpSpeed
+
+        self.rigidBody:setVelocityY(-jumpSpeed)
+
         jumpTimeLeftInTicks -= 1
 
         return true
@@ -545,12 +556,13 @@ end
 function Player:handleJump()
     if self:isJumping() and jumpTimeLeftInTicks > 0 then
         -- Hold Jump
-        self.velocity.dy = -jumpSpeed
-        self.g_mult = 1
+
+        self.rigidBody:setVelocityY(-jumpSpeed)
+
         jumpTimeLeftInTicks -= 1
     elseif pd.buttonJustReleased(KEYNAMES.A) or jumpTimeLeftInTicks > 0 then
         -- Released Jump
-        self.g_mult = 5
+        
         jumpTimeLeftInTicks = 0
     end
 end
@@ -558,10 +570,10 @@ end
 -- Directional
 
 function Player:handleHorizontalMovement()
-    if self:isMovingLeft() and self.velocity.dx > -maxSpeed then
-        self.velocity.dx -= groundAcceleration
-    elseif self:isMovingRight() and self.velocity.dx < maxSpeed then
-        self.velocity.dx += groundAcceleration
+    if self:isMovingLeft() then
+        self.rigidBody:addVelocityX(-groundAcceleration)
+    elseif self:isMovingRight() then
+        self.rigidBody:addVelocityX(groundAcceleration)
     end
 end
 
