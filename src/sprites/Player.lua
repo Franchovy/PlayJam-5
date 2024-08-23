@@ -246,12 +246,6 @@ function Player:handleCollision(collisionData)
             if key then
                 self.isActivatingElevator = other:activate(key)
             end
-
-            -- Do not parent if there is no activation
-            if not self.isActivatingElevator then
-                self.rigidBody:setExitParent()
-            end
-            
         end
     end
 
@@ -284,33 +278,28 @@ function Player:update()
     
     self:handleCheckpoint()
     
-    if timerCooldownCheckpoint then
-        self.rigidBody:skipPhysicsHandling()
-    end
+    -- Skip movement handling if timer cooldown is active
+    if not timerCooldownCheckpoint then
+        
+        -- Movement handling (update velocity X and Y)
 
-    -- RigidBody update
+        -- Velocity X
 
-    self.rigidBody:update()
-
-    -- Movement handling (update velocity X and Y)
-
-    -- Velocity X
-
-    if not self.isDrilling and not self.isActivatingElevator then
-        self:handleHorizontalMovement()
-    end
-
-    -- Velocity Y
-
-    if self.rigidBody:getIsTouchingGround() then
-        local isJumpStart = self:handleJumpStart()
-
-        if isJumpStart then
-            -- Detach from parent (Elevator, ConveyorBelt, Box) on jump starts.
-            self.rigidBody:setExitParent()
+        if not self.isDrilling and not self.isActivatingElevator then
+            self:handleHorizontalMovement()
         end
-    else
-        self:handleJump()
+
+        -- Velocity Y
+
+        if self.rigidBody:getIsTouchingGround() then
+            self:handleJumpStart()
+        else
+            self:handleJump()
+        end
+
+        -- RigidBody update
+
+        self.rigidBody:update()
     end
 
     -- Update state for checkpoint
