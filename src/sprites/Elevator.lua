@@ -1,11 +1,20 @@
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
-local timer <const> = playdate.timer
+local vector2D <const> = gmt.vector2D
+
+local ORIENTATION <const> = {
+  Horizontal = "Horizontal",
+  Vertical = "Vertical"
+}
+
+-- Private Static methods
+
+--- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
+local function isInverseDirection(key)
+  return key == KEYNAMES.Up or key == KEYNAMES.Left
+end
 
 class("Elevator").extends(RigidBody)
-
-local maxVelocity = 5
-local speed = 1
 
 function Elevator:init(entity)
   local imageElevator = gfx.imagetable.new("assets/images/elevator")
@@ -13,84 +22,119 @@ function Elevator:init(entity)
 
   self.fields = table.deepcopy(entity.fields)
   self:setTag(TAGS.Elevator)
+  self:setCenter(0.5, 1)
+
+  -- Set Displacement initial, start and end scalars (1D) based on entity fields
+
+  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
+  self.displacementStart = -1 -- Add extra pixel for smooth platforming
+  self.displacementEnd = self.fields.distance * TILE_SIZE + 1
+
+  -- AnimatedSprite config
 
   self:addState("n", 1, 1).asDefault()
   self:playAnimation()
+
+  -- RigidBody config
+
   self.g_mult = 0
   self.inv_mass = 0
-  self.actualDistance = self.fields.distance * 32
-  self.orientation = self.fields.orientation
   self.restitution = 0.0
+
+  -- Elevator-specific fields
+
+  self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
+  self.movement = vector2D.ZERO -- 2D update vector for movement. 
 end
 
-function Elevator:activate()
-  if self.isActivating or self.isMovingToTarget then return end
-  self.isActivating = true
+function Elevator:postInit()
+  -- Checkpoint Handling setup
 
-  timer.performAfterDelay(400, function()
-    if self.orientation == "Horizontal" then
-      if self.x == self.initialX then
-        self.targetX = self.x - self.actualDistance
-      else
-        self.targetX = self.x + self.actualDistance
-      end
-    elseif self.orientation == "Vertical" then
-      if self.y == self.initialY then
-        self.targetY = self.y - self.actualDistance
-      else
-        self.targetY = self.y + self.actualDistance
-      end
-    end
-    -- self.isActivating = false
+  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
+  
+end
+
+-- Private class methods
+
+--- Get remaining movement based on direction and displacement
+local function getMovementRemaining(self, key)
+  -- Get inverted direction boolean
+  local isInverseDirection = isInverseDirection(key)
+
+  -- Remaining displacement - either towards displacementEnd or displacementStart if inverse direction
+  local displacementRemaining = isInverseDirection 
+    and self.displacement - self.displacementStart
+    or self.displacementEnd - self.displacement
+  
+  -- Calculate movement as scalar value, invert speed if inverse direction
+
+  return math.floor(math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1))
+end
+
+-- Public class Methods
+
+--- Sets movement to be executed in the next update() call using vector.
+--- *param* key - the player input key direction (KEYNAMES)
+--- *returns* whether an activation occurred based on key press.
+function Elevator:activate(key)
+  local movement = 0
+
+  if (key == KEYNAMES.Left or key == KEYNAMES.Right)
+  and self.fields.orientation == ORIENTATION.Horizontal then
+    -- Horizontal movement - get distance remaining
+    movement = getMovementRemaining(self, key)
+
+    -- Update movement update vector applying orientation
+    self.movement = vector2D.new(movement, 0)
+elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
+  and self.fields.orientation == ORIENTATION.Vertical then
+    -- Vertical movement - get distance remaining
+    movement = getMovementRemaining(self, key)
+
+    -- Update movement update vector applying orientation
+    self.movement = vector2D.new(0, movement)
   end
-  )
+
+  -- Return boolean - did activation call capture movement
+
+  return movement ~= 0
 end
 
 function Elevator:update()
-  Elevator.super.update(self)
-  local cvx, cvy = self.velocity:unpack()
+  -- don't call SUPER update here, as that does collision work
+  -- and we just want to call `moveTo` for the elevator
+  -- Elevator.super.update(self)
 
-  local distance = 0
+  -- Move elevator if update vector has been set
 
-  if self.orientation == "Horizontal" then
-    distance = math.abs(self.targetX - self.x)
-    if self.targetX > self.x and math.abs(cvx) < maxVelocity then
-      self.isMovingToTarget = true
-      self.velocity = self.velocity + gmt.vector2D.new(speed, 0);
-    elseif self.targetX < self.x and math.abs(cvx) < maxVelocity then
-      self.isMovingToTarget = true
-      self.velocity = self.velocity + gmt.vector2D.new(-speed, 0);
+  if self.movement ~= vector2D.ZERO then
+
+    local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+
+    self:moveTo(newPos.dx, newPos.dy)
+    
+    -- Update displacement to match movement
+    
+    if self.fields.orientation == ORIENTATION.Horizontal then
+      self.displacement += self.movement.x * _G.delta_time
+    else
+      self.displacement += self.movement.y * _G.delta_time
     end
+    
+    -- Update checkpoint state
 
-    if distance < math.abs(self.velocity.dx) then
-      self:moveTo(self.targetX, self.targetY);
-      self.isMovingToTarget = false
-      self.velocity = gmt.vector2D.new(0, 0)
-    end
-  end
+    self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
 
-  if self.orientation == "Vertical" then
-    distance = math.abs(self.targetY - self.y)
-    if self.targetY > self.y and math.abs(cvy) < maxVelocity then
-      self.isMovingToTarget = true
-      self.velocity = self.velocity + gmt.vector2D.new(0, speed);
-    elseif self.targetY < self.y and math.abs(cvy) < maxVelocity then
-      self.isMovingToTarget = true
-      self.velocity = self.velocity + gmt.vector2D.new(0, -speed);
-    end
-
-    if distance < math.abs(self.velocity.dy) then
-      self:moveTo(self.targetX, self.targetY);
-      self.isMovingToTarget = false
-      self.velocity = gmt.vector2D.new(0, 0)
-    end
+    -- Reset movement vector
+    
+    self.movement = vector2D.ZERO
   end
 end
 
-function Elevator:add()
-  Elevator.super.add(self)
-  self.initialX = self.x
-  self.initialY = self.y
-  self.targetX = self.x
-  self.targetY = self.y
+function Elevator:handleCheckpointRevert(state)
+  self.movement = vector2D.ZERO
+
+  self:moveTo(state.x, state.y)
+
+  self.displacement = state.displacement
 end

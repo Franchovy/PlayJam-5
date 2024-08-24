@@ -5,7 +5,6 @@ local gfx <const> = pd.graphics
 
 local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
-local spLadder = sound.sampleplayer.new("assets/sfx/Ladder")
 local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
 local spDrillLoop = sound.sampleplayer.new("assets/sfx/drill-loop")
 local spDrillEnd = sound.sampleplayer.new("assets/sfx/drill-end")
@@ -43,18 +42,6 @@ local ANIMATION_STATES = {
     Drilling = 4
 }
 
-local STATE = {
-    InAir = 1,
-    Jumping = 2,
-    OnGround = 3,
-    OnLadderTop = 4,
-    OnLadder = 5,
-}
-
--- debug
-local debugStateReverse = {}
-for k, state in pairs(STATE) do debugStateReverse[state] = k end
-
 KEYS = {
     [KEYNAMES.Up] = pd.kButtonUp,
     [KEYNAMES.Down] = pd.kButtonDown,
@@ -65,11 +52,8 @@ KEYS = {
 }
 
 local maxSpeed <const> = 4.5
-local maxSpeedVertical <const> = 3.5
-local gravity <const> = 1.6
-local maxFallSpeed <const> = 7.5
-local jumpSpeed <const> = 7.5
-local jumpSpeedReleased <const> = 3.5
+local groundAcceleration <const> = 10
+local jumpSpeed <const> = 17.5
 local jumpHoldTimeInTicks <const> = 4
 
 -- TODO: [Franch]
@@ -78,7 +62,7 @@ local jumpHoldTimeInTicks <const> = 4
 
 -- Setup
 
-class("Player").extends(AnimatedSprite)
+class("Player").extends(RigidBody)
 
 -- Static Reference
 
@@ -90,8 +74,14 @@ function Player:init(entity)
     _instance = self
 
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
-    Player.super.init(self, playerImageTable)
+    Player.super.init(self, entity, playerImageTable)
 
+    -- RigidBody overrides/config
+    self.ground_friction = 2
+    self.air_friction = 2
+    self.g_mult = 5
+
+    -- AnimatedSprite states
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
     self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
@@ -100,9 +90,10 @@ function Player:init(entity)
 
     self:setTag(TAGS.Player)
 
-    self.state = STATE.OnGround
     self.isDroppingItem = false
     self.isDrilling = false
+    self.isActivatingElevator = false
+    self.shouldExitParent = false
 
     -- Setup keys array and starting keys
     self.blueprints = {}
@@ -171,7 +162,7 @@ function Player:enterLevel(direction, levelBounds)
         local x = self.x + (levelGXPrevious - levelGX)
         local y = levelHeight + 15
 
-        self:moveTo(self.x, levelHeight - 15)
+        self:moveTo(x, y)
     end
 end
 
@@ -196,27 +187,23 @@ end
 
 -- Update Method
 
-local velocityX = 0
-local velocityY = 0
 local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 local activeDrillableBlock
 local activeDialog
 
-function Player:update()
-    -- Checkpoint Handling
+function Player:exitParent()
+    -- Consume `shouldExitParent` variable and reset to false.
+    local shouldExitParent = self.shouldExitParent
+    self.shouldExitParent = false
 
-    self:handleCheckpoint()
+    return shouldExitParent
+end
 
-    -- Crank
+function Player:handleCollisionExtra(collisionData)
+    local other = collisionData.other
+    local tag = other:getTag()
 
-    local _, acceleratedChange = pd.getCrankChange()
-    if acceleratedChange > 75 and not self.isDroppingItem then
-        self:dropLastItem()
-    end
-
-    -- Drilling
-
-    if self:isMovingDown() then
+    if tag == TAGS.DrillableBlock and self:isMovingDown() then
         if self.isDrilling == false then
             spDrillStart:play(1)
             spDrillStart:setFinishCallback(function()
@@ -230,7 +217,7 @@ function Player:update()
         self.isDrilling = true
     else
         if self.isDrilling then
-            -- spDrillStart:stop() -- Until we have better samples, better to cover up the sfx gaps...
+            -- spDrillStart:stop() -- [Franch] Until we have better samples, better to cover up the sfx gaps...
             spDrillLoop:stop()
             spDrillEnd:play(1)
         end
@@ -243,39 +230,78 @@ function Player:update()
         end
     end
 
+    -- TODO: proper direction per orientation
+    if tag == TAGS.Elevator then
+        if collisionData.normal.y == -1 then
+            local key
+            if self:isMovingDown() then
+                key = KEYNAMES.Down
+            elseif self:isMovingUp() then
+                key = KEYNAMES.Up
+            elseif self:isMovingLeft() then
+                key = KEYNAMES.Left
+            elseif self:isMovingRight() then
+                key = KEYNAMES.Right
+            end
+    
+            if key then
+                self.isActivatingElevator = other:activate(key)
+            end
+
+            -- Do not parent if there is no activation
+            self.shouldExitParent = not self.isActivatingElevator
+        end
+    end
+
+    if self.onGround and
+        self.isDrilling and
+        other:getTag() == TAGS.DrillableBlock then
+        drillableBlockCurrentlyDrilling = other
+
+        drillableBlockCurrentlyDrilling:activate()
+    elseif tag == TAGS.Ability then
+        -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
+        -- we should be handling the multiple blueprints as a single checkpoint.
+        -- But it's also useful for debugging.
+
+        if not timerCooldownCheckpoint then
+            self:pickUpBlueprint(other)
+        end
+    end
+end
+
+function Player:update()
+    
+    -- Checkpoint Handling
+    
+    self:handleCheckpoint()
+    
+    if timerCooldownCheckpoint then
+        self:skipPhysicsHandling()
+    end
+
+    -- RigidBody & Sprite update
+    
+    Player.super.update(self)
+
     -- Movement handling (update velocity X and Y)
 
     -- Velocity X
 
-    velocityX = 0
-
-    if not self.isDrilling then
+    if not self.isDrilling and not self.isActivatingElevator then
         self:handleHorizontalMovement()
     end
 
     -- Velocity Y
 
-    if self.state == STATE.OnLadder or self.state == STATE.OnLadderTop then
-        velocityY = 0
-    end
+    if self.onGround then
+        local isJumpStart = self:handleJumpStart()
 
-    if self.state == STATE.OnLadderTop or self.state == STATE.OnGround then
-        jumpTimeLeftInTicks = jumpHoldTimeInTicks
-    elseif self.state == STATE.OnLadder or self.state == STATE.InAir then
-        jumpTimeLeftInTicks = 0
-    end
-
-    if self.state == STATE.OnLadder then
-        self:handleUpMovement()
-        self:handleDownMovement()
-    elseif self.state == STATE.OnLadderTop then
-        self:handleJumpStart()
-        self:handleDownMovement()
-    elseif self.state == STATE.OnGround then
-        self:handleJumpStart()
-    elseif self.state == STATE.InAir then
-        self:handleGravity()
-    elseif self.state == STATE.Jumping then
+        if isJumpStart then
+            -- Detach from parent (Elevator, ConveyorBelt, Box) on jump starts.
+            self.shouldExitParent = true
+        end
+    else
         self:handleJump()
     end
 
@@ -299,99 +325,10 @@ function Player:update()
             })
         end
     end
-
-    --
-
-    if self.state ~= STATE.OnLadder and spLadder:isPlaying() then
-        spLadder:stop()
-    end
-
-    -- Collision Handling
-
-    local targetX, targetY = self.x + velocityX, self.y + velocityY
-    local actualX, actualY, collisions = self:checkCollisions(targetX, targetY)
-
-    local onGround = false
-    local onLadder = false
-    local onLadderTop = false
-    local onElevator = false
-
-    local dialog
-
-    for _, collisionData in pairs(collisions) do
-        local other = collisionData.other
-        local tag = other:getTag()
-        local type = collisionData.type
-        local normal = collisionData.normal
-        local position = collisionData.touch
-        local overlaps = collisionData.overlaps
-
-        if (type == kCollisionTypeSlide and normal.y == -1) then
-            onGround = true
-
-            if self.isDrilling and other:getTag() == TAGS.DrillableBlock then
-                activeDrillableBlock = other
-
-                activeDrillableBlock:activate()
-            end
-        elseif tag == TAGS.Ladder then
-            local otherTop = other.y - other.height - LADDER_TOP_ADJUSTMENT
-            local topDetectionRangeMargin = 2.5
-
-            if actualY < position.y - topDetectionRangeMargin and not overlaps then
-                -- Player is jumping or moving down
-            elseif actualY > otherTop + topDetectionRangeMargin then
-                onLadder = true
-            elseif position.y <= otherTop + topDetectionRangeMargin and position.y >= otherTop - topDetectionRangeMargin then
-                onLadderTop = true
-
-                actualY = otherTop + LADDER_TOP_ADJUSTMENT
-            end
-        elseif tag == TAGS.Ability then
-            -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
-            -- we should be handling the multiple blueprints as a single checkpoint.
-            -- But it's also useful for debugging.
-
-            if not timerCooldownCheckpoint then
-                self:pickUpBlueprint(other)
-            end
-        elseif tag == TAGS.Dialog then
-            dialog = other
-        end
-    end
-
-    if dialog ~= activeDialog then
-        if dialog == nil then
-            activeDialog:collapse()
-        else
-            dialog:expand()
-        end
-
-        activeDialog = dialog
-    end
-
-    if onLadder then
-        self.state = STATE.OnLadder
-    elseif onLadderTop then
-        self.state = STATE.OnLadderTop
-    elseif onGround then
-        self.state = STATE.OnGround
-    elseif self.state == STATE.Jumping then
-        self.state = STATE.Jumping
-    else
-        self.state = STATE.InAir
-    end
-
-    -- Movement
-
-    if not timerCooldownCheckpoint then
-        self:moveTo(actualX, actualY)
-    end
-
+    
     -- Animation Handling
 
-    self:updateAnimationState(self.state)
-    self:updateAnimation()
+    self:updateAnimationState()
 
     -- Camera Movement
 
@@ -440,6 +377,10 @@ function Player:update()
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
+
+    -- Reset update states (Post-update)
+
+    self.isActivatingElevator = false
 end
 
 function Player:revertCheckpoint()
@@ -551,36 +492,27 @@ end
 
 local flip
 
-function Player:updateAnimationState(stateCurrent)
+function Player:updateAnimationState()
     local animationState
 
-    -- Idle/moving (on ground)
-
-    if stateCurrent == STATE.OnGround or stateCurrent == STATE.OnLadderTop then
+    if self.onGround then
         if self.isDrilling then
             animationState = ANIMATION_STATES.Drilling
-        elseif math.abs(velocityX) > 0 then
+        elseif math.floor(math.abs(self.velocity.dx)) > 0 then
             animationState = ANIMATION_STATES.Moving
         else
             animationState = ANIMATION_STATES.Idle
         end
-    end
-
-    -- In Air / Jumping
-
-    if stateCurrent == STATE.OnLadder then
-        animationState = ANIMATION_STATES.Idle
-    elseif stateCurrent == STATE.Jumping then
-        animationState = ANIMATION_STATES.Jumping
-    elseif stateCurrent == STATE.InAir then
+    else
         animationState = ANIMATION_STATES.Jumping
     end
 
     -- Handle direction (flip)
 
-    if velocityX < 0 then
+    flip = 0
+    if self.velocity.dx < 0 then
         flip = 1
-    elseif velocityX > 0 then
+    elseif self.velocity.dx > 0 then
         flip = 0
     end
 
@@ -599,63 +531,37 @@ end
 -- Jump
 
 function Player:handleJumpStart()
-    if pd:buttonJustPressed(pd.kButtonA) and self:isJumping() then
+    if pd.buttonJustPressed(KEYNAMES.A) and self:isJumping() then
         spJump:play(1)
-        velocityY = -jumpSpeed
+        self.velocity.dy = -jumpSpeed
         jumpTimeLeftInTicks -= 1
 
-        self.state = STATE.Jumping
+        return true
     end
+
+    return false
 end
 
 function Player:handleJump()
     if self:isJumping() and jumpTimeLeftInTicks > 0 then
         -- Hold Jump
-        velocityY = -jumpSpeed
+        self.velocity.dy = -jumpSpeed
+        self.g_mult = 1
         jumpTimeLeftInTicks -= 1
-    elseif jumpTimeLeftInTicks > 0 then
+    elseif pd.buttonJustReleased(KEYNAMES.A) or jumpTimeLeftInTicks > 0 then
         -- Released Jump
-        velocityY = -jumpSpeedReleased
+        self.g_mult = 5
         jumpTimeLeftInTicks = 0
     end
-
-    if jumpTimeLeftInTicks == 0 then
-        -- Jump End
-        self.state = STATE.InAir
-    end
-end
-
--- Gravity
-
-function Player:handleGravity()
-    velocityY = math.min(velocityY + gravity, maxFallSpeed)
 end
 
 -- Directional
 
 function Player:handleHorizontalMovement()
-    if self:isMovingLeft() then
-        velocityX = -maxSpeed
-    elseif self:isMovingRight() then
-        velocityX = maxSpeed
-    end
-end
-
-function Player:handleUpMovement()
-    if self:isMovingUp() then
-        if not spLadder:isPlaying() then
-            spLadder:play(1)
-        end
-        velocityY = -maxSpeedVertical
-    end
-end
-
-function Player:handleDownMovement()
-    if self:isMovingDown() then
-        if not spLadder:isPlaying() then
-            spLadder:play(1)
-        end
-        velocityY = maxSpeedVertical
+    if self:isMovingLeft() and self.velocity.dx > -maxSpeed then
+        self.velocity.dx -= groundAcceleration
+    elseif self:isMovingRight() and self.velocity.dx < maxSpeed then
+        self.velocity.dx += groundAcceleration
     end
 end
 

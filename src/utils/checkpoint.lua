@@ -7,6 +7,24 @@ local DEBUG_PRINT <const> = false
 -- Checkpoint for Playdate Sprites
 -- Allows the game to manage checkpoints via a save state kept within each sprite.
 
+---- HOW TO USE ----
+---
+--- 1 - Add a "checkpointHandler" property to your sprite. Push a *initialState* table that represents your sprite's
+--- original state (on load).
+--- 
+--- >> self.checkpointHandler = CheckpointHandler(self, initialState)
+--- 
+--- 2 - Call *pushState* with a table representing the state of your sprite. Keep it consistent and
+--- set it every time your sprite state changes if you want checkpoints to work as expected.
+--- 
+--- >> self.checkpointHandler:pushState({ x = someX, y = someY, myState = 2 })
+--- 
+--- 3 - Implement the reset function. This will return one of the previous state objects pushed based on the
+--- checkpoint that has been reset to.
+--- 
+--- >> function MySprite:handleCheckpointRevert(state)
+--- >>     -- Handle state update here
+--- >> end
 class("Checkpoint").extends()
 
 local checkpointNumber = 1
