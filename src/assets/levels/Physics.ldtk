@@ -1433,7 +1433,7 @@
 									"params": ["Horizontal"]
 								}] },
 								{ "__identifier": "distance", "__type": "Int", "__value": 3, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
-								{ "__identifier": "initialDistance", "__type": "Float", "__value": 0, "__tile": null, "defUid": 212, "realEditorValues": [null] }
+								{ "__identifier": "initialDistance", "__type": "Float", "__value": 3, "__tile": null, "defUid": 212, "realEditorValues": [{ "id": "V_Float", "params": [3] }] }
 							],
 							"__worldX": -608,
 							"__worldY": -672

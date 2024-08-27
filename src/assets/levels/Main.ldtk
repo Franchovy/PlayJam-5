@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 213,
+	"nextUid": 214,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1156,6 +1156,43 @@
 					"doc": "how many 32x32 tiles it moves in given orientation",
 					"__type": "Int",
 					"uid": 210,
+					"type": "F_Int",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "initialDistance",
+					"doc": null,
+					"__type": "Int",
+					"uid": 213,
 					"type": "F_Int",
 					"isArray": false,
 					"canBeNull": false,
@@ -2944,47 +2981,49 @@
 						},
 						{
 							"__identifier": "Elevator",
-							"__grid": [11,24],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#D572E4",
-							"iid": "998ff630-25d0-11ef-99f7-a1f193c4ffa1",
-							"width": 32,
-							"height": 16,
-							"defUid": 207,
-							"px": [368,768],
-							"fieldInstances": [
-								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Vertical"]
-								}] },
-								{ "__identifier": "distance", "__type": "Int", "__value": 23, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [23] }] }
-							],
-							"__worldX": 1184,
-							"__worldY": -112
-						},
-						{
-							"__identifier": "Elevator",
 							"__grid": [8,31],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#D572E4",
-							"iid": "9fe1d9e0-25d0-11ef-99f7-8bc6d1460d88",
+							"iid": "ca3b2940-4ce0-11ef-9ddf-cb3ba0bd6a75",
 							"width": 32,
 							"height": 16,
 							"defUid": 207,
-							"px": [272,992],
+							"px": [256,992],
 							"fieldInstances": [
 								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Vertical"]
 								}] },
-								{ "__identifier": "distance", "__type": "Int", "__value": 8, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [8] }] }
+								{ "__identifier": "distance", "__type": "Int", "__value": 7, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [7] }] },
+								{ "__identifier": "initialDistance", "__type": "Int", "__value": 7, "__tile": null, "defUid": 213, "realEditorValues": [{ "id": "V_Int", "params": [7] }] }
 							],
-							"__worldX": 1088,
+							"__worldX": 1072,
 							"__worldY": 112
+						},
+						{
+							"__identifier": "Elevator",
+							"__grid": [11,24],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D572E4",
+							"iid": "cb69e540-4ce0-11ef-9ddf-4196388e725f",
+							"width": 32,
+							"height": 16,
+							"defUid": 207,
+							"px": [352,768],
+							"fieldInstances": [
+								{ "__identifier": "orientation", "__type": "LocalEnum.ElevatorOrientation", "__value": "Vertical", "__tile": null, "defUid": 209, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Vertical"]
+								}] },
+								{ "__identifier": "distance", "__type": "Int", "__value": 23, "__tile": null, "defUid": 210, "realEditorValues": [{ "id": "V_Int", "params": [23] }] },
+								{ "__identifier": "initialDistance", "__type": "Int", "__value": 23, "__tile": null, "defUid": 213, "realEditorValues": [{ "id": "V_Int", "params": [23] }] }
+							],
+							"__worldX": 1168,
+							"__worldY": -112
 						}
 					]
 				},
