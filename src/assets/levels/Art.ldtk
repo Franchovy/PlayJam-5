@@ -383,7 +383,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "type",
+					"identifier": "blueprints",
 					"doc": null,
 					"__type": "Array<LocalEnum.ObjectEnum>",
 					"uid": 40,
@@ -456,7 +456,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "button",
+					"identifier": "blueprint",
 					"doc": null,
 					"__type": "LocalEnum.ObjectEnum",
 					"uid": 38,
@@ -483,46 +483,6 @@
 					"regex": null,
 					"acceptFileTypes": null,
 					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "pickedUp",
-					"doc": null,
-					"__type": "Bool",
-					"uid": 206,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": {
-						"id": "V_Bool",
-						"params": [ false ]
-					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -747,7 +707,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "Text",
+					"identifier": "text",
 					"doc": null,
 					"__type": "String",
 					"uid": 205,
@@ -1094,7 +1054,7 @@
 							"height": 32,
 							"defUid": 19,
 							"px": [256,160],
-							"fieldInstances": [{ "__identifier": "type", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Left"], "__tile": null, "defUid": 40, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Left"]
 							}] }],
@@ -1113,13 +1073,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [96,160],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Right"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
 							"__worldX": -704,
 							"__worldY": -672
 						},
@@ -1135,7 +1092,7 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [192,160],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "You're gonna have to pick up that blueprint if you want to get around here.", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "You're gonna have to pick up that blueprint if you want to get around here.", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["You're gonna have to pick up that blueprint if you want to get around here."]
 							}] }],
@@ -1379,13 +1336,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [96,192],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["A"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["A"]
+							}] }],
 							"__worldX": -208,
 							"__worldY": -640
 						}
@@ -1668,13 +1622,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [192,128],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Down"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Down"]
+							}] }],
 							"__worldX": 608,
 							"__worldY": -704
 						},
@@ -1690,13 +1641,10 @@
 							"height": 32,
 							"defUid": 21,
 							"px": [288,192],
-							"fieldInstances": [
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Left"]
-								}] },
-								{ "__identifier": "pickedUp", "__type": "Bool", "__value": false, "__tile": null, "defUid": 206, "realEditorValues": [] }
-							],
+							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Left"]
+							}] }],
 							"__worldX": 704,
 							"__worldY": -640
 						},

@@ -1042,7 +1042,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "Text",
+					"identifier": "text",
 					"doc": null,
 					"__type": "String",
 					"uid": 205,
@@ -1405,9 +1405,9 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [192,160],
-							"fieldInstances": [{ "__identifier": "Text", "__type": "String", "__value": "You're gonna have to pick up that blueprint if you want to get around here.", "__tile": null, "defUid": 205, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "You're gonna have to pick up/that blueprint if you want/to get around here.", "__tile": null, "defUid": 205, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["You're gonna have to pick up that blueprint if you want to get around here."]
+								"params": ["You're gonna have to pick up/that blueprint if you want/to get around here."]
 							}] }],
 							"__worldX": -608,
 							"__worldY": -672
