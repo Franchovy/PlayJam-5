@@ -268,6 +268,10 @@ function Player:handleCollisionExtra(collisionData)
             self:pickUpBlueprint(other)
         end
     end
+
+    if tag == TAGS.Dialog then
+        activeDialog = other
+    end
 end
 
 function Player:update()
@@ -303,6 +307,15 @@ function Player:update()
         end
     else
         self:handleJump()
+    end
+
+    -- Update dialog
+
+    if activeDialog then
+        activeDialog:activate()
+
+        -- Consume variable
+        activeDialog = nil
     end
 
     -- Update state for checkpoint
