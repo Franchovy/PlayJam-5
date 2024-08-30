@@ -53,7 +53,7 @@ KEYS = {
 
 local maxSpeed <const> = 4.5
 local groundAcceleration <const> = 10
-local jumpSpeed <const> = 17.5
+local jumpSpeed <const> = 19.5
 local jumpHoldTimeInTicks <const> = 4
 
 -- TODO: [Franch]
