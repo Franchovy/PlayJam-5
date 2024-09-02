@@ -64,6 +64,13 @@ function Elevator:collisionResponse(_)
   return gfx.sprite.kCollisionTypeSlide
 end
 
+--- Used specifically for when jumping while moving up with elevator.
+function Elevator:disableCollisionsForFrame()
+  self:setCollisionsEnabled(false)
+
+  self.isCollisionsDisabledForFrame = true
+end
+
 -- Private class methods
 
 --- Get remaining movement based on direction and displacement
@@ -154,6 +161,14 @@ function Elevator:update()
     -- Reset movement vector
     
     self.movement = 0
+  end
+
+  -- Reset collisions if disabled
+
+  if self.isCollisionsDisabledForFrame then
+    self:setCollisionsEnabled(true)
+
+    self.isCollisionsDisabledForFrame = false
   end
 end
 

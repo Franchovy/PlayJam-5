@@ -260,9 +260,10 @@ function Player:handleCollision(collisionData)
                         centerElevatorX - self.width / 2 + offsetX, 
                         other.y - self.height + offsetY
                     )
-                end
 
-                self.isActivatingElevator = isActivatingElevator
+                    -- Set the elevator
+                    self.isActivatingElevator = other
+                end
             end
         end
     end
@@ -310,10 +311,20 @@ function Player:update()
         -- Velocity Y
 
         if self.rigidBody:getIsTouchingGround() then
-            self:handleJumpStart()
+            local isJumpStart = self:handleJumpStart()
+
+            if isJumpStart and self.isActivatingElevator then
+                -- Disable collisions with elevator for this frame to avoid
+                -- jump / moving elevator up collisions glitch.
+                self.isActivatingElevator:disableCollisionsForFrame()
+            end
         else
             self:handleJump()
         end
+
+        -- Reset activation elevator before update
+
+        self.isActivatingElevator = false
 
         -- RigidBody update
 
@@ -392,10 +403,6 @@ function Player:update()
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
-
-    -- Reset update states (Post-update)
-
-    self.isActivatingElevator = false
 end
 
 function Player:revertCheckpoint()
