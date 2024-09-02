@@ -244,7 +244,25 @@ function Player:handleCollision(collisionData)
             end
     
             if key then
-                self.isActivatingElevator = other:activate(key)
+                local isActivatingElevator, activationDistance = other:activate(key)
+                
+                if isActivatingElevator then
+                    -- Move player to the center of the platform
+                    local centerElevatorX = other.x + other.width / 2
+                    local offsetX, offsetY = 0, 0
+
+                    if key == KEYNAMES.Down and activationDistance > 1 then
+                        -- For moving down, move player slightly into elevator for better collision activation
+                        offsetY = activationDistance
+                    end
+                    
+                    self:moveTo(
+                        centerElevatorX - self.width / 2 + offsetX, 
+                        other.y - self.height + offsetY
+                    )
+                end
+
+                self.isActivatingElevator = isActivatingElevator
             end
         end
     end

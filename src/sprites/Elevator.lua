@@ -41,13 +41,23 @@ function Elevator:init(entity)
   -- Elevator-specific fields
 
   self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = vector2D.ZERO -- 2D update vector for movement. 
+  self.movement = 0 -- Update scalar for movement. 
 end
 
 function Elevator:postInit()
   -- Checkpoint Handling setup
 
   self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
+
+  -- Save initial position
+
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    self.initialPosition = gmt.point.new(self.x - self.displacement, self.y)
+    self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
+  else
+    self.initialPosition = gmt.point.new(self.x, self.y - self.displacement)
+    self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
+  end
 end
 
 function Elevator:collisionResponse(_)
@@ -68,7 +78,7 @@ local function getMovementRemaining(self, key)
   
   -- Calculate movement as scalar value, invert speed if inverse direction
 
-  return math.floor(math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1))
+  return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
 end
 
 -- Public class Methods
@@ -84,20 +94,18 @@ function Elevator:activate(key)
     -- Horizontal movement - get distance remaining
     movement = getMovementRemaining(self, key)
 
-    -- Update movement update vector applying orientation
-    self.movement = vector2D.new(movement, 0)
-elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
+  elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
   and self.fields.orientation == ORIENTATION.Vertical then
     -- Vertical movement - get distance remaining
     movement = getMovementRemaining(self, key)
-
-    -- Update movement update vector applying orientation
-    self.movement = vector2D.new(0, movement)
   end
-
+  
+  -- Set movement update scalar
+  self.movement = movement
+  
   -- Return boolean - did activation call capture movement
 
-  return movement ~= 0
+  return movement ~= 0, movement
 end
 
 function Elevator:update()
@@ -110,32 +118,47 @@ function Elevator:update()
 
   -- Move elevator if update vector has been set
 
-  if self.movement ~= vector2D.ZERO then
+  if self.movement ~= 0 then
 
-    local newPos = vector2D.new(self.x, self.y) + (self.movement * _G.delta_time)
+    -- If displacement is very small, skip to the final position (avoid tiny floats)
 
-    self:moveTo(newPos.dx, newPos.dy)
-    
-    -- Update displacement to match movement
-    
-    if self.fields.orientation == ORIENTATION.Horizontal then
-      self.displacement += self.movement.x * _G.delta_time
+    if self.displacement < 0.5 and self.movement < 0 then
+      -- Move to statically calculated position - initial
+      
+      self:moveTo(self.initialPosition.x, self.initialPosition.y)
+    elseif self.displacementEnd - self.displacement < 0.5 and self.movement > 0 then
+      -- Move to statically calculated position - final
+
+      self:moveTo(self.finalPosition.x, self.finalPosition.y)
     else
-      self.displacement += self.movement.y * _G.delta_time
+      -- Else, move to target position normally
+      if self.fields.orientation == ORIENTATION.Horizontal then
+        self:moveBy(self.movement * _G.delta_time, 0)
+      else
+        self:moveBy(0, self.movement * _G.delta_time)
+      end
+      
+      -- Update displacement to match movement
+      
+      if self.fields.orientation == ORIENTATION.Horizontal then
+        self.displacement += self.movement * _G.delta_time
+      else
+        self.displacement += self.movement * _G.delta_time
+      end
+      
     end
-    
     -- Update checkpoint state
 
     self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
 
     -- Reset movement vector
     
-    self.movement = vector2D.ZERO
+    self.movement = 0
   end
 end
 
 function Elevator:handleCheckpointRevert(state)
-  self.movement = vector2D.ZERO
+  self.movement = 0
 
   self:moveTo(state.x, state.y)
 
