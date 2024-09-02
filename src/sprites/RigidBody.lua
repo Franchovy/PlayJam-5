@@ -6,10 +6,6 @@ local complexCollision = false
 
 local DEBUG_PRINT = false
 
--- FRANCH: Behaviors to adjust for / fix:
--- Elevator going into a wall - should stop (wall should have "infinite mass")
--- Elevator carrying object going into the ceiling - should stop both
-
 class("RigidBody").extends(AnimatedSprite)
 
 function RigidBody:init(entity, imageTable)
@@ -30,23 +26,46 @@ function RigidBody:init(entity, imageTable)
   self.DEBUG_SHOULD_PRINT_VELOCITY = false
 end
 
+-- override this in subclasses to handle collisions outside of basic physics
+function RigidBody:handleCollisionExtra(collisionData)
+end
+
+function RigidBody:exitParent()
+  return false
+end
+
+--- Skips physics handling for one frame.
+function RigidBody:skipPhysicsHandling()
+  self.shouldSkipPhysicsHandling = true
+end
+
 function RigidBody:update()
   if DEBUG_PRINT then print("RigidBody:update() for: ", getmetatable(self).className) end
   RigidBody.super.update(self)
 
+  if self.shouldSkipPhysicsHandling then
+    self.shouldSkipPhysicsHandling = nil
+
+    return
+  end
+
+  local exitParent = self:exitParent()
+
   -- calculate new position by adding velocity to current position
-  local newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
-  if self.onParent and self.parent then
-    newPos = newPos + self.parent.velocity / 2
+  local newPos
+  if self.onParent and self.parent and not exitParent then
+    newPos = gmt.vector2D.new(self.parent.x, self.parent.y - self.parent.height/2) + (self.velocity * _G.delta_time)
+  else
+    newPos = gmt.vector2D.new(self.x, self.y) + (self.velocity * _G.delta_time)
   end
 
   local newX, newY = newPos:unpack()
-  local currentVX, currentVY = self.velocity:unpack()
+  local currentVX, _ = self.velocity:unpack()
 
   local _, _, sdkCollisions = self:moveWithCollisions(newX, newY)
 
   local parentFound = false
-  local onGround = false
+  local groundFound = false
 
   for _, c in pairs(sdkCollisions) do
     local other = c.other
@@ -60,13 +79,11 @@ function RigidBody:update()
       self:checkCollision(other)
     end
 
-    onGround = not onGround and normalY == -1 and
-        (tag == TAGS.Wall or
-          tag == TAGS.ConveyorBelt or
-          tag == TAGS.Box or
-          tag == TAGS.Elevator)
+    if normalY == -1 and PROPS.Ground[tag] and not groundFound then
+      groundFound = true
+    end
 
-    if onGround and (tag == TAGS.Box or tag == TAGS.Elevator) then
+    if groundFound and PROPS.Parent[tag] and not parentFound and not exitParent then
       parentFound = true
       self.parent = other
     end
@@ -79,30 +96,35 @@ function RigidBody:update()
 
       self.DEBUG_SHOULD_PRINT_VELOCITY = DEBUG_PRINT
     end
-    if tag == TAGS.Elevator and onGround then
-      other:activate()
-    end
+
+    self:handleCollisionExtra(c)
   end
 
+  self.onGround = groundFound
   self.onParent = parentFound
 
   if self.DEBUG_SHOULD_PRINT_VELOCITY then print(self.velocity) end
 
   -- incorporate gravity
-  if (complexCollision or not onGround) and currentVY < self.maxFallSpeed then
+
+  if not groundFound then
+    -- Adds gravity vector to current velocity
+
     self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.g_mult
-  elseif not complexCollision and onGround then
+  elseif groundFound then
+    -- Resets velocity (still applying gravity)
+
     local dx, _ = self.velocity:unpack()
-    self.velocity = gmt.vector2D.new(dx, 0)
+    self.velocity = gmt.vector2D.new(dx, self.g_mult * _G.delta_time)
   end
 
   -- incorporate any in-air drag
-  if not onGround and currentVX ~= 0 then
+  if not groundFound and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.air_friction) * _G.delta_time, 0))
   end
 
   -- incorporate any ground friction
-  if onGround and currentVX ~= 0 then
+  if groundFound and currentVX ~= 0 then
     self.velocity:addVector(gmt.vector2D.new((-currentVX * self.ground_friction) * _G.delta_time, 0))
   end
 

@@ -13,11 +13,8 @@ _G.assets = {
     },
     levels = {
         main = "assets/levels/Main.ldtk",
-        art = "assets/levels/Art.ldtk",
-        checkpoint = "assets/levels/Checkpoint.ldtk",
-        physics = "assets/levels/Physics.ldtk",
         scott = "assets/levels/Scott.ldtk",
-        franch = "assets/levels/Franch.ldtk",
+        franch = "assets/levels/Franch.ldtk"
     },
     sounds = {
         speech = "assets/sfx/speech"
