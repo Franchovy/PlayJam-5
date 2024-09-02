@@ -2,13 +2,17 @@ local pd <const> = playdate
 local sound <const> = pd.sound
 local gfx <const> = pd.graphics
 
+-- Constants / Assets
+
 local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
+local imageSpriteTitle <const> = gfx.image.new("assets/images/title"):invertedImage()
+local imageSpriteRobot <const> = gfx.imagetable.new("assets/images/boseki")
+local imagetableArrows <const> = gfx.imagetable.new(assets.imageTables.menuArrows)
 
-class("Menu").extends(Room)
+-- Local Variables
 
-local imageSpriteTitle = gfx.image.new("assets/images/title"):invertedImage()
+local spritesArrows = {}
 local spriteTitle
-local imageSpriteRobot = gfx.imagetable.new("assets/images/boseki")
 local spriteRobot
 local spritePressStart
 local sceneManager
@@ -16,6 +20,17 @@ local fileplayer
 
 local timerTitleAnimation
 local blinkerPressStart
+
+-- Level Selection
+
+local indexLevel = nil
+local levels = nil
+
+class("Menu").extends(Room)
+
+function Menu:init(_levels)
+  levels = _levels
+end
 
 function Menu:enter(previous, inFileplayer)
   -- Set sceneManager reference
@@ -38,8 +53,12 @@ function Menu:enter(previous, inFileplayer)
   spriteRobot:moveTo(200, 130)
   spriteRobot:playAnimation()
 
-  spritePressStart = gfx.sprite.spriteWithText("PRESS A TO START", 280, 70)
-  spritePressStart:setImage(spritePressStart:getImage():invertedImage())
+  for i=1,2 do
+    spritesArrows[i] = gfx.sprite.new(imagetableArrows[i])
+  end
+
+  spritePressStart = gfx.sprite.new()
+  self:setMenuLabelText("PRESS A TO START")
 
   spritePressStart:add()
   spritePressStart:moveTo(200, 180)
@@ -106,6 +125,14 @@ function Menu:enter(previous, inFileplayer)
   blinkerPressStart:startLoop()
 end
 
+function Menu:setMenuLabelText(text)
+  assert(text and type(text) == "string")
+
+  local textImage = gfx.imageWithText(text, 300, 80, nil, nil, nil, kTextAlignment.center)
+  
+  spritePressStart:setImage(textImage:invertedImage())
+end
+
 local blinkerWasActive = false
 
 function Menu:update()
@@ -143,9 +170,57 @@ function Menu:leave(next, ...)
   timerTitleAnimation = nil
 end
 
-function Menu:AButtonDown()
-  spButton:play(1)
+function Menu:incrementLevelSelectionIndex(increment)
+  if not indexLevel then
+    indexLevel = 1
+  else
+    -- Increment
+    indexLevel += increment
 
-  sceneManager.scenes.currentGame = Game(0)
-  sceneManager:enter(sceneManager.scenes.currentGame)
+    -- Loop around if out of range
+    if indexLevel > #levels then
+      indexLevel = 1
+    elseif indexLevel < 1 then
+      indexLevel = #levels
+    end
+  end
+
+  -- Update menu label text
+
+  self:setMenuLabelText(levels[indexLevel])
+
+  -- Move arrows
+
+  local leftArrow = spritesArrows[1]
+  leftArrow:moveTo(spritePressStart.x - spritePressStart.width / 2 - 16, spritePressStart.y)
+  leftArrow:add()
+
+  local rightArrow = spritesArrows[2]
+  rightArrow:moveTo(spritePressStart.x + spritePressStart.width / 2 + 16, spritePressStart.y)
+  rightArrow:add()
+end
+
+function Menu:AButtonDown()
+  if indexLevel then
+    -- Start game with level
+
+    LDtk.load(assets.path.levels.. levels[indexLevel])
+    
+    spButton:play(1)
+
+    sceneManager.scenes.currentGame = Game(0)
+    sceneManager:enter(sceneManager.scenes.currentGame)
+  else
+    -- Load Level selection
+
+    self:incrementLevelSelectionIndex()
+  end
+end
+
+function Menu:rightButtonDown()
+  self:incrementLevelSelectionIndex(1)
+end
+
+function Menu:leftButtonDown()
+  self:incrementLevelSelectionIndex(-1)
 end
