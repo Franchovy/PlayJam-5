@@ -118,11 +118,6 @@ end
 function Elevator:update()
   Elevator.super.update(self)
   
-  -- Don't call RigidBody update here, as that does collision work
-  -- and we just want to call `moveTo` for the elevator
-
-  -- self.rigidBody:update()
-
   -- Move elevator if update vector has been set
 
   if self.movement ~= 0 then
