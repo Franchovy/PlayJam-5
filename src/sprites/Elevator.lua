@@ -36,7 +36,7 @@ function Elevator:init(entity)
 
   -- RigidBody config
 
-  self.rigidBody = RigidBody(self, {gravity = 0})
+  self.rigidBody = RigidBody(self)
 
   -- Elevator-specific fields
 

@@ -4,20 +4,12 @@ local gfx <const> = pd.graphics
 
 class("RigidBody").extends()
 
-local gravity <const> = 1
-local airFriction <const> = .14
-local groundFriction <const> = .3
+local gravity <const> = 8
+local airFrictionCoefficient <const> = -0.2
+local groundFrictionCoefficient <const> = -1.2
 
 function RigidBody:init(sprite, config)
   self.sprite = sprite
-
-  -- Config
-
-  if config then
-    self.gravity = config.gravity or gravity -- TODO - remove
-    self.airFriction = config.airFriction or airFriction
-    self.groundFriction = config.groundFriction or groundFriction
-  end
 
   -- Dynamic variables
 
@@ -55,12 +47,21 @@ function RigidBody:update()
   
   for _, c in pairs(sdkCollisions) do
     local tag = c.other:getTag()
-    local _, normalY = c.normal:unpack()
+    local normal = c.normal
+    local collisionType = c.type
 
+    if collisionType == gfx.sprite.kCollisionTypeSlide then
     -- Detect if ground collision
 
-    if normalY == -1 and PROPS.Ground[tag] then
-      self.onGround = true
+      if normal.y == -1 and PROPS.Ground[tag] then
+        self.onGround = true
+      elseif normal.y == 1 then
+        self.velocity.y = 0
+      end
+
+      if normal.x ~= 0 then
+        self.velocity.x = 0
+      end
     end
   end
 
@@ -70,19 +71,20 @@ function RigidBody:update()
     -- Resets velocity, still applying gravity vector
 
     local dx, _ = self.velocity:unpack()
-    self.velocity = gmt.vector2D.new(dx, self.gravity * _G.delta_time)
+    self.velocity = gmt.vector2D.new(dx, gravity * _G.delta_time)
 
-    -- Apply Ground Friction
+    -- Apply Ground Friction to x-axis movement
 
-    self.velocity:addVector(gmt.vector2D.new((-self.velocity:unpack() * self.groundFriction) * _G.delta_time, 0))
+    self.velocity.x = self.velocity.x + (self.velocity.x * groundFrictionCoefficient * _G.delta_time)
   else
     -- Adds gravity vector to current velocity
 
-    self.velocity = self.velocity + (gmt.vector2D.new(0, 1) * _G.delta_time) * self.gravity
+    self.velocity.y = self.velocity.y + (gravity * _G.delta_time)
 
     -- Apply Air Friction
 
-    self.velocity:addVector(gmt.vector2D.new((-self.velocity:unpack() * self.airFriction) * _G.delta_time, 0))
+    self.velocity.x = self.velocity.x + (self.velocity.x * airFrictionCoefficient * _G.delta_time)
+    self.velocity.y = self.velocity.y + (self.velocity.y * airFrictionCoefficient * _G.delta_time)
   end
 
   -- Call sprite's extra collision handling if available

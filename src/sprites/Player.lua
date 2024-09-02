@@ -33,8 +33,6 @@ local isOverlappingWithGUI = false
 
 --
 
-local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
-
 local ANIMATION_STATES = {
     Idle = 1,
     Moving = 2,
@@ -51,9 +49,9 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local maxSpeed <const> = 4.5
-local groundAcceleration <const> = 10
-local jumpSpeed <const> = 19.5
+local groundAcceleration <const> = 7
+local airAcceleration <const> = 1.5
+local jumpSpeed <const> = 27
 local jumpHoldTimeInTicks <const> = 4
 
 -- TODO: [Franch]
@@ -227,7 +225,6 @@ function Player:handleCollision(collisionData)
         end
     end
 
-    -- TODO: proper direction per orientation
     if tag == TAGS.Elevator then
         if collisionData.normal.y == -1 then
             local key
@@ -532,6 +529,19 @@ function Player:enterLevel(direction, levelBounds)
         y = self.y,
         blueprints = table.deepcopy(self.blueprints)
     })
+
+    -- Set a cooldown timer to prevent key presses on enter
+
+    timerCooldownCheckpoint = playdate.timer.new(50)
+    timerCooldownCheckpoint.timerEndedCallback = function(timer)
+        timer:remove()
+
+        -- Since there can be multiple checkpoint-reverts in sequence, we want to
+        -- ensure we're not removing a timer that's not this one.
+        if timerCooldownCheckpoint == timer then
+            timerCooldownCheckpoint = nil
+        end
+    end
 end
 
 -- Animation Handling
@@ -608,10 +618,11 @@ end
 -- Directional
 
 function Player:handleHorizontalMovement()
+    local acceleration = self.rigidBody:getIsTouchingGround() and groundAcceleration or airAcceleration
     if self:isMovingLeft() then
-        self.rigidBody:addVelocityX(-groundAcceleration)
+        self.rigidBody:addVelocityX(-acceleration)
     elseif self:isMovingRight() then
-        self.rigidBody:addVelocityX(groundAcceleration)
+        self.rigidBody:addVelocityX(acceleration)
     end
 end
 
