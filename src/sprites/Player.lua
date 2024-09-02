@@ -221,8 +221,6 @@ function Player:handleCollision(collisionData)
             spDrillEnd:play(1)
         end
 
-        self.isDrilling = false
-
         if activeDrillableBlock ~= nil then
             activeDrillableBlock:release()
             activeDrillableBlock = nil
@@ -276,7 +274,18 @@ function Player:handleCollision(collisionData)
         other:getTag() == TAGS.DrillableBlock then
         drillableBlockCurrentlyDrilling = other
 
+        -- Activate drillable block
+
         drillableBlockCurrentlyDrilling:activate()
+
+        -- Move player to Center on top of the drilled block
+        
+        local centerBlockX = other.x + other.width / 2
+
+        self:moveTo(
+            centerBlockX - self.width / 2, 
+            other.y - self.height
+        )
     elseif tag == TAGS.Ability then
         -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
         -- we should be handling the multiple blueprints as a single checkpoint.
@@ -322,9 +331,11 @@ function Player:update()
             self:handleJump()
         end
 
-        -- Reset activation elevator before update
+        -- Reset update variables before update
 
         self.isActivatingElevator = false
+
+        self.isDrilling = false
 
         -- RigidBody update
 
