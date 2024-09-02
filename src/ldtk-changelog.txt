@@ -1,0 +1,7 @@
+# Version 0.0.3
+
+Elevator should have an "initialDistance" field as well as a "distance" and "orientation" (enum) field. 
+
+# Version 0.0.2
+
+Dialog should have a "text" multiline text field.
