@@ -8,27 +8,31 @@ import "rooms"
 import "utils"
 import "sprites"
 
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+
 -- Playdate config
 
-local fontDefault = playdate.graphics.font.new("assets/fonts/m42.TTF-7")
-playdate.graphics.setFont(fontDefault)
+local fontDefault = gfx.font.new("assets/fonts/m42.TTF-7")
+gfx.setFont(fontDefault)
 
-playdate.graphics.setBackgroundColor(0)
-playdate.graphics.clear(0)
+gfx.setBackgroundColor(0)
+gfx.clear(0)
 
 -- Set up Scene Manager (Roomy)
 
 local manager = Manager()
+
 manager:hook()
 
--- Pre-load levels data
+-- Get levels available
 
-LDtk.load(assets.levels.main)
+local levels = ReadFile.getLevelFiles()
 
 -- Open Menu (& save reference)
 
 manager.scenes = {
-  menu = Menu()
+  menu = Menu(levels)
 }
 
 manager:enter(manager.scenes.menu)
@@ -45,9 +49,9 @@ function playdate.update()
   updateDeltaTime();
 
   -- Update sprites
-  playdate.graphics.sprite.update()
-  playdate.timer.updateTimers()
-  playdate.graphics.animation.blinker.updateAll()
+  gfx.sprite.update()
+  timer.updateTimers()
+  gfx.animation.blinker.updateAll()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
