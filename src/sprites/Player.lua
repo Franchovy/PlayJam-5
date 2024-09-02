@@ -33,8 +33,6 @@ local isOverlappingWithGUI = false
 
 --
 
-local kCollisionTypeSlide <const> = pd.graphics.sprite.kCollisionTypeSlide
-
 local ANIMATION_STATES = {
     Idle = 1,
     Moving = 2,
@@ -51,9 +49,9 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local maxSpeed <const> = 4.5
-local groundAcceleration <const> = 10
-local jumpSpeed <const> = 17.5
+local groundAcceleration <const> = 7
+local airAcceleration <const> = 1.5
+local jumpSpeed <const> = 27
 local jumpHoldTimeInTicks <const> = 4
 
 -- TODO: [Franch]
@@ -62,7 +60,7 @@ local jumpHoldTimeInTicks <const> = 4
 
 -- Setup
 
-class("Player").extends(RigidBody)
+class("Player").extends(AnimatedSprite)
 
 -- Static Reference
 
@@ -74,14 +72,10 @@ function Player:init(entity)
     _instance = self
 
     local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
-    Player.super.init(self, entity, playerImageTable)
-
-    -- RigidBody overrides/config
-    self.ground_friction = 2
-    self.air_friction = 2
-    self.g_mult = 5
+    Player.super.init(self, playerImageTable)
 
     -- AnimatedSprite states
+
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
     self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
@@ -93,16 +87,27 @@ function Player:init(entity)
     self.isDroppingItem = false
     self.isDrilling = false
     self.isActivatingElevator = false
-    self.shouldExitParent = false
 
     -- Setup keys array and starting keys
+
     self.blueprints = {}
+
     local startingKeys = entity.fields.blueprints
     for _, key in ipairs(startingKeys) do
         table.insert(self.blueprints, key)
     end
 
     Manager.emitEvent(EVENTS.UpdateBlueprints)
+
+    -- RigidBody config
+    
+    local rigidBodyConfig = {
+        groundFriction = 2,
+        airFriction = 2,
+        gravity = 5
+    }
+    
+    self.rigidBody = RigidBody(self, rigidBodyConfig)
 
     -- Add Checkpoint handling
 
@@ -191,15 +196,7 @@ local jumpTimeLeftInTicks = jumpHoldTimeInTicks
 local activeDrillableBlock
 local activeDialog
 
-function Player:exitParent()
-    -- Consume `shouldExitParent` variable and reset to false.
-    local shouldExitParent = self.shouldExitParent
-    self.shouldExitParent = false
-
-    return shouldExitParent
-end
-
-function Player:handleCollisionExtra(collisionData)
+function Player:handleCollision(collisionData)
     local other = collisionData.other
     local tag = other:getTag()
 
@@ -222,15 +219,12 @@ function Player:handleCollisionExtra(collisionData)
             spDrillEnd:play(1)
         end
 
-        self.isDrilling = false
-
         if activeDrillableBlock ~= nil then
             activeDrillableBlock:release()
             activeDrillableBlock = nil
         end
     end
 
-    -- TODO: proper direction per orientation
     if tag == TAGS.Elevator then
         if collisionData.normal.y == -1 then
             local key
@@ -245,20 +239,50 @@ function Player:handleCollisionExtra(collisionData)
             end
     
             if key then
-                self.isActivatingElevator = other:activate(key)
-            end
+                local isActivatingElevator, activationDistance = other:activate(key)
+                
+                if isActivatingElevator then
+                    -- Move player to the center of the platform
+                    local centerElevatorX = other.x + other.width / 2
+                    local offsetX, offsetY = 0, 0
 
-            -- Do not parent if there is no activation
-            self.shouldExitParent = not self.isActivatingElevator
+                    if key == KEYNAMES.Down and activationDistance > 1 then
+                        -- For moving down, move player slightly into elevator for better collision activation
+                        offsetY = activationDistance
+                    end
+                    
+                    self:moveTo(
+                        centerElevatorX - self.width / 2 + offsetX, 
+                        other.y - self.height + offsetY
+                    )
+
+                    -- Set the elevator
+                    self.isActivatingElevator = other
+                end
+            end
         end
     end
 
-    if self.onGround and
+    -- TODO - We should register the sprites the player can interact with here,
+    -- but not handle the interaction itself. That should come after the movement/collisions.
+
+    if self.rigidBody:getIsTouchingGround() and
         self.isDrilling and
         other:getTag() == TAGS.DrillableBlock then
         drillableBlockCurrentlyDrilling = other
 
+        -- Activate drillable block
+
         drillableBlockCurrentlyDrilling:activate()
+
+        -- Move player to Center on top of the drilled block
+        
+        local centerBlockX = other.x + other.width / 2
+
+        self:moveTo(
+            centerBlockX - self.width / 2, 
+            other.y - self.height
+        )
     elseif tag == TAGS.Ability then
         -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
         -- we should be handling the multiple blueprints as a single checkpoint.
@@ -268,41 +292,64 @@ function Player:handleCollisionExtra(collisionData)
             self:pickUpBlueprint(other)
         end
     end
+
+    if tag == TAGS.Dialog then
+        activeDialog = other
+    end
 end
 
 function Player:update()
+    -- Sprite update
+
+    Player.super.update(self)
     
     -- Checkpoint Handling
     
     self:handleCheckpoint()
     
-    if timerCooldownCheckpoint then
-        self:skipPhysicsHandling()
-    end
+    -- Skip movement handling if timer cooldown is active
+    if not timerCooldownCheckpoint then
+        
+        -- Movement handling (update velocity X and Y)
 
-    -- RigidBody & Sprite update
-    
-    Player.super.update(self)
+        -- Velocity X
 
-    -- Movement handling (update velocity X and Y)
-
-    -- Velocity X
-
-    if not self.isDrilling and not self.isActivatingElevator then
-        self:handleHorizontalMovement()
-    end
-
-    -- Velocity Y
-
-    if self.onGround then
-        local isJumpStart = self:handleJumpStart()
-
-        if isJumpStart then
-            -- Detach from parent (Elevator, ConveyorBelt, Box) on jump starts.
-            self.shouldExitParent = true
+        if not self.isDrilling and not self.isActivatingElevator then
+            self:handleHorizontalMovement()
         end
-    else
-        self:handleJump()
+
+        -- Velocity Y
+
+        if self.rigidBody:getIsTouchingGround() then
+            local isJumpStart = self:handleJumpStart()
+
+            if isJumpStart and self.isActivatingElevator then
+                -- Disable collisions with elevator for this frame to avoid
+                -- jump / moving elevator up collisions glitch.
+                self.isActivatingElevator:disableCollisionsForFrame()
+            end
+        else
+            self:handleJump()
+        end
+
+        -- Reset update variables before update
+
+        self.isActivatingElevator = false
+
+        self.isDrilling = false
+
+        -- RigidBody update
+
+        self.rigidBody:update()
+    end
+
+    -- Update dialog
+
+    if activeDialog then
+        activeDialog:activate()
+
+        -- Consume variable
+        activeDialog = nil
     end
 
     -- Update state for checkpoint
@@ -377,10 +424,6 @@ function Player:update()
         Manager.emitEvent(EVENTS.LevelComplete,
             { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
     end
-
-    -- Reset update states (Post-update)
-
-    self.isActivatingElevator = false
 end
 
 function Player:revertCheckpoint()
@@ -486,6 +529,19 @@ function Player:enterLevel(direction, levelBounds)
         y = self.y,
         blueprints = table.deepcopy(self.blueprints)
     })
+
+    -- Set a cooldown timer to prevent key presses on enter
+
+    timerCooldownCheckpoint = playdate.timer.new(50)
+    timerCooldownCheckpoint.timerEndedCallback = function(timer)
+        timer:remove()
+
+        -- Since there can be multiple checkpoint-reverts in sequence, we want to
+        -- ensure we're not removing a timer that's not this one.
+        if timerCooldownCheckpoint == timer then
+            timerCooldownCheckpoint = nil
+        end
+    end
 end
 
 -- Animation Handling
@@ -494,11 +550,12 @@ local flip
 
 function Player:updateAnimationState()
     local animationState
+    local velocity = self.rigidBody:getCurrentVelocity()
 
-    if self.onGround then
+    if self.rigidBody:getIsTouchingGround() then
         if self.isDrilling then
             animationState = ANIMATION_STATES.Drilling
-        elseif math.floor(math.abs(self.velocity.dx)) > 0 then
+        elseif math.floor(math.abs(velocity.dx)) > 0 then
             animationState = ANIMATION_STATES.Moving
         else
             animationState = ANIMATION_STATES.Idle
@@ -510,9 +567,9 @@ function Player:updateAnimationState()
     -- Handle direction (flip)
 
     flip = 0
-    if self.velocity.dx < 0 then
+    if velocity.dx < 0 then
         flip = 1
-    elseif self.velocity.dx > 0 then
+    elseif velocity.dx > 0 then
         flip = 0
     end
 
@@ -533,7 +590,9 @@ end
 function Player:handleJumpStart()
     if pd.buttonJustPressed(KEYNAMES.A) and self:isJumping() then
         spJump:play(1)
-        self.velocity.dy = -jumpSpeed
+
+        self.rigidBody:setVelocityY(-jumpSpeed)
+
         jumpTimeLeftInTicks -= 1
 
         return true
@@ -545,12 +604,13 @@ end
 function Player:handleJump()
     if self:isJumping() and jumpTimeLeftInTicks > 0 then
         -- Hold Jump
-        self.velocity.dy = -jumpSpeed
-        self.g_mult = 1
+
+        self.rigidBody:setVelocityY(-jumpSpeed)
+
         jumpTimeLeftInTicks -= 1
     elseif pd.buttonJustReleased(KEYNAMES.A) or jumpTimeLeftInTicks > 0 then
         -- Released Jump
-        self.g_mult = 5
+        
         jumpTimeLeftInTicks = 0
     end
 end
@@ -558,10 +618,11 @@ end
 -- Directional
 
 function Player:handleHorizontalMovement()
-    if self:isMovingLeft() and self.velocity.dx > -maxSpeed then
-        self.velocity.dx -= groundAcceleration
-    elseif self:isMovingRight() and self.velocity.dx < maxSpeed then
-        self.velocity.dx += groundAcceleration
+    local acceleration = self.rigidBody:getIsTouchingGround() and groundAcceleration or airAcceleration
+    if self:isMovingLeft() then
+        self.rigidBody:addVelocityX(-acceleration)
+    elseif self:isMovingRight() then
+        self.rigidBody:addVelocityX(acceleration)
     end
 end
 

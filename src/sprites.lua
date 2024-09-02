@@ -1,4 +1,3 @@
-import "sprites/RigidBody"
 import "sprites/Player"
 import "sprites/ButtonPickup"
 import "sprites/AbilityPanel"

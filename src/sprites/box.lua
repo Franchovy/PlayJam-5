@@ -1,17 +1,19 @@
 local gfx <const> = playdate.graphics
 
-class("Box").extends(RigidBody)
+class("Box").extends(gfx.sprite)
 
 function Box:init(entity)
-    local imageBox = gfx.imagetable.new("assets/images/box")
-    Box.super.init(self, entity, imageBox)
+    Box.super.init(self, entity, gfx.image.new(assets.images.box))
 
     self:setTag(TAGS.Box)
 
-    self:addState("n", 1, 1).asDefault()
-    self:playAnimation()
-    self.g_mult = 1
-    self.inv_mass = .2
-    self.dynamic_friction =.1
-    self.static_friction = .3
+    self.rigidBody = RigidBody(self)
+end
+
+function Box:update()
+    self.rigidBody:update()
+end
+
+function ConveyorBelt:collisionResponse(_)
+  return gfx.sprite.kCollisionTypeSlide
 end

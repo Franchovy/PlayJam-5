@@ -97,6 +97,10 @@ function Dialog:init(entity)
 
     self.isStateExpanded = false
     self.currentLine = 1
+
+    -- Variables to be consumed in update
+
+    self.isActivated = false
 end
 
 function Dialog:postInit()
@@ -110,13 +114,14 @@ function Dialog:postInit()
 end
 
 function Dialog:updateDialog()
-    if self.isStateExpanded then
+    -- If line is greater than current lines, mimic collapse.
+    if self.isStateExpanded and not (self.currentLine > #self.dialogs) then
         -- Update sprite size using dialog size
 
         local dialog = self.dialogs[self.currentLine]
 
         -- Set timer to handle next line / collapse
-        self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLineOrCollapse, self)
+        self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLine, self)
 
         -- Update child sprite dialog
         self.spriteBubble.dialog = dialog
@@ -135,14 +140,14 @@ function Dialog:updateDialog()
     self.spriteBubble:markDirty()
 end
 
-function Dialog:showNextLineOrCollapse()
-    if self.currentLine < #self.dialogs then
-        -- Show next line
-        self.currentLine += 1
-    else
-        -- Collapse
-        self:collapse()
-    end
+function Dialog:showNextLine()
+    -- Show next line
+    self.currentLine += 1
+end
+
+--- Called from the player class on collide.
+function Dialog:activate()
+    self.isActivated = true
 end
 
 function Dialog:expand()
@@ -168,6 +173,17 @@ function Dialog:collapse()
 end
 
 function Dialog:update()
+    if self.isActivated then
+        -- Consume update variable
+        self.isActivated = false
+
+        if not self.isStateExpanded then
+            self:expand()
+        end
+    elseif self.isStateExpanded then
+        self:collapse()
+    end
+
     if self.isStateExpandedPrevious ~= self.isStateExpanded
         or self.currentLinePrevious ~= self.currentLine then
         self:updateDialog()
