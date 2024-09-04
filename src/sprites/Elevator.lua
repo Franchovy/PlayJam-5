@@ -128,10 +128,18 @@ function Elevator:update()
       -- Move to statically calculated position - initial
       
       self:moveTo(self.initialPosition.x, self.initialPosition.y)
+
+      -- Update displacement
+
+      self.displacement = 0
     elseif self.displacementEnd - self.displacement < 0.5 and self.movement > 0 then
       -- Move to statically calculated position - final
 
       self:moveTo(self.finalPosition.x, self.finalPosition.y)
+
+      -- Update displacement
+
+      self.displacement = self.displacementEnd
     else
       -- Else, move to target position normally
       if self.fields.orientation == ORIENTATION.Horizontal then
