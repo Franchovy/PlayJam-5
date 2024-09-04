@@ -37,7 +37,7 @@ function Elevator:init(entity)
 
   -- Elevator-specific fields
 
-  self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
+  self.speed = 5 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
   self.movement = 0 -- Update scalar for movement. 
 
   -- Create elevator track
