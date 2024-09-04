@@ -54,7 +54,6 @@ function ElevatorTrack:init(trackLengthInTiles, orientation)
     end
     
     self:setZIndex(0)
-    self.setAlwaysRedraw(true)
 end
 
 function ElevatorTrack:setInitialPosition(initialPosition)
