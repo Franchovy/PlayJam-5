@@ -11,7 +11,9 @@ _G.assets = {
     },
     imageTables = {
         buttons = "assets/images/buttons",
-        menuArrows = "assets/images/menu-arrows"
+        menuArrows = "assets/images/menu-arrows",
+        elevatorTrack = "assets/images/elevator-track",
+        objectiveArrow = "assets/images/objective-arrow"
     },
     levels = {
         main = "assets/levels/Main.ldtk",

@@ -6,7 +6,7 @@ class("RigidBody").extends()
 
 local gravity <const> = 8
 local airFrictionCoefficient <const> = -0.2
-local groundFrictionCoefficient <const> = -1.2
+local groundFrictionCoefficient <const> = -1.8
 
 function RigidBody:init(sprite, config)
   self.sprite = sprite

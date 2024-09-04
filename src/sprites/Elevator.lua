@@ -1,11 +1,8 @@
+import "elevator/elevatorTrack"
+
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
 local vector2D <const> = gmt.vector2D
-
-local ORIENTATION <const> = {
-  Horizontal = "Horizontal",
-  Vertical = "Vertical"
-}
 
 local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
@@ -42,6 +39,10 @@ function Elevator:init(entity)
 
   self.speed = 3 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
   self.movement = 0 -- Update scalar for movement. 
+
+  -- Create elevator track
+
+  self.spriteElevatorTrack = ElevatorTrack(self.fields.distance, entity.fields.orientation)
 end
 
 function Elevator:postInit()
@@ -58,6 +59,11 @@ function Elevator:postInit()
     self.initialPosition = gmt.point.new(self.x, self.y - self.displacement)
     self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
   end
+
+  -- Positon elevator track
+
+  self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
+  self.spriteElevatorTrack:add()
 end
 
 function Elevator:collisionResponse(_)
