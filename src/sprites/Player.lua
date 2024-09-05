@@ -141,6 +141,18 @@ function Player:enterLevel(direction, levelBounds)
     levelWidth = levelBounds.width
     levelHeight = levelBounds.height
 
+    if direction == DIRECTION.RIGHT then
+        self:moveBy(30, 0)
+    elseif direction == DIRECTION.LEFT then
+        self:moveBy(-30, 0)
+    elseif direction == DIRECTION.TOP then
+        self:moveBy(0, -30)
+    elseif direction == DIRECTION.BOTTOM then
+        self:moveBy(0, 30)
+    end
+
+    --[[
+
     -- Set level draw offset
 
     levelOffsetX = levelWidth < 400 and (400 - levelWidth) / 2 or 0
@@ -148,7 +160,6 @@ function Player:enterLevel(direction, levelBounds)
 
     -- Position player based on direction of entry
 
-    --[[
     if direction == DIRECTION.RIGHT then
         local x = (levelGXPrevious + levelWidthPrevious) - levelGX + 15
         local y = self.y + (levelGYPrevious - levelGY)
@@ -170,6 +181,7 @@ function Player:enterLevel(direction, levelBounds)
 
         self:moveTo(x, y)
     end
+
     ]]
 
     -- Push level position
@@ -445,7 +457,7 @@ function Player:update()
 
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
-            { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
+            { direction = direction, coordinates = { x = playerX, y = playerY } })
     end
 end
 
