@@ -117,7 +117,7 @@ end
 function Game:leave(next, ...)
     -- Clear sprites in level
 
-    gfx.sprite.removeAll()
+    --gfx.sprite.removeAll()
 
     --
 

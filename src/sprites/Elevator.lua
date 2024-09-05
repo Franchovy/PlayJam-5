@@ -185,6 +185,8 @@ function Elevator:update()
     self.movement = 0
   end
 
+  -- Detect if elevator has moved out of level
+
   -- Reset collisions if disabled
 
   if self.isCollisionsDisabledForFrame then

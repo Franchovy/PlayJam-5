@@ -2,7 +2,8 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 -- Add all layers as tilemaps
 
-function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
+function LDtk.loadAllLayersAsSprites(levelName)
+    local levelBounds = LDtk.get_rect(levelName)
     local hintCrank = LDtk.get_custom_data(levelName, "HintCrank")
     for layerName, layer in pairs(LDtk.get_layers(levelName)) do
         if layer.tiles then
@@ -10,15 +11,15 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
             local sprite = gfx.sprite.new()
             sprite:setTilemap(tilemap)
             sprite:setCenter(0, 0)
-            sprite:moveTo(0, 0)
+            sprite:moveTo(levelBounds.x, levelBounds.y)
             sprite:setZIndex(layer.zIndex)
             sprite:add()
 
             local solidTiles = LDtk.get_empty_tileIDs(levelName, "Solid", layerName)
             if solidTiles then
-                local stiles = gfx.sprite.addWallSprites(tilemap, solidTiles)
-                for _, lsprite in ipairs(stiles) do
-                    lsprite:setTag(TAGS.Wall)
+                local listSpriteWall = gfx.sprite.addWallSprites(tilemap, solidTiles, levelBounds.x, levelBounds.y)
+                for _, spriteWall in ipairs(listSpriteWall) do
+                    spriteWall:setTag(TAGS.Wall)
                 end
             end
         end
@@ -26,7 +27,10 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
     return hintCrank
 end
 
+
+
 function LDtk.loadAllEntitiesAsSprites(levelName)
+    local levelBounds = LDtk.get_rect(levelName)
     for _, entity in ipairs(LDtk.get_entities(levelName)) do
         if not _G[entity.name] then
             print("WARNING: No sprite class for entity with name: " .. entity.name)
@@ -54,9 +58,11 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         else
             sprite:setCollideRect(0, 0, entity.size.width, entity.size.height)
         end
-        sprite:moveTo(tileCenterX, tileCenterY)
+        sprite:moveTo(tileCenterX + levelBounds.x, tileCenterY + levelBounds.y)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
+
+        print(sprite.x, sprite.y)
 
         -- Optional Post-init call for overriding default configurations
         if sprite.postInit then
