@@ -63,18 +63,24 @@ function Elevator:postInit()
   -- Positon elevator track
 
   self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
+end
+
+-- Playdate Sprite Overrides
+
+function Elevator:add()
+  Elevator.super.add(self)
+
   self.spriteElevatorTrack:add()
+end
+
+function Elevator:remove()
+  Elevator.super.remove(self)
+
+  self.spriteElevatorTrack:remove()
 end
 
 function Elevator:collisionResponse(_)
   return gfx.sprite.kCollisionTypeSlide
-end
-
---- Used specifically for when jumping while moving up with elevator.
-function Elevator:disableCollisionsForFrame()
-  self:setCollisionsEnabled(false)
-
-  self.isCollisionsDisabledForFrame = true
 end
 
 -- Private class methods
@@ -95,6 +101,13 @@ local function getMovementRemaining(self, key)
 end
 
 -- Public class Methods
+
+--- Used specifically for when jumping while moving up with elevator.
+function Elevator:disableCollisionsForFrame()
+  self:setCollisionsEnabled(false)
+
+  self.isCollisionsDisabledForFrame = true
+end
 
 --- Sets movement to be executed in the next update() call using vector.
 --- *param* key - the player input key direction (KEYNAMES)
