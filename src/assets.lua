@@ -20,5 +20,8 @@ _G.assets = {
     },
     sounds = {
         speech = "assets/sfx/speech"
+    },
+    music = {
+        world1 = "assets/music/world_1"
     }
 }
