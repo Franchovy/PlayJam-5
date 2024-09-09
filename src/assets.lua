@@ -11,7 +11,8 @@ _G.assets = {
     },
     imageTables = {
         buttons = "assets/images/buttons",
-        menuArrows = "assets/images/menu-arrows"
+        menuArrows = "assets/images/menu-arrows",
+        player = "assets/images/player"
     },
     levels = {
         main = "assets/levels/Main.ldtk",
