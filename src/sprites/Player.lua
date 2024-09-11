@@ -3,6 +3,7 @@ local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
+local imagetablePlayer = gfx.imagetable.new(assets.imageTables.player)
 local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
 local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
@@ -71,15 +72,18 @@ function Player.getInstance() return _instance end
 function Player:init(entity)
     _instance = self
 
-    local playerImageTable = gfx.imagetable.new("assets/images/boseki-table-32-32")
-    Player.super.init(self, playerImageTable)
+    Player.super.init(self, imagetablePlayer)
 
     -- AnimatedSprite states
 
-    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 2 }).asDefault()
-    self:addState(ANIMATION_STATES.Moving, 5, 6, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Jumping, 7, 11, { tickStep = 2 })
-    self:addState(ANIMATION_STATES.Drilling, 12, 15, { tickStep = 2 })
+    function pauseAnimation()
+        self:pauseAnimation()
+    end
+
+    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = 3 }).asDefault()
+    self:addState(ANIMATION_STATES.Jumping, 5, 8, { tickStep = 1, onLoopFinishedEvent = pauseAnimation })
+    self:addState(ANIMATION_STATES.Moving, 9, 12, { tickStep = 2 })
+    self:addState(ANIMATION_STATES.Drilling, 12, 16, { tickStep = 2 })
     self:playAnimation()
 
     self:setTag(TAGS.Player)

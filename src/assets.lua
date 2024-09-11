@@ -12,6 +12,7 @@ _G.assets = {
     imageTables = {
         buttons = "assets/images/buttons",
         menuArrows = "assets/images/menu-arrows",
+        player = "assets/images/player",
         elevatorTrack = "assets/images/elevator-track",
         objectiveArrow = "assets/images/objective-arrow"
     },
@@ -22,5 +23,8 @@ _G.assets = {
     },
     sounds = {
         speech = "assets/sfx/speech"
+    },
+    music = {
+        world1 = "assets/music/world_1"
     }
 }

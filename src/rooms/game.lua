@@ -150,7 +150,7 @@ end
 function Game:setupFilePlayer()
     fileplayer = SuperFilePlayer()
 
-    fileplayer:loadFiles("assets/music/01_Mine")
+    fileplayer:loadFiles(assets.music.world1)
 
     fileplayer:setPlayConfig(1)
 end

@@ -6,7 +6,7 @@ local gfx <const> = pd.graphics
 
 local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 local imageSpriteTitle <const> = gfx.image.new("assets/images/title"):invertedImage()
-local imageSpriteRobot <const> = gfx.imagetable.new("assets/images/boseki")
+local imageSpriteRobot <const> = gfx.imagetable.new(assets.imageTables.player)
 local imagetableArrows <const> = gfx.imagetable.new(assets.imageTables.menuArrows)
 
 -- Local Variables
@@ -48,7 +48,7 @@ function Menu:enter(previous, inFileplayer)
   spriteTitle:moveTo(200, 70)
 
   spriteRobot = AnimatedSprite.new(imageSpriteRobot)
-  spriteRobot:addState("placeholder-name", 5, 6, { tickStep = 2 }).asDefault()
+  spriteRobot:addState("placeholder-name", 9, 12, { tickStep = 2 }).asDefault()
   spriteRobot:add()
   spriteRobot:moveTo(200, 130)
   spriteRobot:playAnimation()
