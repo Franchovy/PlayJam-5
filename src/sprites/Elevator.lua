@@ -6,7 +6,7 @@ local vector2D <const> = gmt.vector2D
 
 local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
-local tileAdjustmentPx <const> = 5
+local tileAdjustmentPx <const> = 4
 
 -- Private Static methods
 
@@ -117,16 +117,42 @@ function Elevator:activate(key)
   
   -- Set movement update scalar
   self.movement = movement
-  
+
+  self.displacement += self.movement * _G.delta_time
+
+  -- If close to start or end, adjust displacement & cancel movement
+  if self.displacement - self.displacementStart < 1 or
+    self.displacementEnd - self.displacement < 1 then
+      self:displacementAdjustToTile()
+      self.movement = 0
+  end
+
   -- Return boolean - did activation call capture movement
 
   return movement ~= 0, movement
 end
 
+
+--- If elevator is within `tileAdjustmentPx` of tile, then adjusts
+--- `self.displacement` to be on that tile exactly.
+function Elevator:displacementAdjustToTile()
+
+  local adjustmentDown = self.displacement % TILE_SIZE
+  local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
+  if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
+    -- Adjust downwards
+    self.displacement -= adjustmentDown
+  elseif adjustmentUp > 0 and adjustmentUp < tileAdjustmentPx then
+    -- Adjust upwards
+    self.displacement += adjustmentUp
+  end
+
+end
+
 function Elevator:updatePosition()
   -- Move to new position using displacement
 
-  if self.orientation == ORIENTATION.Horizontal then
+  if self.fields.orientation == ORIENTATION.Horizontal then
     self:moveTo(self.initialPosition.x + self.displacement, self.initialPosition.y)
   else
     self:moveTo(self.initialPosition.x, self.initialPosition.y + self.displacement)
@@ -135,24 +161,14 @@ function Elevator:updatePosition()
   -- Update checkpoint state
 
   self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
-
 end
 
 function Elevator:update()
   Elevator.super.update(self)
 
-  -- If Movement
-
-  -- Update position / displacement
-
-  -- If math.abs(Displacement % TILE_SIZE) < 1
   -- Skip displacement to the nearest tile 
 
   if self.movement ~= 0 then
-
-    -- Update displacement
-
-    self.displacement += self.movement * _G.delta_time
 
     -- Set sprite position
 
@@ -161,18 +177,11 @@ function Elevator:update()
     -- Reset movement vector
     
     self.movement = 0
-  else
-    -- Adjust displacement to move to nearest tile
 
-    local adjustmentDown = self.displacement % TILE_SIZE
-    local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
-    if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
-      -- Adjust downwards
-      self.displacement -= adjustmentDown
-    elseif adjustmentUp > 0 and adjustmentUp < tileAdjustmentPx then
-      -- Adjust upwards
-      self.displacement += adjustmentUp
-    end
+  elseif self.fields.orientation == ORIENTATION.Vertical then
+    -- If not active, adjust for pixel-perfect tile position
+
+    self:displacementAdjustToTile()
 
     self:updatePosition()
   end
