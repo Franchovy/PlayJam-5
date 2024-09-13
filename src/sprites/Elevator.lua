@@ -6,6 +6,8 @@ local vector2D <const> = gmt.vector2D
 
 local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
+local tileAdjustmentPx <const> = 5
+
 -- Private Static methods
 
 --- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
@@ -121,55 +123,58 @@ function Elevator:activate(key)
   return movement ~= 0, movement
 end
 
+function Elevator:updatePosition()
+  -- Move to new position using displacement
+
+  if self.orientation == ORIENTATION.Horizontal then
+    self:moveTo(self.initialPosition.x + self.displacement, self.initialPosition.y)
+  else
+    self:moveTo(self.initialPosition.x, self.initialPosition.y + self.displacement)
+  end
+
+  -- Update checkpoint state
+
+  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+
+end
+
 function Elevator:update()
   Elevator.super.update(self)
-  
-  -- Move elevator if update vector has been set
+
+  -- If Movement
+
+  -- Update position / displacement
+
+  -- If math.abs(Displacement % TILE_SIZE) < 1
+  -- Skip displacement to the nearest tile 
 
   if self.movement ~= 0 then
 
-    -- If displacement is very small, skip to the final position (avoid tiny floats)
+    -- Update displacement
 
-    if self.displacement < 0.5 and self.movement < 0 then
-      -- Move to statically calculated position - initial
-      
-      self:moveTo(self.initialPosition.x, self.initialPosition.y)
+    self.displacement += self.movement * _G.delta_time
 
-      -- Update displacement
+    -- Set sprite position
 
-      self.displacement = 0
-    elseif self.displacementEnd - self.displacement < 0.5 and self.movement > 0 then
-      -- Move to statically calculated position - final
-
-      self:moveTo(self.finalPosition.x, self.finalPosition.y)
-
-      -- Update displacement
-
-      self.displacement = self.displacementEnd
-    else
-      -- Else, move to target position normally
-      if self.fields.orientation == ORIENTATION.Horizontal then
-        self:moveBy(self.movement * _G.delta_time, 0)
-      else
-        self:moveBy(0, self.movement * _G.delta_time)
-      end
-      
-      -- Update displacement to match movement
-      
-      if self.fields.orientation == ORIENTATION.Horizontal then
-        self.displacement += self.movement * _G.delta_time
-      else
-        self.displacement += self.movement * _G.delta_time
-      end
-      
-    end
-    -- Update checkpoint state
-
-    self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+    self:updatePosition()
 
     -- Reset movement vector
     
     self.movement = 0
+  else
+    -- Adjust displacement to move to nearest tile
+
+    local adjustmentDown = self.displacement % TILE_SIZE
+    local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
+    if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
+      -- Adjust downwards
+      self.displacement -= adjustmentDown
+    elseif adjustmentUp > 0 and adjustmentUp < tileAdjustmentPx then
+      -- Adjust upwards
+      self.displacement += adjustmentUp
+    end
+
+    self:updatePosition()
   end
 
   -- Reset collisions if disabled
