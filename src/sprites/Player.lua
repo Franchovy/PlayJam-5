@@ -244,6 +244,15 @@ function Player:handleCollision(collisionData)
     
             if key then
                 local isActivatingElevator, activationDistance = other:activate(key)
+
+                -- Player -> Elevator Activate call() 
+                -- > Elevator checks if it makes sense to activate
+                -- > If so, it returns true and sets the sprite variable
+
+                -- Elevator:update()
+                -- Checks collisions for player
+                -- Moves self and player accordingly
+                -- Handles the complexities down below
                 
                 if isActivatingElevator then
                     -- Move player to the center of the platform
@@ -260,8 +269,9 @@ function Player:handleCollision(collisionData)
                         other.y - self.height + offsetY
                     )
 
-                    -- Set the elevator
+                    -- Set the elevator variable for self, and sprite variable for other
                     self.isActivatingElevator = other
+                    other:setActivatingSprite(self)
                 end
             end
         end

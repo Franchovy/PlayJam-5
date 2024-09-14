@@ -79,6 +79,10 @@ function Elevator:disableCollisionsForFrame()
   self.isCollisionsDisabledForFrame = true
 end
 
+function Elevator:setActivatingSprite(sprite)
+  self.sprite = sprite
+end
+
 -- Private class methods
 
 --- Get remaining movement based on direction and displacement
@@ -96,24 +100,34 @@ local function getMovementRemaining(self, key)
   return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
 end
 
+local function collisionsCheckForSprite(self)
+  if not self.sprite then
+    return
+  end
+
+  local destinationX, destinationY = self.sprite.x, self.sprite.y
+  
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    destinationX += self.movement
+  else
+    destinationY += self.movement
+  end
+  
+  local _, _, collisions = self.sprite:checkCollisions(destinationX, destinationY)
+
+  print(#collisions)
+
+  return true
+end
+
 -- Public class Methods
 
 --- Sets movement to be executed in the next update() call using vector.
 --- *param* key - the player input key direction (KEYNAMES)
 --- *returns* whether an activation occurred based on key press.
 function Elevator:activate(key)
-  local movement = 0
-
-  if (key == KEYNAMES.Left or key == KEYNAMES.Right)
-  and self.fields.orientation == ORIENTATION.Horizontal then
-    -- Horizontal movement - get distance remaining
-    movement = getMovementRemaining(self, key)
-
-  elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
-  and self.fields.orientation == ORIENTATION.Vertical then
-    -- Vertical movement - get distance remaining
-    movement = getMovementRemaining(self, key)
-  end
+  -- Get distance remaining
+  local movement = getMovementRemaining(self, key)
   
   -- Set movement update scalar
   self.movement = movement
@@ -132,7 +146,6 @@ function Elevator:activate(key)
   return movement ~= 0, movement
 end
 
-
 --- If elevator is within `tileAdjustmentPx` of tile, then adjusts
 --- `self.displacement` to be on that tile exactly.
 function Elevator:displacementAdjustToTile()
@@ -150,6 +163,7 @@ function Elevator:displacementAdjustToTile()
 end
 
 function Elevator:updatePosition()
+
   -- Move to new position using displacement
 
   if self.fields.orientation == ORIENTATION.Horizontal then
@@ -170,13 +184,13 @@ function Elevator:update()
 
   if self.movement ~= 0 then
 
+    -- Check collisions
+
+    local isCollisionCheckPassed = collisionsCheckForSprite(self)
+
     -- Set sprite position
 
     self:updatePosition()
-
-    -- Reset movement vector
-    
-    self.movement = 0
 
   elseif self.fields.orientation == ORIENTATION.Vertical then
     -- If not active, adjust for pixel-perfect tile position
@@ -193,6 +207,11 @@ function Elevator:update()
 
     self.isCollisionsDisabledForFrame = false
   end
+
+  -- Reset update variables
+  
+  self.movement = 0
+  self.sprite = nil
 end
 
 function Elevator:handleCheckpointRevert(state)
