@@ -243,7 +243,7 @@ function Player:handleCollision(collisionData)
             end
     
             if key then
-                local isActivatingElevator, activationDistance = other:activate(key)
+                local isActivatingElevator = other:activate(self, key)
 
                 -- Player -> Elevator Activate call() 
                 -- > Elevator checks if it makes sense to activate
@@ -252,26 +252,10 @@ function Player:handleCollision(collisionData)
                 -- Elevator:update()
                 -- Checks collisions for player
                 -- Moves self and player accordingly
-                -- Handles the complexities down below
+                -- √ Handles the complexities down below
                 
                 if isActivatingElevator then
-                    -- Move player to the center of the platform
-                    local centerElevatorX = other.x + other.width / 2
-                    local offsetX, offsetY = 0, 0
-
-                    if key == KEYNAMES.Down and activationDistance > 1 then
-                        -- For moving down, move player slightly into elevator for better collision activation
-                        offsetY = activationDistance
-                    end
-                    
-                    self:moveTo(
-                        centerElevatorX - self.width / 2 + offsetX, 
-                        other.y - self.height + offsetY
-                    )
-
-                    -- Set the elevator variable for self, and sprite variable for other
                     self.isActivatingElevator = other
-                    other:setActivatingSprite(self)
                 end
             end
         end

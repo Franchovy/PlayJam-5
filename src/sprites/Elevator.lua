@@ -10,11 +10,6 @@ local tileAdjustmentPx <const> = 4
 
 -- Private Static methods
 
---- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
-local function isInverseDirection(key)
-  return key == KEYNAMES.Up or key == KEYNAMES.Left
-end
-
 class("Elevator").extends(gfx.sprite)
 
 function Elevator:init(entity)
@@ -85,19 +80,39 @@ end
 
 -- Private class methods
 
+local function getActivationMovement(self, key)
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    -- Horizontal orientation, return positive if Right, negative if Left
+
+    if key == KEYNAMES.Right then
+      return self.speed
+    elseif key == KEYNAMES.Left then
+      return -self.speed
+    end
+  else
+    -- Vertical orientation, return positive if Down, negative if Up
+
+    if key == KEYNAMES.Down then
+      return self.speed
+    elseif key == KEYNAMES.Up then
+      return -self.speed
+    end
+  end
+
+  -- If key is not a correct activation key, return 0
+
+  return 0
+end
+
 --- Get remaining movement based on direction and displacement
-local function getMovementRemaining(self, key)
-  -- Get inverted direction boolean
-  local isInverseDirection = isInverseDirection(key)
-
-  -- Remaining displacement - either towards displacementEnd or displacementStart if inverse direction
-  local displacementRemaining = isInverseDirection 
-    and self.displacement - self.displacementStart
-    or self.displacementEnd - self.displacement
-  
-  -- Calculate movement as scalar value, invert speed if inverse direction
-
-  return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
+local function getMovementRemaining(self, movement)
+  if movement < 0 then
+    return math.max(self.displacementStart - self.displacement, movement)
+  elseif movement > 0 then
+    return math.min(self.displacementEnd - self.displacement, movement)
+  else
+    return 0
+  end
 end
 
 local function collisionsCheckForSprite(self)
@@ -120,36 +135,9 @@ local function collisionsCheckForSprite(self)
   return true
 end
 
--- Public class Methods
-
---- Sets movement to be executed in the next update() call using vector.
---- *param* key - the player input key direction (KEYNAMES)
---- *returns* whether an activation occurred based on key press.
-function Elevator:activate(key)
-  -- Get distance remaining
-  local movement = getMovementRemaining(self, key)
-  
-  -- Set movement update scalar
-  self.movement = movement
-
-  self.displacement += self.movement * _G.delta_time
-
-  -- If close to start or end, adjust displacement & cancel movement
-  if self.displacement - self.displacementStart < 1 or
-    self.displacementEnd - self.displacement < 1 then
-      self:displacementAdjustToTile()
-      self.movement = 0
-  end
-
-  -- Return boolean - did activation call capture movement
-
-  return movement ~= 0, movement
-end
-
 --- If elevator is within `tileAdjustmentPx` of tile, then adjusts
 --- `self.displacement` to be on that tile exactly.
-function Elevator:displacementAdjustToTile()
-
+local function displacementAdjustToTile(self)
   local adjustmentDown = self.displacement % TILE_SIZE
   local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
   if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
@@ -159,7 +147,47 @@ function Elevator:displacementAdjustToTile()
     -- Adjust upwards
     self.displacement += adjustmentUp
   end
+end
 
+
+-- Public class Methods
+
+--- Sets movement to be executed in the next update() call using vector.
+--- *param* key - the player input key direction (KEYNAMES)
+--- *returns* whether an activation occurred based on key press.
+function Elevator:activate(sprite, key)
+  -- Gets applied movement using key, self.speed and self.orientation
+  local activationMovement = getActivationMovement(self, key)
+
+  if activationMovement ~= 0 then
+    -- Clamp movement to distance remaining
+    local movement = getMovementRemaining(self, activationMovement)
+      
+    -- Update displacement
+    self.displacement += movement * _G.delta_time
+
+    -- If close to start or end, adjust displacement & cancel movement
+    if self.displacement - self.displacementStart < 1 or
+      self.displacementEnd - self.displacement < 1 then
+        displacementAdjustToTile(self)
+        movement = 0
+    end
+
+    if movement ~= 0 then
+      -- If activated, add child sprite for collision check
+      if movement then
+        self.spriteChild = sprite
+      end
+
+      -- Set movement update scalar
+      self.movement = movement
+            
+      -- Return true if activated
+      return true
+    end
+  end
+  
+  return false
 end
 
 function Elevator:updatePosition()
@@ -188,14 +216,29 @@ function Elevator:update()
 
     local isCollisionCheckPassed = collisionsCheckForSprite(self)
 
-    -- Set sprite position
+    -- Update position
 
     self:updatePosition()
+
+    -- Update child position
+
+    local centerX = self.x + self.width / 2
+
+    local offsetY = 0
+    if self.movement < 0 and self.fields.orientation == ORIENTATION.Vertical then
+      -- For moving down, move player slightly into elevator for better collision activation
+      offsetY = 0
+    end
+
+    self.spriteChild:moveTo(
+      centerX - self.spriteChild.width / 2, 
+      self.y - self.spriteChild.height - offsetY
+    )
 
   elseif self.fields.orientation == ORIENTATION.Vertical then
     -- If not active, adjust for pixel-perfect tile position
 
-    self:displacementAdjustToTile()
+    displacementAdjustToTile(self)
 
     self:updatePosition()
   end
@@ -207,6 +250,25 @@ function Elevator:update()
 
     self.isCollisionsDisabledForFrame = false
   end
+
+  --[[
+  -- Move player to the center of the platform
+  local centerElevatorX = other.x + other.width / 2
+  local offsetX, offsetY = 0, 0
+
+  if key == KEYNAMES.Down and activationDistance > 1 then
+      -- For moving down, move player slightly into elevator for better collision activation
+      offsetY = activationDistance
+  end
+  
+  self:moveTo(
+      centerElevatorX - self.width / 2 + offsetX, 
+      other.y - self.height + offsetY
+  )
+
+  -- Set the elevator variable for self, and sprite variable for other
+  self.isActivatingElevator = other
+  ]]
 
   -- Reset update variables
   
