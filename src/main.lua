@@ -25,14 +25,11 @@ local manager = Manager()
 
 manager:hook()
 
--- Get levels available
-
-local levels = ReadFile.getLevelFiles()
-
 -- Open Menu (& save reference)
 
 manager.scenes = {
-  start = Start()
+  start = Start(),
+  menu = Menu()
 }
 
 manager:enter(manager.scenes.start)

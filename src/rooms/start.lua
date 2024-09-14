@@ -1,10 +1,12 @@
 local pd <const> = playdate
+local sound <const> = pd.sound
 local gfx <const> = pd.graphics
 
 -- Constants / Assets
 
 local imageSpriteTitle <const> = gfx.image.new("assets/images/title"):invertedImage()
 local imageSpriteRobot <const> = gfx.imagetable.new(assets.imageTables.player)
+local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 -- Local Variables
 
@@ -13,7 +15,7 @@ local spriteRobot
 local spriteContinueButton
 local spriteSelectLevelButton
 local sceneManager
-local fileplayer
+
 
 local timerTitleAnimation
 local blinkerPressStart
@@ -137,7 +139,8 @@ function Start:leave(next, ...)
 
   spriteTitle:remove()
   spriteRobot:remove()
-  spritePressStart:remove()
+  spriteContinueButton:remove()
+  spriteSelectLevelButton:remove()
 
   -- Music
 
@@ -154,9 +157,17 @@ function Start:leave(next, ...)
 end
 
 function Start:AButtonDown()
-  print('todo')
+  local world, level = MemoryCard.getLastPlayed()
+  local levelFile = ReadFile.getLevel(world, level)
+  if levelFile then
+    LDtk.load(assets.path.levels..levelFile)
+    spButton:play(1)
+    MemoryCard.setLastPlayed(world, level)
+    sceneManager.scenes.currentGame = Game(0)
+    sceneManager:enter(sceneManager.scenes.currentGame)
+  end
 end
 
 function Start:BButtonDown()
-  print('b todo')
+  sceneManager:enter(sceneManager.scenes.menu)
 end
