@@ -30,6 +30,10 @@ local function goToMainMenu()
     sceneManager:enter(sceneManager.scenes.menu)
 end
 
+local function goToStart()
+    sceneManager:enter(sceneManager.scenes.start)
+end
+
 -- Instance methods
 
 function Game:init()
@@ -37,6 +41,7 @@ function Game:init()
 end
 
 function Game:enter(previous, data)
+    print('test')
     data = data or {}
     local direction = data.direction
     local level = data.level
@@ -59,6 +64,7 @@ function Game:enter(previous, data)
         -- Menu items
 
         systemMenu:addMenuItem("main menu", goToMainMenu)
+        systemMenu:addMenuItem("back to start", goToStart)
     end
 
     -- Load level --
@@ -121,7 +127,7 @@ function Game:leave(next, ...)
 
     --
 
-    if next.super.className == "Menu" then
+    if next.super.className == "Start" or next.super.className == "Menu" then
         -- Remove system/PD menu items
 
         systemMenu:removeAllMenuItems()
