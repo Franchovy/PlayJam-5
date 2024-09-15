@@ -16,11 +16,6 @@ _G.assets = {
         elevatorTrack = "assets/images/elevator-track",
         objectiveArrow = "assets/images/objective-arrow"
     },
-    levels = {
-        main = "assets/levels/Main.ldtk",
-        scott = "assets/levels/Scott.ldtk",
-        franch = "assets/levels/Franch.ldtk"
-    },
     sounds = {
         speech = "assets/sfx/speech"
     },
