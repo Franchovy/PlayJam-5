@@ -115,22 +115,56 @@ local function getMovementRemaining(self, movement)
   end
 end
 
-local function collisionsCheckForSprite(self)
-  if not self.sprite then
-    return
+local function checkIfCollides(self, idealX, idealY)
+  -- Check if elevator collides
+
+  local actualX, actualY, collisions = self:checkCollisions(idealX, idealY)
+  local isCollisionCheckPassed = true
+
+  for _, collision in pairs(collisions) do
+    if collision.other == self.spriteChild then
+      goto continue
+    end
+
+    -- Block collision
+    isCollisionCheckPassed = false
+
+    ::continue::
   end
 
-  local destinationX, destinationY = self.sprite.x, self.sprite.y
+  -- Return if collision check failed
+
+  if not isCollisionCheckPassed then
+    return false, actualX, actualY
+  end
+
+  -- Check if child sprite collides
+
+  assert(self.spriteChild, "Expected to have a child sprite in update loop for elevator")
+  
+  -- if either collide with something else than each other, block movement.
+
+  local destinationX, destinationY
   
   if self.fields.orientation == ORIENTATION.Horizontal then
-    destinationX += self.movement
+    destinationX = self.spriteChild.x + self.movement
+    destinationY = self.spriteChild.y
   else
-    destinationY += self.movement
+    destinationX = self.spriteChild.x
+    destinationY = self.spriteChild.y + self.movement
   end
   
-  local _, _, collisions = self.sprite:checkCollisions(destinationX, destinationY)
+  --[[
+  local spriteActualX, spriteActualY, collisions = self.spriteChild:checkCollisions(destinationX, destinationY)
+
+  for _, collision in pairs(collisions) do
+
+  end
+    
+  end
 
   print(#collisions)
+  ]]
 
   return true
 end
@@ -138,15 +172,25 @@ end
 --- If elevator is within `tileAdjustmentPx` of tile, then adjusts
 --- `self.displacement` to be on that tile exactly.
 local function displacementAdjustToTile(self)
+
+  -- Get adjustment from tiles both above and below.
+
   local adjustmentDown = self.displacement % TILE_SIZE
   local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
+
   if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
     -- Adjust downwards
     self.displacement -= adjustmentDown
   elseif adjustmentUp > 0 and adjustmentUp < tileAdjustmentPx then
     -- Adjust upwards
     self.displacement += adjustmentUp
+  else
+    -- If no adjustment made, return false
+    return false
   end
+  
+  -- If adjustment was made, return true
+  return true
 end
 
 
@@ -161,19 +205,20 @@ function Elevator:activate(sprite, key)
 
   if activationMovement ~= 0 then
     -- Clamp movement to distance remaining
-    local movement = getMovementRemaining(self, activationMovement)
-      
-    -- Update displacement
-    self.displacement += movement * _G.delta_time
+    local movementRemaining = getMovementRemaining(self, activationMovement)
+    
+    -- If close to start or end, no activation, but we keep the remaining movement.
 
-    -- If close to start or end, adjust displacement & cancel movement
-    if self.displacement - self.displacementStart < 1 or
-      self.displacementEnd - self.displacement < 1 then
-        displacementAdjustToTile(self)
-        movement = 0
+    if movementRemaining == 0 then
+      
+    elseif math.abs(movementRemaining) < self.speed then
+      self.movement = movementRemaining
+
+      return false
     end
 
-    if movement ~= 0 then
+    if movementRemaining ~= 0 then
+    
       -- If activated, add child sprite for collision check
       if movement then
         self.spriteChild = sprite
@@ -190,57 +235,64 @@ function Elevator:activate(sprite, key)
   return false
 end
 
-function Elevator:updatePosition()
-
-  -- Move to new position using displacement
-
+function getPositionFromDisplacement(self)
   if self.fields.orientation == ORIENTATION.Horizontal then
-    self:moveTo(self.initialPosition.x + self.displacement, self.initialPosition.y)
+    return self.initialPosition.x + self.displacement, self.initialPosition.y
   else
-    self:moveTo(self.initialPosition.x, self.initialPosition.y + self.displacement)
+    return self.initialPosition.x, self.initialPosition.y + self.displacement
   end
-
-  -- Update checkpoint state
-
-  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
 end
 
 function Elevator:update()
   Elevator.super.update(self)
 
+  -- Get if elevator has been activated
+  local isDisplacementChanged = self.movement ~= 0
+  
+  if not isDisplacementChanged and self.fields.orientation == ORIENTATION.Vertical then
+    -- If not active, adjust for pixel-perfect tile position
+
+    isDisplacementChanged = displacementAdjustToTile(self)
+  end
+
   -- Skip displacement to the nearest tile 
 
-  if self.movement ~= 0 then
+  if isDisplacementChanged then  
+
+    -- Get new position using displacement
+
+    local x, y = getPositionFromDisplacement(self)
 
     -- Check collisions
 
-    local isCollisionCheckPassed = collisionsCheckForSprite(self)
+    local isCollisionCheckPassed = checkIfCollides(self, x, y)
 
-    -- Update position
-
-    self:updatePosition()
+    if not isCollisionCheckPassed then
+      
+    end
 
     -- Update child position
 
     local centerX = self.x + self.width / 2
 
     local offsetY = 0
-    if self.movement < 0 and self.fields.orientation == ORIENTATION.Vertical then
+    if self.movement > 0 and self.fields.orientation == ORIENTATION.Vertical then
       -- For moving down, move player slightly into elevator for better collision activation
-      offsetY = 0
+      offsetY = 2
     end
 
     self.spriteChild:moveTo(
       centerX - self.spriteChild.width / 2, 
-      self.y - self.spriteChild.height - offsetY
+      self.y - self.spriteChild.height + offsetY
     )
 
-  elseif self.fields.orientation == ORIENTATION.Vertical then
-    -- If not active, adjust for pixel-perfect tile position
+    -- Move to new position using displacement
 
-    displacementAdjustToTile(self)
+    self:moveTo(x, y)
 
-    self:updatePosition()
+    -- Update checkpoint state
+
+    self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
   end
 
   -- Reset collisions if disabled
@@ -250,25 +302,6 @@ function Elevator:update()
 
     self.isCollisionsDisabledForFrame = false
   end
-
-  --[[
-  -- Move player to the center of the platform
-  local centerElevatorX = other.x + other.width / 2
-  local offsetX, offsetY = 0, 0
-
-  if key == KEYNAMES.Down and activationDistance > 1 then
-      -- For moving down, move player slightly into elevator for better collision activation
-      offsetY = activationDistance
-  end
-  
-  self:moveTo(
-      centerElevatorX - self.width / 2 + offsetX, 
-      other.y - self.height + offsetY
-  )
-
-  -- Set the elevator variable for self, and sprite variable for other
-  self.isActivatingElevator = other
-  ]]
 
   -- Reset update variables
   
