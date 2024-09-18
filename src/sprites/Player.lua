@@ -243,7 +243,7 @@ function Player:handleCollision(collisionData)
             end
     
             if key then
-                local isActivatingElevator = other:activate(self, key)
+                local activationDistance = other:activate(self, key)
 
                 -- Player -> Elevator Activate call() 
                 -- > Elevator checks if it makes sense to activate
@@ -254,7 +254,7 @@ function Player:handleCollision(collisionData)
                 -- Moves self and player accordingly
                 -- √ Handles the complexities down below
                 
-                if isActivatingElevator then
+                if math.abs(activationDistance) ~= 0 then
                     self.isActivatingElevator = other
                 end
             end
