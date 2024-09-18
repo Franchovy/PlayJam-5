@@ -108,65 +108,39 @@ end
 
 --- Checks collision for frame, also checking if child collides. Returns a partial movement for itself
 --- if elevator or child collides with another object.
-local function checkIfCollides(self, idealX, idealY)
+local function checkIfCollides(self, idealX, idealY, spritesToIgnoreCollisions, spriteToCheck)
   -- TODO: Make function general to any sprite. 
   -- spriteToCheck as argument, defaults to self
   -- check idealX/idealY relative to sprite
   -- return idealX/idealY relative to elevator
 
+  local spriteToCheck = spriteToCheck or self
+  local idealSpriteToCheckX = idealX - self.x + spriteToCheck.x
+  local idealSpriteToCheckY = idealY - self.y + spriteToCheck.y
+
   -- Check if elevator collides
 
-  local actualX, actualY, collisions = self:checkCollisions(idealX, idealY)
+  local actualSpriteToCheckX, actualSpriteToCheckY, collisions = spriteToCheck:checkCollisions(idealSpriteToCheckX, idealSpriteToCheckY)
   local isCollisionCheckPassed = true
 
   for _, collision in pairs(collisions) do
-    if collision.other == self.spriteChild then
-      goto continue
+    if not spritesToIgnoreCollisions[collision.other] then
+      -- Block collision
+      isCollisionCheckPassed = false
+      
+      break
     end
-
-    -- Block collision
-    isCollisionCheckPassed = false
-
-    ::continue::
   end
 
   -- Return if collision check failed
 
   if not isCollisionCheckPassed then
+    local actualX = actualSpriteToCheckX - spriteToCheck.x + self.x
+    local actualY = actualSpriteToCheckY - spriteToCheck.y + self.y
     return false, actualX, actualY
   end
 
-  if self.spriteChild then
-      -- Check if child sprite collides
-    
-      assert(self.spriteChild, "Expected to have a child sprite in update loop for elevator")
-      
-      -- if either collide with something else than each other, block movement.
-    
-      local destinationX, destinationY
-      
-      if self.fields.orientation == ORIENTATION.Horizontal then
-        destinationX = self.spriteChild.x + self.movement
-        destinationY = self.spriteChild.y
-      else
-        destinationX = self.spriteChild.x
-        destinationY = self.spriteChild.y + self.movement
-      end
-      
-      --[[
-      local spriteActualX, spriteActualY, collisions = self.spriteChild:checkCollisions(destinationX, destinationY)
-    
-      for _, collision in pairs(collisions) do
-    
-      end
-        
-      end
-    
-      print(#collisions)
-      ]]
-  end
-
-  return true
+  return true, idealX, idealY
 end
 
 --- If elevator is within `tileAdjustmentPx` of tile, then returns
@@ -206,19 +180,26 @@ local function updateMovement(self, movement)
 
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
 
-  -- Check collisions
+  -- Check collisions for self
 
-  local isCollisionCheckPassed = checkIfCollides(self, x, y)
+  local collisionSpritesToIgnore = { [self] = true, [self.spriteChild] = true }
+  local isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, collisionSpritesToIgnore)
 
+  -- Check collisions for child
+
+  if isCollisionCheckPassed then
+    -- The "y - 1" avoids a glitch through upper tiles if travelling upwards.
+    isCollisionCheckPassed, _, _ = checkIfCollides(self, x, y - 1, collisionSpritesToIgnore, self.spriteChild)
+  end
+
+  -- Skip movement if collision happened
   if not isCollisionCheckPassed then
-    -- Skip movement (or use partial movement)
-
     return
   end
 
   -- Update child position
 
-  local centerX = self.x + self.width / 2
+  local centerX = x + self.width / 2
 
   local offsetY = 0
   if movement > 0 and self.fields.orientation == ORIENTATION.Vertical then
@@ -228,7 +209,7 @@ local function updateMovement(self, movement)
 
   self.spriteChild:moveTo(
     centerX - self.spriteChild.width / 2, 
-    self.y - self.spriteChild.height + offsetY
+    y - self.spriteChild.height + offsetY
   )
 
   -- Move to new position using displacement
@@ -293,10 +274,12 @@ function Elevator:update()
     movement = getAdjustmentToTile(self)
 
     if movement ~= 0 then
+      -- Call without delta_time to avoid very small, inconsequential movements
+
       updateMovement(self, movement)
     end
   else
-    -- If any movement occurs, update elevator position based on movement
+    -- If any movement occurs, update elevator position based on movement * delta_time
 
     updateMovement(self, movement * _G.delta_time)
   end
