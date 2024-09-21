@@ -22,12 +22,12 @@ function ReadFile.getLevel(world, level)
     -- Get the level files
     local files = file.listFiles(assets.path.levels)
 
-    -- Filter files to just .ldtk suffix
     local levelFile = nil
 
     for _, filename in pairs(files) do
+        -- find .ldtk files that match the convention and the given world/level
         if string.match(filename, '^World '..world..'%-'..level..'.+%.ldtk') then
-          -- don't break the loop - there may be a 'v2' coming, adduming listFiles is alpha-sorted
+          -- don't break the loop - there may be a 'v2' coming, assuming listFiles is alpha-sorted
           levelFile = filename
         end
     end
