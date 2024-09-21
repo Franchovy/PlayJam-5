@@ -6,7 +6,7 @@ class("MemoryCard").extends()
 local FILE_NAME <const> = "discontrolled_save_data"
 
 local DEFAULT_DATA <const> = {
-  lastPlayed = { world = 1, level = 1 },
+  lastPlayed = nil,
   worlds = {
     [1] = {
       levels = {
