@@ -113,16 +113,6 @@ end
 
 -- static functions, to be called by other classes
 
--- sets the total bots for the level
--- ideally called during LDtk loading so
--- it can be done dynamically
-function MemoryCard.setTotalBotsForLevel(world, level, total)
-  assertValidInput(world, level)
-  local data = loadData()
-  data.worlds[world].levels[level].total = total
-  saveData(data)
-end
-
 -- sets the rescued bots for the level
 -- ideally called when a bot is rescued
 function MemoryCard.setRescuedBotsForLevel(world, level, rescued)
