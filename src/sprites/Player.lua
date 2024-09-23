@@ -104,13 +104,13 @@ function Player:init(entity)
     Manager.emitEvent(EVENTS.UpdateBlueprints)
 
     -- RigidBody config
-    
+
     local rigidBodyConfig = {
         groundFriction = 2,
         airFriction = 2,
         gravity = 5
     }
-    
+
     self.rigidBody = RigidBody(self, rigidBodyConfig)
 
     -- Add Checkpoint handling
@@ -241,26 +241,20 @@ function Player:handleCollision(collisionData)
             elseif self:isMovingRight() then
                 key = KEYNAMES.Right
             end
-    
+
             if key then
-                local isActivatingElevator, activationDistance = other:activate(key)
-                
-                if isActivatingElevator then
-                    -- Move player to the center of the platform
-                    local centerElevatorX = other.x + other.width / 2
-                    local offsetX, offsetY = 0, 0
+                local activationDistance = other:activate(self, key)
 
-                    if key == KEYNAMES.Down and activationDistance > 1 then
-                        -- For moving down, move player slightly into elevator for better collision activation
-                        offsetY = activationDistance
-                    end
-                    
-                    self:moveTo(
-                        centerElevatorX - self.width / 2 + offsetX, 
-                        other.y - self.height + offsetY
-                    )
+                -- Player -> Elevator Activate call()
+                -- > Elevator checks if it makes sense to activate
+                -- > If so, it returns true and sets the sprite variable
 
-                    -- Set the elevator
+                -- Elevator:update()
+                -- Checks collisions for player
+                -- Moves self and player accordingly
+                -- √ Handles the complexities down below
+
+                if math.abs(activationDistance) ~= 0 then
                     self.isActivatingElevator = other
                 end
             end
@@ -280,11 +274,11 @@ function Player:handleCollision(collisionData)
         drillableBlockCurrentlyDrilling:activate()
 
         -- Move player to Center on top of the drilled block
-        
+
         local centerBlockX = other.x + other.width / 2
 
         self:moveTo(
-            centerBlockX - self.width / 2, 
+            centerBlockX - self.width / 2,
             other.y - self.height
         )
     elseif tag == TAGS.Ability then
@@ -306,14 +300,14 @@ function Player:update()
     -- Sprite update
 
     Player.super.update(self)
-    
+
     -- Checkpoint Handling
-    
+
     self:handleCheckpoint()
-    
+
     -- Skip movement handling if timer cooldown is active
     if not timerCooldownCheckpoint then
-        
+
         -- Movement handling (update velocity X and Y)
 
         -- Velocity X
@@ -376,7 +370,7 @@ function Player:update()
             })
         end
     end
-    
+
     -- Animation Handling
 
     self:updateAnimationState()
@@ -614,7 +608,7 @@ function Player:handleJump()
         jumpTimeLeftInTicks -= 1
     elseif pd.buttonJustReleased(KEYNAMES.A) or jumpTimeLeftInTicks > 0 then
         -- Released Jump
-        
+
         jumpTimeLeftInTicks = 0
     end
 end

@@ -31,7 +31,7 @@ function ElevatorTrack:init(trackLengthInTiles, orientation)
 
     for i=1,numberOfTiles do
         local tileID = i == 1 and TILE_ID[orientation].START or i == numberOfTiles and TILE_ID[orientation].END or TILE_ID[orientation].BODY
-        
+
         table.insert(dataTilemap, tileID)
     end
 
@@ -39,7 +39,7 @@ function ElevatorTrack:init(trackLengthInTiles, orientation)
     local tilemap = gfx.tilemap.new()
     tilemap:setImageTable(imageTableElevatorTrack)
     tilemap:setTiles(dataTilemap, orientation == ORIENTATION.Vertical and 1 or numberOfTiles)
-    
+
     self.tilemap = tilemap
     self.orientation = orientation
 
@@ -52,7 +52,7 @@ function ElevatorTrack:init(trackLengthInTiles, orientation)
         self:setCenter(0.5, 0.75)
         self:setSize(TILE_SIZE * numberOfTiles, TILE_SIZE)
     end
-    
+
     self:setZIndex(0)
 end
 

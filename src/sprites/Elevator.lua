@@ -2,16 +2,15 @@ import "elevator/elevatorTrack"
 
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
-local vector2D <const> = gmt.vector2D
 
 local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
--- Private Static methods
+local tileAdjustmentPx <const> = 4
 
---- Categorize UP and RIGHT as positive direction and DOWN and LEFT as negative/"inverse" direction.
-local function isInverseDirection(key)
-  return key == KEYNAMES.Up or key == KEYNAMES.Left
-end
+---
+---
+--- Private Static methods
+---
 
 class("Elevator").extends(gfx.sprite)
 
@@ -27,8 +26,7 @@ function Elevator:init(entity)
 
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
-  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- [Franch] We can make the initial displacement greater than 0.
-  self.displacementStart = 0 -- Add extra pixel for smooth platforming
+  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
   self.displacementEnd = self.fields.distance * TILE_SIZE
 
   -- RigidBody config
@@ -37,8 +35,8 @@ function Elevator:init(entity)
 
   -- Elevator-specific fields
 
-  self.speed = 5 -- [Franch] Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = 0 -- Update scalar for movement. 
+  self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
+  self.movement = 0 -- Update scalar for movement.
 
   -- Create elevator track
 
@@ -70,6 +68,203 @@ function Elevator:collisionResponse(_)
   return gfx.sprite.kCollisionTypeSlide
 end
 
+---
+---
+--- Private class methods
+---
+
+local function getActivationMovement(self, key)
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    -- Horizontal orientation, return positive if Right, negative if Left
+
+    if key == KEYNAMES.Right then
+      return self.speed
+    elseif key == KEYNAMES.Left then
+      return -self.speed
+    end
+  else
+    -- Vertical orientation, return positive if Down, negative if Up
+
+    if key == KEYNAMES.Down then
+      return self.speed
+    elseif key == KEYNAMES.Up then
+      return -self.speed
+    end
+  end
+end
+
+--- Get remaining movement based on direction and displacement
+local function getMovementRemaining(self, movement)
+  if movement < 0 then
+    return math.max(-self.displacement, movement)
+  elseif movement > 0 then
+    return math.min(self.displacementEnd - self.displacement, movement)
+  else
+    return 0
+  end
+end
+
+--- Checks collision for frame, also checking if child collides. Returns a partial movement for itself
+--- if elevator or child collides with another object.
+local function checkIfCollides(self, idealX, idealY, spriteToCheck)
+  local spriteToCheck = spriteToCheck or self
+  local idealSpriteToCheckX = idealX - self.x + spriteToCheck.x
+  local idealSpriteToCheckY = idealY - self.y + spriteToCheck.y
+
+  -- Check if elevator collides
+
+  local actualSpriteToCheckX, actualSpriteToCheckY, collisions = spriteToCheck:checkCollisions(idealSpriteToCheckX, idealSpriteToCheckY)
+  local isCollisionCheckPassed = true
+
+  for _, collision in pairs(collisions) do
+    -- If collision happens to elevator above, skip.
+
+    local shouldSkipCollision =
+      (self == spriteToCheck and collision.normal.y == -1) or
+      (self ~= spriteToCheck and collision.normal.y == 1)
+
+    if shouldSkipCollision then
+      -- Block collision
+      isCollisionCheckPassed = false
+
+      break
+    end
+  end
+
+  -- Return if collision check failed
+
+  if not isCollisionCheckPassed then
+    local actualX = actualSpriteToCheckX - spriteToCheck.x + self.x
+    local actualY = actualSpriteToCheckY - spriteToCheck.y + self.y
+    return false, actualX, actualY
+  end
+
+  -- If collision check passes, Check collisions for child
+
+  if isCollisionCheckPassed and self.spriteChild then
+    -- The "y - 1" avoids a glitch through upper tiles if travelling upwards.
+    local isCollisionCheckPassedChild, actualX, actualY = checkIfCollides(self, x, y - 1, self.spriteChild)
+
+    return isCollisionCheckPassedChild, actualX, actualY
+  end
+
+  return true, idealX, idealY
+end
+
+--- If elevator is within `tileAdjustmentPx` of tile, then returns
+--- the adjustment to be exactly on that tile.
+local function getAdjustmentToTile(self)
+
+  -- Get adjustment from tiles both above and below.
+
+  local adjustmentDown = self.displacement % TILE_SIZE
+  local adjustmentUp = TILE_SIZE - (self.displacement % TILE_SIZE)
+
+  if adjustmentDown > 0 and adjustmentDown < tileAdjustmentPx then
+    -- Adjust downwards
+    return -adjustmentDown
+  elseif adjustmentUp > 0 and adjustmentUp < tileAdjustmentPx then
+    -- Adjust upwards
+    return adjustmentUp
+  else
+    -- No adjustment made
+    return 0
+  end
+end
+
+--- Convenience method to get the X & Y position based on a displacement.
+function getPositionFromDisplacement(self, displacement)
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    return self.initialPosition.x + displacement, self.initialPosition.y
+  else
+    return self.initialPosition.x, self.initialPosition.y + displacement
+  end
+end
+
+--- Update method for movement
+local function updateMovement(self, movement)
+
+  -- Get new position using displacement
+
+  local x, y = getPositionFromDisplacement(self, self.displacement + movement)
+
+  -- Check collisions for self
+
+  local isCollisionCheckPassed
+
+  isCollisionCheckPassed, x, y = checkIfCollides(self, x, y)
+
+  -- Skip movement if collision happened
+  if not isCollisionCheckPassed then
+    return
+  end
+
+  if self.spriteChild then
+
+    -- Update child position
+
+    local centerX = x + self.width / 2
+
+    local offsetY = 0
+    if movement > 0 and self.fields.orientation == ORIENTATION.Vertical then
+      -- For moving down, move player slightly into elevator for better collision activation
+      offsetY = 2
+    end
+
+    self.spriteChild:moveTo(
+      centerX - self.spriteChild.width / 2,
+      y - self.spriteChild.height + offsetY
+    )
+  end
+
+  -- Move to new position using displacement
+
+  self:moveTo(x, y)
+
+  -- Update displacement to reflect new position
+
+  self.displacement += movement
+
+  -- Update checkpoint state
+
+  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+end
+
+---
+---
+--- Public class Methods
+---
+
+--- Sets movement to be executed in the next update() call using vector.
+--- *param* key - the player input key direction (KEYNAMES)
+--- *returns* the distance covered in the activation.
+function Elevator:activate(sprite, key)
+  -- Gets applied movement using key, self.speed and self.orientation
+  local activationMovement = getActivationMovement(self, key)
+
+  if not activationMovement then
+    -- Key was not handled. Throw error
+    error("Key is not handled by Elevator.", 2)
+  end
+
+  -- Clamp movement to distance remaining
+
+  if activationMovement ~= 0 then
+    activationMovement = getMovementRemaining(self, activationMovement)
+  end
+
+  -- If activated, set update variables for movement
+  if activationMovement ~= 0 then
+    -- Set child sprite for collision check
+    self.spriteChild = sprite
+
+    -- Set movement update scalar
+    self.movement = activationMovement
+  end
+
+  return activationMovement
+end
+
 --- Used specifically for when jumping while moving up with elevator.
 function Elevator:disableCollisionsForFrame()
   self:setCollisionsEnabled(false)
@@ -77,99 +272,26 @@ function Elevator:disableCollisionsForFrame()
   self.isCollisionsDisabledForFrame = true
 end
 
--- Private class methods
-
---- Get remaining movement based on direction and displacement
-local function getMovementRemaining(self, key)
-  -- Get inverted direction boolean
-  local isInverseDirection = isInverseDirection(key)
-
-  -- Remaining displacement - either towards displacementEnd or displacementStart if inverse direction
-  local displacementRemaining = isInverseDirection 
-    and self.displacement - self.displacementStart
-    or self.displacementEnd - self.displacement
-  
-  -- Calculate movement as scalar value, invert speed if inverse direction
-
-  return math.min(displacementRemaining, self.speed) * (isInverseDirection and -1 or 1)
-end
-
--- Public class Methods
-
---- Sets movement to be executed in the next update() call using vector.
---- *param* key - the player input key direction (KEYNAMES)
---- *returns* whether an activation occurred based on key press.
-function Elevator:activate(key)
-  local movement = 0
-
-  if (key == KEYNAMES.Left or key == KEYNAMES.Right)
-  and self.fields.orientation == ORIENTATION.Horizontal then
-    -- Horizontal movement - get distance remaining
-    movement = getMovementRemaining(self, key)
-
-  elseif (key == KEYNAMES.Down or key == KEYNAMES.Up)
-  and self.fields.orientation == ORIENTATION.Vertical then
-    -- Vertical movement - get distance remaining
-    movement = getMovementRemaining(self, key)
-  end
-  
-  -- Set movement update scalar
-  self.movement = movement
-  
-  -- Return boolean - did activation call capture movement
-
-  return movement ~= 0, movement
-end
-
 function Elevator:update()
   Elevator.super.update(self)
-  
-  -- Move elevator if update vector has been set
 
-  if self.movement ~= 0 then
+  -- Get if elevator has been activated
+  local movement = self.movement
 
-    -- If displacement is very small, skip to the final position (avoid tiny floats)
+  if movement == 0 then
+    -- If not active, adjust for pixel-perfect tile position
 
-    if self.displacement < 0.5 and self.movement < 0 then
-      -- Move to statically calculated position - initial
-      
-      self:moveTo(self.initialPosition.x, self.initialPosition.y)
+    movement = getAdjustmentToTile(self)
 
-      -- Update displacement
+    if movement ~= 0 then
+      -- Call without delta_time to avoid very small, inconsequential movements
 
-      self.displacement = 0
-    elseif self.displacementEnd - self.displacement < 0.5 and self.movement > 0 then
-      -- Move to statically calculated position - final
-
-      self:moveTo(self.finalPosition.x, self.finalPosition.y)
-
-      -- Update displacement
-
-      self.displacement = self.displacementEnd
-    else
-      -- Else, move to target position normally
-      if self.fields.orientation == ORIENTATION.Horizontal then
-        self:moveBy(self.movement * _G.delta_time, 0)
-      else
-        self:moveBy(0, self.movement * _G.delta_time)
-      end
-      
-      -- Update displacement to match movement
-      
-      if self.fields.orientation == ORIENTATION.Horizontal then
-        self.displacement += self.movement * _G.delta_time
-      else
-        self.displacement += self.movement * _G.delta_time
-      end
-      
+      updateMovement(self, movement)
     end
-    -- Update checkpoint state
+  else
+    -- If any movement occurs, update elevator position based on movement * delta_time
 
-    self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
-
-    -- Reset movement vector
-    
-    self.movement = 0
+    updateMovement(self, movement * _G.delta_time)
   end
 
   -- Reset collisions if disabled
@@ -179,6 +301,11 @@ function Elevator:update()
 
     self.isCollisionsDisabledForFrame = false
   end
+
+  -- Reset update variables
+
+  self.movement = 0
+  self.spriteChild = nil
 end
 
 function Elevator:handleCheckpointRevert(state)
