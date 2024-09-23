@@ -8,7 +8,7 @@ function ReadFile.getLevelFiles()
 
     -- Filter files to just .ldtk suffix
     local levels = {}
-    
+
     for _, filename in pairs(files) do
         if string.match(filename, '(.ldtk)$') then
             table.insert(levels, filename)
