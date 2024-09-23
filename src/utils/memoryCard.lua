@@ -5,92 +5,6 @@ class("MemoryCard").extends()
 
 local FILE_NAME <const> = "discontrolled_save_data"
 
-local DEFAULT_DATA <const> = {
-  lastPlayed = nil,
-  worlds = {
-    [1] = {
-      levels = {
-        [1] = {
-          total = 0,
-          rescued = 0
-        },
-        [2] = {
-          total = 0,
-          rescued = 0
-        },
-        [3] = {
-          total = 0,
-          rescued = 0
-        },
-        [4] = {
-          total = 0,
-          rescued = 0
-        },
-      }
-    },
-    [2] = {
-      levels = {
-        [1] = {
-          total = 0,
-          rescued = 0
-        },
-        [2] = {
-          total = 0,
-          rescued = 0
-        },
-        [3] = {
-          total = 0,
-          rescued = 0
-        },
-        [4] = {
-          total = 0,
-          rescued = 0
-        },
-      }
-    },
-    [3] = {
-      levels = {
-        [1] = {
-          total = 0,
-          rescued = 0
-        },
-        [2] = {
-          total = 0,
-          rescued = 0
-        },
-        [3] = {
-          total = 0,
-          rescued = 0
-        },
-        [4] = {
-          total = 0,
-          rescued = 0
-        },
-      }
-    },
-    [4] = {
-      levels = {
-        [1] = {
-          total = 0,
-          rescued = 0
-        },
-        [2] = {
-          total = 0,
-          rescued = 0
-        },
-        [3] = {
-          total = 0,
-          rescued = 0
-        },
-        [4] = {
-          total = 0,
-          rescued = 0
-        },
-      }
-    },
-  }
-}
-
 -- local functions, actual data access
 
 local function saveData(data)
@@ -101,14 +15,29 @@ end
 local function loadData()
   local data = ds.read(FILE_NAME)
   if (data) then return data end
-  return DEFAULT_DATA
+  return LEVEL_DATA
 end
 
 -- local functions, helpers
 
 local function assertValidInput(world, level)
-  assert(world > 0 and world < 5, "world must be between 1-4 (inclusive)")
-  assert(level > 0 and level < 5, "level must be between 1-4 (inclusive)")
+  local isValidInputWorld = world > 0 and world <= #LEVEL_DATA.worlds
+  local isValidInputLevel = level > 0 and level <= #LEVEL_DATA.worlds[world].levels
+
+  -- PLAYTESTING: Throw error.
+  if BUILD_FLAG.DEBUG or BUILD_FLAG.PLAYTESTING then
+    assert(isValidInputWorld, "`world` is out of range.", 2)
+    assert(isValidInputLevel, "`level` is out of range.", 2)
+  end
+
+  -- DEBUG ONLY: Overwrite level data if data is invalid.
+  if BUILD_FLAG.DEBUG then
+    local currentData = loadData()
+    
+    if #currentData.worlds ~= #LEVEL_DATA.worlds or #currentData.worlds[world].levels ~= #LEVEL_DATA.worlds[world].levels then
+      saveData(LEVEL_DATA)
+    end
+  end
 end
 
 -- static functions, to be called by other classes
@@ -133,6 +62,11 @@ end
 -- the last level the player played
 function MemoryCard.getLastPlayed()
   local data = loadData()
+  
+  if not data.lastPlayed then
+    return nil
+  end
+
   return data.lastPlayed.world, data.lastPlayed.level
 end
 
@@ -142,9 +76,9 @@ function MemoryCard.getLevelCompletion(world, level)
   assertValidInput(world, level)
   local data = loadData()
   local r = data.worlds[world].levels[level]
-  return r.total, r.rescued
+  return r.total, r.rescued or 0
 end
 
 function MemoryCard.resetProgress()
-  saveData(DEFAULT_DATA)
+  saveData(LEVEL_DATA)
 end

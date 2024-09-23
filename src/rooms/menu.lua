@@ -1,13 +1,15 @@
+import "menu/grid"
+
 local pd <const> = playdate
 local sound <const> = pd.sound
 local gfx <const> = pd.graphics
 local systemMenu <const> = pd.getSystemMenu()
-import "menuGrid"
+
+local spButton <const> = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 class ("Menu").extends(Room)
 
 local sceneManager
-local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 
 ---
 --- LIFECYCLE
@@ -16,8 +18,7 @@ local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
 function Menu:enter()
   sceneManager = self.manager
 
-
-  self.gridView = MenuGrid.new(self.a)
+  self.gridView = MenuGridView.new()
 
   systemMenu:addMenuItem("reset progress", MemoryCard.resetProgress)
 
@@ -31,9 +32,10 @@ function Menu:enter()
   if not level then
     level = 1
   end
-  MenuGrid.resetAnimator(world, level)
-  self.gridView:scrollToCell(world, level, 1)
-  self.gridView:setSelection(world, level, 1)
+
+  -- Position current row in center of screen
+  
+  self.gridView:setSelection(world, level, 1, false)
 end
 
 function Menu:leave()
@@ -65,23 +67,9 @@ function Menu:BButtonDown()
 end
 
 function Menu:downButtonDown()
-  local section, row = self.gridView:getSelection()
-  -- returning early so the grid doesn't scroll wrap
-  -- `selectPreviousRow` has a flag for that but we also
-  -- want to check we are going to change selected cell
-  -- before `resetAnimator` so odd redundancy here
-  if(not section or section > 4) then return end
-  MenuGrid.resetAnimator(section, row)
   self.gridView:selectNextRow(false, true, true)
 end
 
 function Menu:upButtonDown()
-  local section, row = self.gridView:getSelection()
-  -- returning early so the grid doesn't scroll wrap
-  -- `selectPreviousRow` has a flag for that but we also
-  -- want to check we are going to change selected cell
-  -- before `resetAnimator` so odd redundancy here
-  if (not section or section < 1) then return end
-  MenuGrid.resetAnimator(section, row)
   self.gridView:selectPreviousRow(false, true, true)
 end
