@@ -33,7 +33,7 @@ local function assertValidInput(world, level)
   -- DEBUG ONLY: Overwrite level data if data is invalid.
   if BUILD_FLAG.DEBUG then
     local currentData = loadData()
-    
+
     if #currentData.worlds ~= #LEVEL_DATA.worlds or #currentData.worlds[world].levels ~= #LEVEL_DATA.worlds[world].levels then
       saveData(LEVEL_DATA)
     end
@@ -62,7 +62,7 @@ end
 -- the last level the player played
 function MemoryCard.getLastPlayed()
   local data = loadData()
-  
+
   if not data.lastPlayed then
     return nil
   end

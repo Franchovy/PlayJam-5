@@ -34,7 +34,7 @@ function Menu:enter()
   end
 
   -- Position current row in center of screen
-  
+
   self.gridView:setSelection(world, level, 1, false)
 end
 
