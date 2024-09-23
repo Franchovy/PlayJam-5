@@ -44,7 +44,7 @@ function RigidBody:update()
   -- Reset variables
 
   self.onGround = false
-  
+
   for _, c in pairs(sdkCollisions) do
     local tag = c.other:getTag()
     local normal = c.normal

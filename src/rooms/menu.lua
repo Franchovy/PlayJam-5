@@ -129,7 +129,7 @@ function Menu:setMenuLabelText(text)
   assert(text and type(text) == "string")
 
   local textImage = gfx.imageWithText(text, 300, 80, nil, nil, nil, kTextAlignment.center)
-  
+
   spritePressStart:setImage(textImage:invertedImage())
 end
 
@@ -205,7 +205,7 @@ function Menu:AButtonDown()
     -- Start game with level
 
     LDtk.load(assets.path.levels.. levels[indexLevel])
-    
+
     spButton:play(1)
 
     sceneManager.scenes.currentGame = Game(0)
