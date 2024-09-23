@@ -2,13 +2,15 @@ import "elevator/elevatorTrack"
 
 local gfx <const> = playdate.graphics
 local gmt <const> = playdate.geometry
-local vector2D <const> = gmt.vector2D
 
 local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
 local tileAdjustmentPx <const> = 4
 
--- Private Static methods
+---
+---
+--- Private Static methods
+---
 
 class("Elevator").extends(gfx.sprite)
 
@@ -34,7 +36,7 @@ function Elevator:init(entity)
   -- Elevator-specific fields
 
   self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = 0 -- Update scalar for movement. 
+  self.movement = 0 -- Update scalar for movement.
 
   -- Create elevator track
 
@@ -66,10 +68,10 @@ function Elevator:collisionResponse(_)
   return gfx.sprite.kCollisionTypeSlide
 end
 
---
---
------ Private class methods
---
+---
+---
+--- Private class methods
+---
 
 local function getActivationMovement(self, key)
   if self.fields.orientation == ORIENTATION.Horizontal then
@@ -89,10 +91,6 @@ local function getActivationMovement(self, key)
       return -self.speed
     end
   end
-
-  -- If key is not a correct activation key, return 0
-
-  return 0
 end
 
 --- Get remaining movement based on direction and displacement
@@ -121,14 +119,14 @@ local function checkIfCollides(self, idealX, idealY, spriteToCheck)
   for _, collision in pairs(collisions) do
     -- If collision happens to elevator above, skip.
 
-    local shouldSkipCollision = 
+    local shouldSkipCollision =
       (self == spriteToCheck and collision.normal.y == -1) or
       (self ~= spriteToCheck and collision.normal.y == 1)
-    
+
     if shouldSkipCollision then
       -- Block collision
       isCollisionCheckPassed = false
-      
+
       break
     end
   end
@@ -139,6 +137,15 @@ local function checkIfCollides(self, idealX, idealY, spriteToCheck)
     local actualX = actualSpriteToCheckX - spriteToCheck.x + self.x
     local actualY = actualSpriteToCheckY - spriteToCheck.y + self.y
     return false, actualX, actualY
+  end
+
+  -- If collision check passes, Check collisions for child
+
+  if isCollisionCheckPassed and self.spriteChild then
+    -- The "y - 1" avoids a glitch through upper tiles if travelling upwards.
+    local isCollisionCheckPassedChild, actualX, actualY = checkIfCollides(self, x, y - 1, self.spriteChild)
+
+    return isCollisionCheckPassedChild, actualX, actualY
   end
 
   return true, idealX, idealY
@@ -182,15 +189,10 @@ local function updateMovement(self, movement)
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
 
   -- Check collisions for self
-  
-  local isCollisionCheckPassed, x, y = checkIfCollides(self, x, y)
 
-  -- Check collisions for child
+  local isCollisionCheckPassed
 
-  if isCollisionCheckPassed and self.spriteChild then
-    -- The "y - 1" avoids a glitch through upper tiles if travelling upwards.
-    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y - 1, self.spriteChild)
-  end
+  isCollisionCheckPassed, x, y = checkIfCollides(self, x, y)
 
   -- Skip movement if collision happened
   if not isCollisionCheckPassed then
@@ -210,10 +212,10 @@ local function updateMovement(self, movement)
     end
 
     self.spriteChild:moveTo(
-      centerX - self.spriteChild.width / 2, 
+      centerX - self.spriteChild.width / 2,
       y - self.spriteChild.height + offsetY
     )
-  end 
+  end
 
   -- Move to new position using displacement
 
@@ -228,10 +230,10 @@ local function updateMovement(self, movement)
   self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
 end
 
---
---
------ Public class Methods
---
+---
+---
+--- Public class Methods
+---
 
 --- Sets movement to be executed in the next update() call using vector.
 --- *param* key - the player input key direction (KEYNAMES)
@@ -239,7 +241,12 @@ end
 function Elevator:activate(sprite, key)
   -- Gets applied movement using key, self.speed and self.orientation
   local activationMovement = getActivationMovement(self, key)
-  
+
+  if not activationMovement then
+    -- Key was not handled. Throw error
+    error("Key is not handled by Elevator.", 2)
+  end
+
   -- Clamp movement to distance remaining
 
   if activationMovement ~= 0 then
@@ -254,7 +261,7 @@ function Elevator:activate(sprite, key)
     -- Set movement update scalar
     self.movement = activationMovement
   end
-  
+
   return activationMovement
 end
 
@@ -270,7 +277,7 @@ function Elevator:update()
 
   -- Get if elevator has been activated
   local movement = self.movement
-  
+
   if movement == 0 then
     -- If not active, adjust for pixel-perfect tile position
 
@@ -296,7 +303,7 @@ function Elevator:update()
   end
 
   -- Reset update variables
-  
+
   self.movement = 0
   self.spriteChild = nil
 end
