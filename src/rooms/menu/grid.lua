@@ -50,9 +50,9 @@ local function animateSelectionChange(self, callback, ...)
   local section, row = self.gridView:getSelection()
 
   if sectionPrevious ~= section or rowPrevious ~= row then
-    -- [Franch] NOTE: There seems to be a bug where scrolling to the last cell for some reason
+    -- [Franch] NOTE: There seems to be a bug where scrolling first or last cell to center
     -- blocks scrolling indefinitely. Not sure what's causing it.
-    -- Work-around is to disable scrolling and only scroll this is the first or last row.
+    -- Work-around is to disable scrolling to center on those cells.
 
     if isFirstOrLastCell(self, section, row) then
       self.gridView:scrollCellToCenter(section, row, 1)
