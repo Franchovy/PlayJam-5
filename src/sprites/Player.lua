@@ -1,14 +1,16 @@
+import "player/crank"
+
 local pd <const> = playdate
 local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local imagetablePlayer = gfx.imagetable.new(assets.imageTables.player)
-local spJump = sound.sampleplayer.new("assets/sfx/Jump")
-local spError = sound.sampleplayer.new("assets/sfx/Error")
-local spDrill = sound.sampleplayer.new("assets/sfx/drill-start")
-local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
-local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
+local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
+local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
+local spError <const> = sound.sampleplayer.new("assets/sfx/Error")
+local spDrill <const> = sound.sampleplayer.new("assets/sfx/drill-start")
+local spCheckpointRevert <const> = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
+local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -110,6 +112,10 @@ function Player:init(entity)
     }
 
     self.rigidBody = RigidBody(self, rigidBodyConfig)
+
+    -- Add Crank controller
+
+    self.crankWarpController = CrankWarpController()
 
     -- Add Checkpoint handling
 
@@ -261,7 +267,13 @@ function Player:update()
 
     -- Checkpoint Handling
 
-    self:handleCheckpoint()
+    local hasWarped = self.crankWarpController:handleCrankChange()
+
+    if hasWarped then
+        self:revertCheckpoint()
+
+        self.crankWarpController:resetCrankChange()
+    end
 
     -- Skip movement handling if timer cooldown is active
     if not timerCooldownCheckpoint then

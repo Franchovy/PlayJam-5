@@ -14,7 +14,7 @@ _G.assets = {
         menuArrows = "assets/images/menu-arrows",
         player = "assets/images/player",
         elevatorTrack = "assets/images/elevator-track",
-        objectiveArrow = "assets/images/objective-arrow"
+        warp = "assets/images/warp"
     },
     sounds = {
         speech = "assets/sfx/speech"
