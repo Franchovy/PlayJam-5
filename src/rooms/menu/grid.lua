@@ -77,9 +77,7 @@ function MenuGridView:init()
 
   -- No super init call available on gridView, so let's redirect missed function calls on super to the gridview object.
   local mt = {
-    __index = function(table, key)
-      return self.gridView[key]
-    end
+    __index = self.gridView
   }
   setmetatable(MenuGridView.super, mt)
 
