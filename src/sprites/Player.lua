@@ -363,6 +363,10 @@ function Player:update()
 
     self:updateAnimationState()
 
+    -- Update warp overlay
+
+    self.crankWarpController:updateImage()
+
     -- Camera Movement
 
     local playerX, playerY = self.x, self.y
