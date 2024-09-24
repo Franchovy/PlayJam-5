@@ -107,26 +107,14 @@ end
 
 --- Checks collision for frame, also checking if child collides. Returns a partial movement for itself
 --- if elevator or child collides with another object.
-local function checkIfCollides(self, idealX, idealY, spriteToCheck)
-  spriteToCheck = spriteToCheck or self
+local function checkIfCollides(spriteToCheck, idealX, idealY, spritesToIgnore)
+  spritesToIgnore = spritesToIgnore or {}
 
-  -- Offset idealY if sprite is child (for better vertical collision checking)
-  local collisionCheckOffsetY = spriteToCheck == self.spriteChild and -1 or 0
-
-  local idealSpriteToCheckX = idealX - self.x + spriteToCheck.x
-  local idealSpriteToCheckY = idealY - self.y + spriteToCheck.y + collisionCheckOffsetY
-
-  -- Check if elevator collides
-
-  local actualSpriteToCheckX, actualSpriteToCheckY, collisions = spriteToCheck:checkCollisions(idealSpriteToCheckX, idealSpriteToCheckY)
+  local actualX, actualY, collisions = spriteToCheck:checkCollisions(idealX, idealY)
   local isCollisionCheckPassed = true
 
   for _, collision in pairs(collisions) do
-    -- If collision happens to elevator above, skip.
-
-    local shouldSkipCollision =
-      (self == spriteToCheck and collision.normal.y == 1) or
-      (self ~= spriteToCheck and collision.normal.y == -1)
+    local shouldSkipCollision = spritesToIgnore[collision.other]
 
     if not shouldSkipCollision then
       -- Block collision
@@ -136,15 +124,28 @@ local function checkIfCollides(self, idealX, idealY, spriteToCheck)
     end
   end
 
-  -- Return if collision check failed
-
+  -- Return if collision check result
   if not isCollisionCheckPassed then
-    local actualX = actualSpriteToCheckX - spriteToCheck.x + self.x
-    local actualY = actualSpriteToCheckY - spriteToCheck.y + self.y - collisionCheckOffsetY
     return false, actualX, actualY
   end
 
-  return true, idealX, idealY
+  -- [Franch] If collision check passes, we return ideal X & Y to ignore the
+  -- effect of potential collisions from elevator into player and vice versa.
+
+  return isCollisionCheckPassed, idealX, idealY
+end
+
+local function getPositionChildIdeal(self, x, y, isMovingDown)
+  x = x or self.x
+  y = y or self.y
+
+  local offsetY = isMovingDown and 2 or 0
+
+  -- Center the child on the elevator
+  local idealX = x + self.width / 2 - self.spriteChild.width / 2
+  local idealY = y - self.spriteChild.height + offsetY
+
+  return idealX, idealY
 end
 
 --- If elevator is within `tileAdjustmentPx` of tile, then returns
@@ -179,7 +180,6 @@ end
 
 --- Update method for movement
 local function updateMovement(self, movement, skipCollisionCheck)
-
   -- Get new position using displacement
 
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
@@ -188,13 +188,7 @@ local function updateMovement(self, movement, skipCollisionCheck)
     -- Check collisions for self
 
     local isCollisionCheckPassed
-    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y)
-
-    -- Check collisions for child
-
-    if isCollisionCheckPassed and self.spriteChild then
-      isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, self.spriteChild)
-    end
+    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, { [self.spriteChild] = true })
 
     -- Skip movement if collision happened
     if not isCollisionCheckPassed then
@@ -203,20 +197,25 @@ local function updateMovement(self, movement, skipCollisionCheck)
   end
 
   if self.spriteChild then
+    -- Calculate ideal X & Y for child
+    local isMovingDown = movement > 0 and self.fields.orientation == ORIENTATION.Vertical
+    local childX, childY = getPositionChildIdeal(self, x, y, isMovingDown)
 
-    -- Update child position
+    if not skipCollisionCheck then
+      -- Check collisions for child
+      local isCollisionCheckPassed
+      isCollisionCheckPassed, childX, childY = checkIfCollides(self.spriteChild, childX, childY, { [self] = true })
 
-    local centerX = x + self.width / 2
-
-    local offsetY = 0
-    if movement > 0 and self.fields.orientation == ORIENTATION.Vertical then
-      -- For moving down, move player slightly into elevator for better collision activation
-      offsetY = 2
+      -- Skip movement if collision happened
+      if not isCollisionCheckPassed then
+        return false
+      end
     end
 
+    -- Update child position
     self.spriteChild:moveTo(
-      centerX - self.spriteChild.width / 2,
-      y - self.spriteChild.height + offsetY
+      childX,
+      childY
     )
   end
 
