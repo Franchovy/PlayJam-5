@@ -254,7 +254,7 @@ function Player:handleCollision(collisionData)
                 -- Moves self and player accordingly
                 -- √ Handles the complexities down below
 
-                if math.abs(activationDistance) ~= 0 then
+                if activationDistance and math.abs(activationDistance) ~= 0 then
                     self.isActivatingElevator = other
                 end
             end
@@ -312,7 +312,9 @@ function Player:update()
 
         -- Velocity X
 
-        if not self.isDrilling and not self.isActivatingElevator then
+        if self.isActivatingElevator and self.isActivatingElevator:wasActivationSuccessful() then
+            -- Skip horizontal movement
+        elseif not self.isDrilling then
             self:handleHorizontalMovement()
         end
 
