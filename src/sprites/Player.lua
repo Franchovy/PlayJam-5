@@ -365,7 +365,11 @@ function Player:update()
 
     -- Update warp overlay
 
-    self.crankWarpController:updateImage()
+    if self.crankWarpController:isActive() then
+        self.crankWarpController:moveTo(self.x, self.y)
+        self.crankWarpController:updateIndex()
+        self.crankWarpController:updateImage()
+    end
 
     -- Camera Movement
 

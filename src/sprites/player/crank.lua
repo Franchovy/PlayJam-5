@@ -2,44 +2,102 @@ local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
 local imageTableWarp <const> = gfx.imagetable.new(assets.imageTables.warp)
+local angleCrankToWarpTotal <const> = 6 * 360
+local coefficientResistanceCrankMomentum <const> = 0.3
+local speedAutoCrankMomentum <const> = 5
 
-local totalCrankAngleToWarp <const> = 6 * 360
-local currentCrankAngleTotal = 0
+local animationStates = {
+    start = "start",
+    loop = "loop",
+    finish = "finish",
+    complete = "complete"
+}
 
-class("CrankWarpController").extends(gfx.sprite)
+--- Indexes in the `totalCrankAngleToWarp` imagetable. Imagetable
+--- works in inverse order, starting at the end and working back to the start.
+--- @field start number start index.
+local indexesImageTableWarp = {
+    [animationStates.start] = 90,
+    [animationStates.loop] = 60,
+    [animationStates.finish] = 30,
+    [animationStates.complete] = 1
+}
+
+---@class CrankWarpController: playdate.graphics.sprite
+CrankWarpController = Class("CrankWarpController", gfx.sprite)
 
 function CrankWarpController:init()
     CrankWarpController.super.init(self, imageTableWarp[1])
 
-    self:setScale(4)
-    self:setCenter(0, 0)
-    self:moveTo(0, 0)
+    self:setScale(2)
     self:add()
     self:setZIndex(99)
 
-    --self:setAlwaysRedraw(true)
-    self:setIgnoresDrawOffset(true)
+    self.state = animationStates.complete
+    self.index = indexesImageTableWarp[animationStates.start]
+    self.crankMomentum = 0
+end
+
+function CrankWarpController:isActive()
+    return self.state ~= animationStates.complete
 end
 
 function CrankWarpController:handleCrankChange()
+    if self.state == animationStates.complete then
+        self.state = animationStates.start
+    end
+
     -- Get crank change
     local crankChange = pd.getCrankChange()
 
     -- Increment totalCrankAngleToWarp
-    currentCrankAngleTotal += crankChange
+
+    self.crankMomentum += crankChange
+
+    -- If in state start or loop, apply resistance backwards.
+    local resistanceCrankMomentum = (speedAutoCrankMomentum - self.crankMomentum) * coefficientResistanceCrankMomentum
+    self.crankMomentum -= resistanceCrankMomentum
+
+    print(self.crankMomentum)
+    -- Update index
+    --self.index = math.floor(self.index - self.crankMomentum / #imageTableWarp)
 
     -- Get whether a warp has happened
-    local hasWarped = currentCrankAngleTotal > totalCrankAngleToWarp
+    local hasWarped = self.index <= 1
 
     return hasWarped
 end
 
 function CrankWarpController:resetCrankChange()
-    currentCrankAngleTotal = 0
+    self.index = animationStates.start
+end
+
+function CrankWarpController:updateIndex()
+    local index = self.index
+
+    if self.state == animationStates.start and self.index <= indexesImageTableWarp[animationStates.loop] then
+        -- Transition to loop state
+        self.state = animationStates.loop
+    end
+
+    if self.state == animationStates.finish and self.index <= indexesImageTableWarp[animationStates.complete] then
+        -- Transition to complete
+        self.state = animationStates.complete
+    end
+
+    if self.state == animationStates.loop and self.index <= indexesImageTableWarp[animationStates.finish] then
+        -- Loop current animation
+        index = indexesImageTableWarp[animationStates.loop]
+    end
+
+    if self.state == animationStates.complete then
+        -- Set index to restart
+        index = indexesImageTableWarp[animationStates.start]
+    end
+
+    self.index = index
 end
 
 function CrankWarpController:updateImage()
-    local index = math.floor(currentCrankAngleTotal / totalCrankAngleToWarp * (#imageTableWarp + 1))
-
-    self:setImage(imageTableWarp[index])
+    self:setImage(imageTableWarp[self.index])
 end
