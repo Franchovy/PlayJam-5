@@ -6,9 +6,7 @@ local gfx <const> = pd.graphics
 local imagetablePlayer = gfx.imagetable.new(assets.imageTables.player)
 local spJump = sound.sampleplayer.new("assets/sfx/Jump")
 local spError = sound.sampleplayer.new("assets/sfx/Error")
-local spDrillStart = sound.sampleplayer.new("assets/sfx/drill-start")
-local spDrillLoop = sound.sampleplayer.new("assets/sfx/drill-loop")
-local spDrillEnd = sound.sampleplayer.new("assets/sfx/drill-end")
+local spDrill = sound.sampleplayer.new("assets/sfx/drill-start")
 local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
 local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
 
@@ -89,7 +87,7 @@ function Player:init(entity)
     self:setTag(TAGS.Player)
 
     self.isDroppingItem = false
-    self.isDrilling = false
+    self.isActivatingDrillableBlock = false
     self.isActivatingElevator = false
 
     -- Setup keys array and starting keys
@@ -204,29 +202,16 @@ function Player:handleCollision(collisionData)
     local other = collisionData.other
     local tag = other:getTag()
 
-    if tag == TAGS.DrillableBlock and self:isMovingDown() then
-        if self.isDrilling == false then
-            spDrillStart:play(1)
-            spDrillStart:setFinishCallback(function()
-                if self.isDrilling then
-                    -- Play loop
-                    spDrillLoop:play(0)
-                end
-            end)
+    -- If Drilling
+    if tag == TAGS.DrillableBlock and self:isMovingDown() and collisionData.normal.y == -1  then
+        -- Play drilling sound
+        if not spDrill:isPlaying() then
+            spDrill:play(1)
         end
 
-        self.isDrilling = true
-    else
-        if self.isDrilling then
-            -- spDrillStart:stop() -- [Franch] Until we have better samples, better to cover up the sfx gaps...
-            spDrillLoop:stop()
-            spDrillEnd:play(1)
-        end
-
-        if activeDrillableBlock ~= nil then
-            activeDrillableBlock:release()
-            activeDrillableBlock = nil
-        end
+        self.isActivatingDrillableBlock = other
+    elseif self.isActivatingDrillableBlock then
+        self.isActivatingDrillableBlock = nil
     end
 
     if tag == TAGS.Elevator then
@@ -243,45 +228,18 @@ function Player:handleCollision(collisionData)
             end
 
             if key then
+                -- Elevator checks if it makes sense to activate
                 local activationDistance = other:activate(self, key)
 
-                -- Player -> Elevator Activate call()
-                -- > Elevator checks if it makes sense to activate
-                -- > If so, it returns true and sets the sprite variable
-
-                -- Elevator:update()
-                -- Checks collisions for player
-                -- Moves self and player accordingly
-                -- √ Handles the complexities down below
-
-                if math.abs(activationDistance) ~= 0 then
+                if activationDistance and math.abs(activationDistance) ~= 0 then
+                    -- If so, mark as activating elevator
                     self.isActivatingElevator = other
                 end
             end
         end
     end
 
-    -- TODO - We should register the sprites the player can interact with here,
-    -- but not handle the interaction itself. That should come after the movement/collisions.
-
-    if self.rigidBody:getIsTouchingGround() and
-        self.isDrilling and
-        other:getTag() == TAGS.DrillableBlock then
-        drillableBlockCurrentlyDrilling = other
-
-        -- Activate drillable block
-
-        drillableBlockCurrentlyDrilling:activate()
-
-        -- Move player to Center on top of the drilled block
-
-        local centerBlockX = other.x + other.width / 2
-
-        self:moveTo(
-            centerBlockX - self.width / 2,
-            other.y - self.height
-        )
-    elseif tag == TAGS.Ability then
+    if tag == TAGS.Ability then
         -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
         -- we should be handling the multiple blueprints as a single checkpoint.
         -- But it's also useful for debugging.
@@ -312,7 +270,9 @@ function Player:update()
 
         -- Velocity X
 
-        if not self.isDrilling and not self.isActivatingElevator then
+        if self.isActivatingElevator and self.isActivatingElevator:wasActivationSuccessful() then
+            -- Skip horizontal movement
+        elseif not self.isActivatingDrillableBlock then
             self:handleHorizontalMovement()
         end
 
@@ -330,11 +290,27 @@ function Player:update()
             self:handleJump()
         end
 
+        -- Drilling
+
+        if self.isActivatingDrillableBlock then
+            -- Activate block drilling
+
+            self.isActivatingDrillableBlock:activate()
+
+            -- Move player to Center on top of the drilled block
+
+            local centerBlockX = self.isActivatingDrillableBlock.x + self.isActivatingDrillableBlock.width / 2
+
+            self:moveTo(
+                centerBlockX - self.width / 2,
+                self.isActivatingDrillableBlock.y - self.height
+            )
+        end
+
         -- Reset update variables before update
 
         self.isActivatingElevator = false
-
-        self.isDrilling = false
+        self.isActivatingDrillableBlock = false
 
         -- RigidBody update
 
@@ -549,11 +525,12 @@ local flip
 function Player:updateAnimationState()
     local animationState
     local velocity = self.rigidBody:getCurrentVelocity()
+    local isMoving = math.floor(math.abs(velocity.dx)) > 0
 
     if self.rigidBody:getIsTouchingGround() then
-        if self.isDrilling then
+        if self.isActivatingDrillableBlock then
             animationState = ANIMATION_STATES.Drilling
-        elseif math.floor(math.abs(velocity.dx)) > 0 then
+        elseif isMoving and not self.isActivatingElevator then
             animationState = ANIMATION_STATES.Moving
         else
             animationState = ANIMATION_STATES.Idle
@@ -564,14 +541,12 @@ function Player:updateAnimationState()
 
     -- Handle direction (flip)
 
-    flip = 0
     if velocity.dx < 0 then
-        flip = 1
+        self.states[animationState].flip = 1
     elseif velocity.dx > 0 then
-        flip = 0
+        self.states[animationState].flip = 0
     end
 
-    self.states[animationState].flip = flip
     self:changeState(animationState)
 end
 

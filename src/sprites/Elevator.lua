@@ -37,6 +37,7 @@ function Elevator:init(entity)
 
   self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
   self.movement = 0 -- Update scalar for movement.
+  self.didActivationSuccess = false -- Update value for checking if activation was successful
 
   -- Create elevator track
 
@@ -106,24 +107,16 @@ end
 
 --- Checks collision for frame, also checking if child collides. Returns a partial movement for itself
 --- if elevator or child collides with another object.
-local function checkIfCollides(self, idealX, idealY, spriteToCheck)
-  local spriteToCheck = spriteToCheck or self
-  local idealSpriteToCheckX = idealX - self.x + spriteToCheck.x
-  local idealSpriteToCheckY = idealY - self.y + spriteToCheck.y
+local function checkIfCollides(spriteToCheck, idealX, idealY, spritesToIgnore)
+  spritesToIgnore = spritesToIgnore or {}
 
-  -- Check if elevator collides
-
-  local actualSpriteToCheckX, actualSpriteToCheckY, collisions = spriteToCheck:checkCollisions(idealSpriteToCheckX, idealSpriteToCheckY)
+  local actualX, actualY, collisions = spriteToCheck:checkCollisions(idealX, idealY)
   local isCollisionCheckPassed = true
 
   for _, collision in pairs(collisions) do
-    -- If collision happens to elevator above, skip.
+    local shouldSkipCollision = spritesToIgnore[collision.other]
 
-    local shouldSkipCollision =
-      (self == spriteToCheck and collision.normal.y == -1) or
-      (self ~= spriteToCheck and collision.normal.y == 1)
-
-    if shouldSkipCollision then
+    if not shouldSkipCollision then
       -- Block collision
       isCollisionCheckPassed = false
 
@@ -131,24 +124,29 @@ local function checkIfCollides(self, idealX, idealY, spriteToCheck)
     end
   end
 
-  -- Return if collision check failed
-
+  -- Return if collision check result
   if not isCollisionCheckPassed then
-    local actualX = actualSpriteToCheckX - spriteToCheck.x + self.x
-    local actualY = actualSpriteToCheckY - spriteToCheck.y + self.y
     return false, actualX, actualY
   end
 
-  -- If collision check passes, Check collisions for child
+  -- [Franch] If collision check passes, we return ideal X & Y to ignore the
+  -- effect of potential collisions from elevator into player and vice versa.
 
-  if isCollisionCheckPassed and self.spriteChild then
-    -- The "y - 1" avoids a glitch through upper tiles if travelling upwards.
-    local isCollisionCheckPassedChild, actualX, actualY = checkIfCollides(self, x, y - 1, self.spriteChild)
+  return isCollisionCheckPassed, idealX, idealY
+end
 
-    return isCollisionCheckPassedChild, actualX, actualY
-  end
+local function getPositionChildIdeal(self, x, y, isMovingDown)
+  x = x or self.x
+  y = y or self.y
 
-  return true, idealX, idealY
+  -- We push the player into the elevator if moving down for better collision handling.
+  local offsetY = isMovingDown and 2 or 0
+
+  -- Center the child on the elevator
+  local idealX = x + self.width / 2 - self.spriteChild.width / 2
+  local idealY = y - self.spriteChild.height + offsetY
+
+  return idealX, idealY
 end
 
 --- If elevator is within `tileAdjustmentPx` of tile, then returns
@@ -182,38 +180,43 @@ function getPositionFromDisplacement(self, displacement)
 end
 
 --- Update method for movement
-local function updateMovement(self, movement)
-
+local function updateMovement(self, movement, skipCollisionCheck)
   -- Get new position using displacement
 
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
 
-  -- Check collisions for self
+  if not skipCollisionCheck then
+    -- Check collisions for self
 
-  local isCollisionCheckPassed
+    local isCollisionCheckPassed
+    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, { [self.spriteChild] = true })
 
-  isCollisionCheckPassed, x, y = checkIfCollides(self, x, y)
-
-  -- Skip movement if collision happened
-  if not isCollisionCheckPassed then
-    return
+    -- Skip movement if collision happened
+    if not isCollisionCheckPassed then
+      return false
+    end
   end
 
   if self.spriteChild then
+    -- Calculate ideal X & Y for child
+    local isMovingDown = movement > 0 and self.fields.orientation == ORIENTATION.Vertical
+    local childX, childY = getPositionChildIdeal(self, x, y, isMovingDown)
 
-    -- Update child position
+    if not skipCollisionCheck then
+      -- Check collisions for child
+      local isCollisionCheckPassed
+      isCollisionCheckPassed, childX, childY = checkIfCollides(self.spriteChild, childX, childY, { [self] = true })
 
-    local centerX = x + self.width / 2
-
-    local offsetY = 0
-    if movement > 0 and self.fields.orientation == ORIENTATION.Vertical then
-      -- For moving down, move player slightly into elevator for better collision activation
-      offsetY = 2
+      -- Skip movement if collision happened
+      if not isCollisionCheckPassed then
+        return false
+      end
     end
 
+    -- Update child position
     self.spriteChild:moveTo(
-      centerX - self.spriteChild.width / 2,
-      y - self.spriteChild.height + offsetY
+      childX,
+      childY
     )
   end
 
@@ -228,6 +231,8 @@ local function updateMovement(self, movement)
   -- Update checkpoint state
 
   self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+
+  return true
 end
 
 ---
@@ -243,8 +248,8 @@ function Elevator:activate(sprite, key)
   local activationMovement = getActivationMovement(self, key)
 
   if not activationMovement then
-    -- Key was not handled. Throw error
-    error("Key is not handled by Elevator.", 2)
+    -- No key to handle.
+    return
   end
 
   -- Clamp movement to distance remaining
@@ -286,12 +291,12 @@ function Elevator:update()
     if movement ~= 0 then
       -- Call without delta_time to avoid very small, inconsequential movements
 
-      updateMovement(self, movement)
+      updateMovement(self, movement, true)
     end
   else
     -- If any movement occurs, update elevator position based on movement * delta_time
 
-    updateMovement(self, movement * _G.delta_time)
+    self.didActivationSuccess = updateMovement(self, movement * _G.delta_time)
   end
 
   -- Reset collisions if disabled
@@ -306,6 +311,11 @@ function Elevator:update()
 
   self.movement = 0
   self.spriteChild = nil
+  self.didActivationSuccess = false
+end
+
+function Elevator:wasActivationSuccessful()
+  return self.didActivationSuccess
 end
 
 function Elevator:handleCheckpointRevert(state)
