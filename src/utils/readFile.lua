@@ -17,3 +17,20 @@ function ReadFile.getLevelFiles()
 
     return levels
 end
+
+function ReadFile.getLevel(world, level)
+    -- Get the level files
+    local files = file.listFiles(assets.path.levels)
+
+    local levelFile = nil
+
+    for _, filename in pairs(files) do
+        -- find .ldtk files that match the convention and the given world/level
+        if string.match(filename, '^World '..world..'%-'..level..'.+%.ldtk') then
+          -- don't break the loop - there may be a 'v2' coming, assuming listFiles is alpha-sorted
+          levelFile = filename
+        end
+    end
+
+    return levelFile
+end
