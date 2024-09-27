@@ -139,6 +139,7 @@ local function getPositionChildIdeal(self, x, y, isMovingDown)
   x = x or self.x
   y = y or self.y
 
+  -- We push the player into the elevator if moving down for better collision handling.
   local offsetY = isMovingDown and 2 or 0
 
   -- Center the child on the elevator
