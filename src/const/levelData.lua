@@ -3,9 +3,12 @@ LEVEL_DATA = {
         [1] = {
           levels = {
                 [1] = {
-                    total = 7
+                    total = 8
                 },
                 [2] = {
+                    total = 4
+                },
+                [3] = {
                     total = 4
                 }
             }
