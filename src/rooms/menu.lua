@@ -65,8 +65,10 @@ function Menu:AButtonDown()
     LDtk.load(assets.path.levels..levelFile)
     spButton:play(1)
     MemoryCard.setLastPlayed(section, row)
+    local levelData = LEVEL_DATA.worlds[section].levels[row]
+
     sceneManager.scenes.currentGame = Game(0)
-    sceneManager:enter(sceneManager.scenes.currentGame)
+    sceneManager:enter(sceneManager.scenes.currentGame, levelData)
   end
 end
 
