@@ -17,6 +17,11 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
+local botsToRescue
+
+-- Sprites
+
+local spriteGuiRescueCounter
 
 -- Static methods
 
@@ -41,6 +46,24 @@ function Game:enter(previous, data)
     local direction = data.direction
     local level = data.level
     local isCheckpointRevert = data.isCheckpointRevert
+
+    -- Load rescuable bot array
+
+    if data.total then
+        local botRescueCount = data.total
+        botsToRescue = {}
+        for _=1,botRescueCount do
+            table.insert(botsToRescue, false)
+        end
+
+        -- Set up GUI
+
+        if not spriteGuiRescueCounter then
+            spriteGuiRescueCounter = SpriteRescueCounter()
+        end
+
+        spriteGuiRescueCounter:setRescueSpriteCount(botRescueCount)
+    end
 
     -- This should run only once to initialize the game instance.
 
@@ -98,6 +121,12 @@ function Game:enter(previous, data)
 
     if abilityPanel then
         abilityPanel:add()
+    end
+
+    local rescueCounter = SpriteRescueCounter.getInstance()
+
+    if rescueCounter then
+        rescueCounter:add()
     end
 end
 
@@ -172,6 +201,12 @@ function Game:levelComplete(data)
 
     sceneManager:enter(sceneManager.scenes.currentGame,
         { direction = direction, level = { name = nextLevel, bounds = nextLevelBounds } })
+end
+
+function Game:botRescued(bot, botNumber)
+    botsToRescue[botNumber] = true
+
+    spriteGuiRescueCounter:setSpriteRescued(botNumber)
 end
 
 function Game:updateBlueprints()

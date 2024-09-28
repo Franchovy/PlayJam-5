@@ -14,7 +14,8 @@ _G.assets = {
         menuArrows = "assets/images/menu-arrows",
         player = "assets/images/player",
         elevatorTrack = "assets/images/elevator-track",
-        warp = "assets/images/warp"
+        warp = "assets/images/warp",
+        guiRescueBots = "assets/images/gui-rescued-bots"
     },
     sounds = {
         speech = "assets/sfx/speech"

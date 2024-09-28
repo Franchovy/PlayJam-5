@@ -47,10 +47,14 @@ function Dialog:init(entity)
 
     self:setTag(TAGS.Dialog)
 
+    -- Set whether is "rescuable"
+
+    self.isRescuable = entity.fields.save
+    self.rescueNumber = entity.fields.saveNumber
+
     -- Get text from LDtk entity
 
     local text = entity.fields.text
-    assert(text)
 
     -- Get font used for calculating text size
 
@@ -92,6 +96,10 @@ function Dialog:init(entity)
     self.spriteBubble:moveTo(self.x, self.y)
     self.spriteBubble:setZIndex(2)
     self.spriteBubble:add()
+
+    -- Self state
+
+    self.isRescued = false
 
     -- Set state
 
@@ -148,6 +156,13 @@ end
 --- Called from the player class on collide.
 function Dialog:activate()
     self.isActivated = true
+
+    if not self.isRescued and self.isRescuable then
+        -- Send message that has been rescued
+        self.isRescued = true
+
+        Manager.emitEvent(EVENTS.BotRescued, self, self.rescueNumber)
+    end
 end
 
 function Dialog:expand()
