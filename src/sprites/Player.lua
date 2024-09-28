@@ -124,6 +124,22 @@ function Player:init(entity)
     self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
 end
 
+function Player:add()
+    Player.super.add(self)
+
+    if self.crankWarpController then
+        self.crankWarpController:add()
+    end
+end
+
+function Player:remove()
+    Player.super.add(self)
+
+    if self.crankWarpController then
+        self.crankWarpController:remove()
+    end
+end
+
 function Player:handleCheckpointRevert(state)
     self:moveTo(state.x, state.y)
 
@@ -271,12 +287,10 @@ function Player:update()
 
     if hasWarped then
         self:revertCheckpoint()
-
-        self.crankWarpController:resetCrankChange()
     end
 
     -- Skip movement handling if timer cooldown is active
-    if not timerCooldownCheckpoint then
+    if not self.crankWarpController:isActive() then
 
         -- Movement handling (update velocity X and Y)
 
@@ -365,10 +379,8 @@ function Player:update()
 
     -- Update warp overlay
 
-    if self.crankWarpController:isActive() then
+    if self.crankWarpController then
         self.crankWarpController:moveTo(self.x, self.y)
-        self.crankWarpController:updateIndex()
-        self.crankWarpController:updateImage()
     end
 
     -- Camera Movement

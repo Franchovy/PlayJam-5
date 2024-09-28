@@ -2,9 +2,10 @@ local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
 local imageTableWarp <const> = gfx.imagetable.new(assets.imageTables.warp)
-local angleCrankToWarpTotal <const> = 6 * 360
-local coefficientResistanceCrankMomentum <const> = 0.3
-local speedAutoCrankMomentum <const> = 5
+local angleCrankToWarpTotal <const> = 300
+local coefficientCrankResistance <const> = 0.3
+local maxCrankResistanceStart <const> = 15
+local maxCrankResistanceLoop <const> = 25
 
 local animationStates = {
     start = "start",
@@ -17,11 +18,21 @@ local animationStates = {
 --- works in inverse order, starting at the end and working back to the start.
 --- @field start number start index.
 local indexesImageTableWarp = {
-    [animationStates.start] = 90,
+    [animationStates.start] = 91,
     [animationStates.loop] = 60,
     [animationStates.finish] = 30,
     [animationStates.complete] = 1
 }
+
+local function setState(self, state)
+    self.index = indexesImageTableWarp[state]
+    self.state = state
+
+    if self.state == animationStates.loop then
+        -- Reset momentum
+        self.crankMomentum = 0
+    end
+end
 
 ---@class CrankWarpController: playdate.graphics.sprite
 CrankWarpController = Class("CrankWarpController", gfx.sprite)
@@ -39,7 +50,7 @@ function CrankWarpController:init()
 end
 
 function CrankWarpController:isActive()
-    return self.state ~= animationStates.complete
+    return self.state == animationStates.loop
 end
 
 function CrankWarpController:handleCrankChange()
@@ -54,48 +65,48 @@ function CrankWarpController:handleCrankChange()
 
     self.crankMomentum += crankChange
 
-    -- If in state start or loop, apply resistance backwards.
-    local resistanceCrankMomentum = (speedAutoCrankMomentum - self.crankMomentum) * coefficientResistanceCrankMomentum
-    self.crankMomentum -= resistanceCrankMomentum
+    -- If in state start, apply resistance backwards.
+    local resistanceCrankMomentum = (self.crankMomentum) * coefficientCrankResistance
+    local maxCrankResistance = self.state == animationStates.start and maxCrankResistanceStart or maxCrankResistanceLoop
+    self.crankMomentum = math.max(0, self.crankMomentum - math.min(resistanceCrankMomentum, maxCrankResistance))
 
-    print(self.crankMomentum)
-    -- Update index
-    --self.index = math.floor(self.index - self.crankMomentum / #imageTableWarp)
+    if self.state == animationStates.start then
+
+        -- Update index
+        self.index = indexesImageTableWarp[animationStates.start] - math.floor(self.crankMomentum / angleCrankToWarpTotal * 30)
+
+        if self.index <= indexesImageTableWarp[animationStates.loop] then
+            -- Transition to loop state
+            setState(self, animationStates.loop)
+
+            -- Reset momentum
+            self.crankMomentum = 0
+        end
+    elseif self.state == animationStates.loop then
+        self.index -= 1
+
+        if self.index <= indexesImageTableWarp[animationStates.finish] then
+            -- Transition to next state
+
+            -- If crank momentum is high enough, loop again.
+            if self.crankMomentum > 60 then
+                setState(self, animationStates.loop)
+            else
+                setState(self, animationStates.finish)
+            end
+        end
+    elseif self.state == animationStates.finish then
+        self.index -= 1
+
+        if self.index <= indexesImageTableWarp[animationStates.complete] then
+            setState(self, animationStates.complete)
+        end
+    end
+
+    self:updateImage()
 
     -- Get whether a warp has happened
-    local hasWarped = self.index <= 1
-
-    return hasWarped
-end
-
-function CrankWarpController:resetCrankChange()
-    self.index = animationStates.start
-end
-
-function CrankWarpController:updateIndex()
-    local index = self.index
-
-    if self.state == animationStates.start and self.index <= indexesImageTableWarp[animationStates.loop] then
-        -- Transition to loop state
-        self.state = animationStates.loop
-    end
-
-    if self.state == animationStates.finish and self.index <= indexesImageTableWarp[animationStates.complete] then
-        -- Transition to complete
-        self.state = animationStates.complete
-    end
-
-    if self.state == animationStates.loop and self.index <= indexesImageTableWarp[animationStates.finish] then
-        -- Loop current animation
-        index = indexesImageTableWarp[animationStates.loop]
-    end
-
-    if self.state == animationStates.complete then
-        -- Set index to restart
-        index = indexesImageTableWarp[animationStates.start]
-    end
-
-    self.index = index
+    return self.index == indexesImageTableWarp[animationStates.loop]
 end
 
 function CrankWarpController:updateImage()
