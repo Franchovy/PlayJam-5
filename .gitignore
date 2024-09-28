@@ -1,4 +1,5 @@
 *.pdx
+*.pdx.zip
 .luarc.json
 .DS_Store
 src/assets/levels/*/backups
