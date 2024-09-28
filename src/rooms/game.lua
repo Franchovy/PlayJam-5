@@ -17,7 +17,6 @@ local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
 local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
-local botsToRescue
 
 -- Sprites
 
@@ -51,10 +50,6 @@ function Game:enter(previous, data)
 
     if data.total then
         local botRescueCount = data.total
-        botsToRescue = {}
-        for _=1,botRescueCount do
-            table.insert(botsToRescue, false)
-        end
 
         -- Set up GUI
 
@@ -204,8 +199,6 @@ function Game:levelComplete(data)
 end
 
 function Game:botRescued(bot, botNumber)
-    botsToRescue[botNumber] = true
-
     spriteGuiRescueCounter:setSpriteRescued(botNumber)
 end
 

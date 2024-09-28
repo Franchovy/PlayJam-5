@@ -3108,32 +3108,6 @@
 							}] }],
 							"__worldX": 790,
 							"__worldY": -395
-						},
-						{
-							"__identifier": "Dialog",
-							"__grid": [8,6],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#FFFFFF",
-							"iid": "591f6990-73f0-11ef-9b00-7572f9c163e5",
-							"width": 16,
-							"height": 16,
-							"defUid": 204,
-							"px": [256,192],
-							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "test\n", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["test\\n"]
-								}] },
-								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 402, "realEditorValues": [{
-									"id": "V_Bool",
-									"params": [ true ]
-								}] },
-								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 403, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
-							],
-							"__worldX": 256,
-							"__worldY": -192
 						}
 					]
 				},
@@ -5885,8 +5859,11 @@
 									"id": "V_String",
 									"params": ["1"]
 								}] },
-								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 402, "realEditorValues": [] },
-								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 403, "realEditorValues": [] }
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 402, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 403, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
 							],
 							"__worldX": 1952,
 							"__worldY": 800

@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 418,
+	"nextUid": 420,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2610,6 +2610,80 @@
 					"editorDisplayPos": "Above",
 					"editorLinkStyle": "StraightArrow",
 					"editorDisplayColor": "#FFFFFF",
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "saveNumber",
+					"doc": null,
+					"__type": "Int",
+					"uid": 418,
+					"type": "F_Int",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "save",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 419,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
 					"editorAlwaysShow": false,
 					"editorShowInWorld": true,
 					"editorCutLongValues": true,
@@ -5785,10 +5859,17 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [384,416],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "2", "__tile": null, "defUid": 205, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["2"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "2", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["2"]
+								}] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 2, "__tile": null, "defUid": 418, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 419, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
 							"__worldX": 1632,
 							"__worldY": -768
 						},
@@ -5804,10 +5885,17 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [192,640],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "1", "__tile": null, "defUid": 205, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["1"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "1", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["1"]
+								}] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 418, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 419, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
 							"__worldX": 1440,
 							"__worldY": -544
 						},
@@ -6008,10 +6096,14 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [128,128],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "end", "__tile": null, "defUid": 205, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["end"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "end", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["end"]
+								}] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 418, "realEditorValues": [] },
+								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 419, "realEditorValues": [] }
+							],
 							"__worldX": 1376,
 							"__worldY": -1056
 						}
@@ -7699,10 +7791,17 @@
 							"height": 16,
 							"defUid": 204,
 							"px": [352,288],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "4", "__tile": null, "defUid": 205, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["4"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "4", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["4"]
+								}] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 4, "__tile": null, "defUid": 418, "realEditorValues": [{ "id": "V_Int", "params": [4] }] },
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 419, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
 							"__worldX": 2112,
 							"__worldY": -1056
 						},
