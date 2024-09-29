@@ -172,5 +172,5 @@ function Start:AButtonDown()
 end
 
 function Start:BButtonDown()
-  sceneManager:enter(sceneManager.scenes.menu)
+  sceneManager:enter(sceneManager.scenes.menu, fileplayer)
 end

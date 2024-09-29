@@ -15,7 +15,9 @@ local sceneManager
 --- LIFECYCLE
 ---
 --
-function Menu:enter()
+function Menu:enter(fileplayer)
+  self.fileplayer = fileplayer
+
   sceneManager = self.manager
 
   self.gridView = MenuGridView.new()
@@ -34,8 +36,11 @@ function Menu:enter()
   end
 
   -- Position current row in center of screen
+  -- Wrapped in a timer delay to allow the gridview to initialize.
 
-  self.gridView:setSelection(world, level, 1, false)
+  playdate.timer.performAfterDelay(1, function()
+    self.gridView:setSelection(world, level)
+  end)
 end
 
 function Menu:leave()
@@ -59,6 +64,8 @@ end
 ---
 
 function Menu:AButtonDown()
+  fileplayer:stop()
+
   local section, row = self.gridView:getSelection()
   local levelFile = ReadFile.getLevel(section, row)
   if levelFile then
