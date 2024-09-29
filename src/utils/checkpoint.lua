@@ -28,7 +28,7 @@ local DEBUG_PRINT <const> = false
 class("Checkpoint").extends()
 
 local checkpointNumber = 1
-local checkpointHandlers = table.create(0, 32)
+local checkpointHandlers = table.create(32, 0)
 
 -- Static methods - managing save state at the game level
 
@@ -70,6 +70,20 @@ end
 
 class("CheckpointHandler").extends()
 
+function CheckpointHandler.getOrCreate(id, sprite, initialState)
+    local checkpointHandlerExisting = checkpointHandlers[id]
+    if checkpointHandlerExisting then
+        -- Update sprite reference
+        checkpointHandlerExisting.sprite = sprite
+
+        return checkpointHandlerExisting
+    else
+        local checkpointHandlerNew = CheckpointHandler(sprite, initialState)
+        checkpointHandlers[id] = checkpointHandlerNew
+        return checkpointHandlerNew
+    end
+end
+
 function CheckpointHandler:init(sprite, initialState)
     assert(sprite, "Checkpoint handler needs sprite to initialize.")
     self.sprite = sprite
@@ -77,8 +91,6 @@ function CheckpointHandler:init(sprite, initialState)
     if initialState ~= nil then
         self.states = LinkedList(initialState, 0)
     end
-
-    table.insert(checkpointHandlers, self)
 end
 
 -- Init / Setup methods

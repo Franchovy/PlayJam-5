@@ -117,11 +117,13 @@ function Player:init(entity)
 
     self.crankWarpController = CrankWarpController()
 
+    self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
+end
+
+function Player:postInit()
     -- Add Checkpoint handling
 
-    self.checkpointHandler = CheckpointHandler(self)
-
-    self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
+    self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self)
 end
 
 function Player:add()

@@ -9,10 +9,6 @@ local maxTicksToDrill = 15
 function DrillableBlock:init(entity)
     DrillableBlock.super.init(self, entity)
 
-    -- Persistent sprite data
-
-    self.fields = entity.fields
-
     self:setImage(imageSprite)
     self:setTag(TAGS.DrillableBlock)
 

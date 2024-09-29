@@ -21,7 +21,7 @@ function ButtonPickup:init(entity)
 
   -- Set blueprint name from ldtk
 
-  self.abilityName = self.fields.blueprint
+  self.abilityName = entity.fields.blueprint
   assert(KEYNAMES[self.abilityName], "Missing Key name: " .. self.abilityName)
 
   -- Set blueprint image for name

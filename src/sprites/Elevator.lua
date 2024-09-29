@@ -7,79 +7,6 @@ local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
 local tileAdjustmentPx <const> = 4
 
----
----
---- Private Static methods
----
-
-class("Elevator").extends(gfx.sprite)
-
-function Elevator:init(entity)
-  Elevator.super.init(self, imageElevator)
-
-  self:setTag(TAGS.Elevator)
-  self:setCenter(0.5, 1)
-
-  -- LDtk fields
-
-  self.fields = entity.fields
-
-  -- Set Displacement initial, start and end scalars (1D) based on entity fields
-
-  self.displacementInitial = (self.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
-  self.displacementEnd = self.fields.distance * TILE_SIZE
-
-  -- RigidBody config
-
-  self.rigidBody = RigidBody(self)
-
-  -- Elevator-specific fields
-
-  self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = 0 -- Update scalar for movement.
-  self.didActivationSuccess = false -- Update value for checking if activation was successful
-
-  -- Create elevator track
-
-  self.spriteElevatorTrack = ElevatorTrack(self.fields.distance, entity.fields.orientation)
-end
-
-function Elevator:postInit()
-  -- Checkpoint Handling setup
-
-  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
-
-  -- Save initial position
-
-  if self.fields.orientation == ORIENTATION.Horizontal then
-    self.initialPosition = gmt.point.new(self.x - self.displacementInitial, self.y)
-    self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
-  else
-    self.initialPosition = gmt.point.new(self.x, self.y - self.displacementInitial)
-    self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
-  end
-
-  -- Positon elevator track
-
-  self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
-  self.spriteElevatorTrack:add()
-
-  -- Load displacement from previous data or initial LDtk setup
-
-  if self.fields.displacement then
-    self.displacement = self.fields.displacement
-  else
-    self.displacement = self.displacementInitial
-  end
-
-  -- Set position based on displacement
-  local x, y = getPositionFromDisplacement(self, self.displacement)
-  self:moveTo(x, y)
-end
-
-function Elevator:collisionResponse(_)
-  return gfx.sprite.kCollisionTypeSlide
-end
 
 ---
 ---
@@ -183,12 +110,20 @@ local function getAdjustmentToTile(self)
 end
 
 --- Convenience method to get the X & Y position based on a displacement.
-function getPositionFromDisplacement(self, displacement)
+local function getPositionFromDisplacement(self, displacement)
   if self.fields.orientation == ORIENTATION.Horizontal then
     return self.initialPosition.x + displacement, self.initialPosition.y
   else
     return self.initialPosition.x, self.initialPosition.y + displacement
   end
+end
+
+local function setDisplacement(self, displacement)
+  self.displacement = displacement
+  self.fields.displacement = displacement
+
+  local x, y = getPositionFromDisplacement(self, displacement)
+  self:moveTo(x, y)
 end
 
 --- Update method for movement
@@ -234,18 +169,88 @@ local function updateMovement(self, movement, skipCollisionCheck)
 
   -- Move to new position using displacement
 
-  self:moveTo(x, y)
+--  self:moveTo(x, y)
 
   -- Update displacement to reflect new position
 
-  self.displacement += movement
-  self.fields.displacement = self.displacement -- Update LDtk data for persistent data
+  setDisplacement(self, self.displacement + movement)
 
   -- Update checkpoint state
 
-  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+  self.checkpointHandler:pushState({displacement = self.displacement})
 
   return true
+end
+
+---
+---
+--- Private Static methods
+---
+
+class("Elevator").extends(gfx.sprite)
+
+function Elevator:init(entity)
+  Elevator.super.init(self, imageElevator)
+
+  self:setTag(TAGS.Elevator)
+  self:setCenter(0.5, 1)
+
+  -- Set Displacement initial, start and end scalars (1D) based on entity fields
+
+  self.displacementInitial = (entity.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
+  self.displacementEnd = entity.fields.distance * TILE_SIZE
+
+  -- RigidBody config
+
+  self.rigidBody = RigidBody(self)
+
+  -- Elevator-specific fields
+
+  self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
+  self.movement = 0 -- Update scalar for movement.
+  self.didActivationSuccess = false -- Update value for checking if activation was successful
+
+  -- Create elevator track
+
+  self.spriteElevatorTrack = ElevatorTrack(entity.fields.distance, entity.fields.orientation)
+end
+
+function Elevator:postInit()
+
+  -- Save initial position
+
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    self.initialPosition = gmt.point.new(self.x - self.displacementInitial, self.y)
+    self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
+  else
+    self.initialPosition = gmt.point.new(self.x, self.y - self.displacementInitial)
+    self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
+  end
+
+  -- Positon elevator track
+
+  self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
+  self.spriteElevatorTrack:add()
+
+  -- Load displacement from previous data or initial LDtk setup
+
+  if self.fields.displacement then
+    self.displacement = self.fields.displacement
+  else
+    self.displacement = self.displacementInitial
+  end
+
+  -- Set position based on displacement
+
+  setDisplacement(self, self.displacement)
+
+  -- Checkpoint Handling setup
+
+  self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self, { displacement = self.displacement })
+end
+
+function Elevator:collisionResponse(_)
+  return gfx.sprite.kCollisionTypeSlide
 end
 
 ---
@@ -334,7 +339,5 @@ end
 function Elevator:handleCheckpointRevert(state)
   self.movement = 0
 
-  self:moveTo(state.x, state.y)
-
-  self.displacement = state.displacement
+  setDisplacement(self, state.displacement)
 end

@@ -59,6 +59,10 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
 
+        -- Give sprite references to LDtk data
+        sprite.id = entity.iid
+        sprite.fields = entity.fields
+
         -- Optional Post-init call for overriding default configurations
         if sprite.postInit then
             sprite:postInit()
