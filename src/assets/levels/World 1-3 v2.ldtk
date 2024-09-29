@@ -3013,25 +3013,6 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Player",
-							"__grid": [3,4],
-							"__pivot": [-0.3,-0.333],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#275FFC",
-							"iid": "83f3dc60-4ce0-11ef-885c-b10659cdfd30",
-							"width": 20,
-							"height": 24,
-							"defUid": 19,
-							"px": [118,149],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Right"], "__tile": null, "defUid": 40, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Right"]
-							}] }],
-							"__worldX": -362,
-							"__worldY": 149
-						},
-						{
 							"__identifier": "ButtonPickup",
 							"__grid": [6,4],
 							"__pivot": [-0.071,-0.071],
@@ -3049,6 +3030,25 @@
 							}] }],
 							"__worldX": -258,
 							"__worldY": 158
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [3,4],
+							"__pivot": [-0.3,-0.333],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "83f3dc60-4ce0-11ef-885c-b10659cdfd30",
+							"width": 20,
+							"height": 24,
+							"defUid": 19,
+							"px": [118,149],
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": ["Right"], "__tile": null, "defUid": 40, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Right"]
+							}] }],
+							"__worldX": -362,
+							"__worldY": 149
 						}
 					]
 				},
@@ -3487,6 +3487,31 @@
 							}] }],
 							"__worldX": 30,
 							"__worldY": -98
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [0,9],
+							"__pivot": [-0.3,-0.333],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#275FFC",
+							"iid": "323085b0-73f0-11ef-b406-93877550fff3",
+							"width": 20,
+							"height": 24,
+							"defUid": 19,
+							"px": [22,309],
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Right", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["Left"]
+							}, {
+								"id": "V_String",
+								"params": ["Right"]
+							}, {
+								"id": "V_String",
+								"params": ["Up"]
+							} ] }],
+							"__worldX": 22,
+							"__worldY": 149
 						}
 					]
 				},

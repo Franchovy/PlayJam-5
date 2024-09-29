@@ -19,7 +19,10 @@ _G.assets = {
     },
     sounds = {
         speech = "assets/sfx/speech",
-        win = "assets/sfx/Win"
+        win = "assets/sfx/Win",
+        errorAction = "assets/sfx/error-action",
+        errorSavePoint = "assets/sfx/error-save-point",
+        menuSelect = "assets/sfx/menu-select",
     },
     music = {
         world1 = "assets/music/world_1"

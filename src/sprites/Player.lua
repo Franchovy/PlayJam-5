@@ -7,7 +7,7 @@ local gfx <const> = pd.graphics
 
 local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
 local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
-local spError <const> = sound.sampleplayer.new("assets/sfx/Error")
+local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
 local spDrill <const> = sound.sampleplayer.new("assets/sfx/drill-start")
 local spCheckpointRevert <const> = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
 local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")

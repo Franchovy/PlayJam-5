@@ -5,7 +5,7 @@ local sound <const> = pd.sound
 local gfx <const> = pd.graphics
 local systemMenu <const> = pd.getSystemMenu()
 
-local spButton <const> = sound.sampleplayer.new("assets/sfx/ButtonSelect")
+local spButton <const> = sound.sampleplayer.new(assets.sounds.menuSelect)
 
 class ("Menu").extends(Room)
 

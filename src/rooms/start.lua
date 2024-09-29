@@ -6,7 +6,7 @@ local gfx <const> = pd.graphics
 
 local imageSpriteTitle <const> = gfx.image.new("assets/images/title"):invertedImage()
 local imageSpriteRobot <const> = gfx.imagetable.new(assets.imageTables.player)
-local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
+local spButton = assert(sound.sampleplayer.new(assets.sounds.menuSelect))
 
 -- Local Variables
 

@@ -38,12 +38,12 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
 
         if entity.name == "Player" and Player.getInstance() then
             -- If Player already exists and is playing, then create a SavePoint instead.
-            sprite = SavePoint()
+            sprite = SavePoint(entity)
         elseif entity.fields.consumed == true then
             -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. DrillableBlock, ButtonPickup)
             goto continue
         else
-            -- Create sprite with LDtk naming
+            -- Create sprite using LDtk naming
             sprite = _G[entity.name](entity)
         end
         local tileCenterX, tileCenterY = entity.position.x + 16, entity.position.y + 16
