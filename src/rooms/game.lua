@@ -9,9 +9,6 @@ local systemMenu <const> = pd.getSystemMenu()
 
 local fileplayer
 
-local spWin = sound.sampleplayer.new("assets/sfx/Win")
-local spItemDrop = sound.sampleplayer.new("assets/sfx/Discard")
-
 -- LDtk current level name
 
 local initialLevelName <const> = "Level_0"
@@ -187,8 +184,6 @@ local maxLevels <const> = 10
 function Game:levelComplete(data)
     local direction = data.direction
     local coordinates = data.coordinates
-
-    spWin:play(1)
 
     -- Load next level
 

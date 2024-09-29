@@ -76,7 +76,7 @@ function Player:init(entity)
 
     -- AnimatedSprite states
 
-    function pauseAnimation()
+    local function pauseAnimation()
         self:pauseAnimation()
     end
 
@@ -273,6 +273,10 @@ function Player:handleCollision(collisionData)
 
     if tag == TAGS.Dialog then
         activeDialog = other
+    end
+
+    if tag == TAGS.SavePoint then
+        other:activate()
     end
 end
 

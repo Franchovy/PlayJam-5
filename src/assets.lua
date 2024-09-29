@@ -18,7 +18,8 @@ _G.assets = {
         guiRescueBots = "assets/images/gui-rescued-bots"
     },
     sounds = {
-        speech = "assets/sfx/speech"
+        speech = "assets/sfx/speech",
+        win = "assets/sfx/Win"
     },
     music = {
         world1 = "assets/music/world_1"
