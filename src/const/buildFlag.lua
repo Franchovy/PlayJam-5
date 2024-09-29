@@ -1,4 +1,4 @@
 BUILD_FLAG = {
-    DEBUG = true,
-    PLAYTESTING = false
+    DEBUG = false,
+    PLAYTESTING = true
 }
