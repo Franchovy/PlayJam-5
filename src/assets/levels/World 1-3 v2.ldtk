@@ -3495,20 +3495,17 @@
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#275FFC",
-							"iid": "323085b0-73f0-11ef-b406-93877550fff3",
+							"iid": "400e5f70-73f0-11ef-a33f-53336990fe2e",
 							"width": 20,
 							"height": 24,
 							"defUid": 19,
 							"px": [22,309],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Right", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
-								"id": "V_String",
-								"params": ["Left"]
-							}, {
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Right"]
 							}, {
 								"id": "V_String",
-								"params": ["Up"]
+								"params": ["A"]
 							} ] }],
 							"__worldX": 22,
 							"__worldY": 149

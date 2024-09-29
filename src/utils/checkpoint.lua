@@ -66,6 +66,14 @@ function Checkpoint.getCheckpointNumber()
     return checkpointNumber
 end
 
+function Checkpoint.clearAllPrevious()
+    -- Loop over all checkpoint handlers.
+    for _, handler in pairs(checkpointHandlers) do
+        -- Set initial state to the most recent state.
+        handler:clearAllPrevious()
+    end
+end
+
 -- Instance methods - individual sprite methods for managing state
 
 class("CheckpointHandler").extends()
@@ -158,4 +166,11 @@ function CheckpointHandler:revertState()
     end
 
     return hasChangedState
+end
+
+function CheckpointHandler:clearAllPrevious()
+    local lastCheckpointState = self.states:getLast()
+
+    -- Create new list with last as initial
+    self.states = LinkedList(table.deepcopy(lastCheckpointState), 0)
 end

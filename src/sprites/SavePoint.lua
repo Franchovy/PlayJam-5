@@ -67,6 +67,8 @@ function SavePoint:activate()
         spWin:play(1)
 
         self:setImage(imageTableSprite[2])
+
+        Checkpoint.clearAllPrevious()
     else
         self.blueprintsCurrentError = blueprintsPlayer
 
