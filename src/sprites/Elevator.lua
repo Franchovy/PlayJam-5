@@ -22,11 +22,11 @@ function Elevator:init(entity)
 
   -- LDtk fields
 
-  self.fields = table.deepcopy(entity.fields)
+  self.fields = entity.fields
 
   -- Set Displacement initial, start and end scalars (1D) based on entity fields
 
-  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
+  self.displacementInitial = (self.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
   self.displacementEnd = self.fields.distance * TILE_SIZE
 
   -- RigidBody config
@@ -52,10 +52,10 @@ function Elevator:postInit()
   -- Save initial position
 
   if self.fields.orientation == ORIENTATION.Horizontal then
-    self.initialPosition = gmt.point.new(self.x - self.displacement, self.y)
+    self.initialPosition = gmt.point.new(self.x - self.displacementInitial, self.y)
     self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
   else
-    self.initialPosition = gmt.point.new(self.x, self.y - self.displacement)
+    self.initialPosition = gmt.point.new(self.x, self.y - self.displacementInitial)
     self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
   end
 
@@ -63,6 +63,18 @@ function Elevator:postInit()
 
   self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
   self.spriteElevatorTrack:add()
+
+  -- Load displacement from previous data or initial LDtk setup
+
+  if self.fields.displacement then
+    self.displacement = self.fields.displacement
+  else
+    self.displacement = self.displacementInitial
+  end
+
+  -- Set position based on displacement
+  local x, y = getPositionFromDisplacement(self, self.displacement)
+  self:moveTo(x, y)
 end
 
 function Elevator:collisionResponse(_)
@@ -227,6 +239,7 @@ local function updateMovement(self, movement, skipCollisionCheck)
   -- Update displacement to reflect new position
 
   self.displacement += movement
+  self.fields.displacement = self.displacement -- Update LDtk data for persistent data
 
   -- Update checkpoint state
 

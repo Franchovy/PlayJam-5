@@ -70,7 +70,7 @@ function SavePoint:activate()
     else
         self.blueprintsCurrentError = blueprintsPlayer
 
-        self.blinkerError = gfx.animation.blinker.new(30, 40, false, 20, true)
+        self.blinkerError = gfx.animation.blinker.new(30, 40, false, 14, true)
         self.blinkerError:start()
 
         spError:play(1)
