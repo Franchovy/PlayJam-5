@@ -27,19 +27,13 @@ function Menu:enter(fileplayer)
   -- TODO: if last played is 100% complete, select _next_ level
   -- and if all levels are 100% complete, just set to 1-1
   -- STRETCH: cool new state or animationg for 100% completion
-  local world, level = MemoryCard.getLastPlayed()
-  if not world then
-    world = 1
-  end
-  if not level then
-    level = 1
-  end
+  local level = MemoryCard.getLastPlayed()
 
   -- Position current row in center of screen
   -- Wrapped in a timer delay to allow the gridview to initialize.
 
   playdate.timer.performAfterDelay(1, function()
-    self.gridView:setSelection(world, level)
+    self.gridView:setSelection(level or 1)
   end)
 end
 
@@ -66,16 +60,14 @@ end
 function Menu:AButtonDown()
   fileplayer:stop()
 
-  local section, row = self.gridView:getSelection()
-  local levelFile = ReadFile.getLevel(section, row)
-  if levelFile then
-    LDtk.load(assets.path.levels..levelFile)
+  local level = self.gridView:getSelectedLevel()
+  if level then
+    LDtk.load(assets.path.levels..level..".ldtk")
     spButton:play(1)
-    MemoryCard.setLastPlayed(section, row)
-    local levelData = LEVEL_DATA.worlds[section].levels[row]
+    MemoryCard.setLastPlayed(level)
 
-    sceneManager.scenes.currentGame = Game(0)
-    sceneManager:enter(sceneManager.scenes.currentGame, levelData)
+    sceneManager.scenes.currentGame = Game()
+    sceneManager:enter(sceneManager.scenes.currentGame, {isInitialLoad = true})
   end
 end
 

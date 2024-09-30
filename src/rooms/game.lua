@@ -17,6 +17,7 @@ local checkpointPlayerStart
 
 -- Sprites
 
+local botsToRescueCount <const> = 3
 local spriteGuiRescueCounter
 
 -- Static methods
@@ -45,8 +46,8 @@ function Game:enter(previous, data)
 
     -- Load rescuable bot array
 
-    if data.total then
-        local botRescueCount = data.total
+    if data.isInitialLoad then
+        local botRescueCount = botsToRescueCount
 
         -- Set up GUI
 

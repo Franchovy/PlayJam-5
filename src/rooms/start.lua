@@ -157,17 +157,15 @@ function Start:leave(next, ...)
 end
 
 function Start:AButtonDown()
-  local world, level = MemoryCard.getLastPlayed()
-  local levelFile = ReadFile.getLevel(world, level)
-  if levelFile then
-    LDtk.load(assets.path.levels..levelFile)
-    spButton:play(1)
-    MemoryCard.setLastPlayed(world, level)
+  local levelFile = MemoryCard.getLastPlayed()
 
-    local levelData = LEVEL_DATA.worlds[world].levels[level]
+  if levelFile then
+    LDtk.load(assets.path.levels..levelFile..".ldtk")
+    spButton:play(1)
+    MemoryCard.setLastPlayed(levelFile)
 
     sceneManager.scenes.currentGame = Game()
-    sceneManager:enter(sceneManager.scenes.currentGame, levelData)
+    sceneManager:enter(sceneManager.scenes.currentGame, {isInitialLoad = true})
   end
 end
 

@@ -2,8 +2,6 @@ local pd <const> = playdate
 local gfx <const> = pd.graphics
 local ui <const> = pd.ui
 
-local LEVEL_DATA <const> = LEVEL_DATA
-
 local CELL_HEIGHT <const> = 110
 local CELL_INSETS <const> = 5
 local CELL_PADDING_V <const> = 8
@@ -12,6 +10,7 @@ local CELL_FILL_ANIM_SPEED <const> = 800
 local CELL_WIDTH <const> = 400 - (CELL_INSETS * 2) - (CELL_PADDING_H * 2)
 
 local animatorGridCell
+local levels
 
 class("MenuGridView").extends()
 
@@ -21,7 +20,7 @@ class("MenuGridView").extends()
 
 local function resetAnimator(self)
   local section, row = self.gridView:getSelection()
-  local total, rescued = MemoryCard.getLevelCompletion(section, row);
+  local total, rescued = MemoryCard.getLevelCompletion(levels[row]);
 
   -- TODO: total/rescued not tracked currently, remove this for dynamic width
   rescued = total
@@ -31,10 +30,10 @@ local function resetAnimator(self)
 end
 
 local function isFirstOrLastCell(self, section, row)
-  if section == 1 and row == 1 then
+  if row == 1 then
     -- is First cell
     return false
-  elseif section == #LEVEL_DATA.worlds and row == #LEVEL_DATA.worlds[#LEVEL_DATA.worlds].levels then
+  elseif row == #levels then
     -- is last cell
     return false
   end
@@ -81,11 +80,14 @@ function MenuGridView:init()
   }
   setmetatable(MenuGridView.super, mt)
 
+  -- Get levels
+
+  levels = ReadFile.getLevelFiles()
+
   -- Set number of sections & rows
-  self.gridView:setNumberOfSections(#LEVEL_DATA.worlds)
-  for i, world in ipairs(LEVEL_DATA.worlds) do
-    self.gridView:setNumberOfRowsInSection(i, #world.levels)
-  end
+
+  self.gridView:setNumberOfSections(1)
+  self.gridView:setNumberOfRowsInSection(1, #levels)
 
   -- Set gridview config
   self.gridView:setCellPadding(CELL_PADDING_H, CELL_PADDING_H, CELL_PADDING_V, CELL_PADDING_V)
@@ -130,11 +132,26 @@ function MenuGridView:selectPreviousRow()
   )
 end
 
-function MenuGridView:setSelection(section, row)
+function MenuGridView:setSelection(rowOrLevel)
+  local row
+
+  if type(rowOrLevel) == "number" then
+    row = math.max(rowOrLevel, #levels)
+  elseif type(rowOrLevel) == "string" then
+    -- Get number from
+    for i, level in ipairs(levels) do
+      if level == rowOrLevel then
+        row = i
+      end
+    end
+  end
+
+  row = row or 1
+
   animateSelectionChange(
     self,
     self.gridView.setSelection,
-    section,
+    1,
     row,
     1
   )
@@ -159,7 +176,14 @@ function MenuGridView:drawCell(section, row, _, selected, x, y, width, height)
     gfx.setLineWidth(1)
   end
 	local fontHeight = 50
-	gfx.drawTextAligned(section..' - '..row, x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
+
+  local filename = levels[row]
+	gfx.drawTextAligned(filename, x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
   gfx.setColor(gfx.kColorWhite)
   gfx.drawRoundRect(x, y, width, height, 10)
+end
+
+function MenuGridView:getSelectedLevel()
+  local _, row = self:getSelection()
+  return levels[row]
 end

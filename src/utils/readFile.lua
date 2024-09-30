@@ -6,12 +6,13 @@ function ReadFile.getLevelFiles()
     -- Get the level files
     local files = file.listFiles(assets.path.levels)
 
-    -- Filter files to just .ldtk suffix
     local levels = {}
 
+    -- Filter files to just .ldtk suffix
     for _, filename in pairs(files) do
         if string.match(filename, '(.ldtk)$') then
-            table.insert(levels, filename)
+
+            table.insert(levels, string.sub(filename, 1, #filename - 5))
         end
     end
 

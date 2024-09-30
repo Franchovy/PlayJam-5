@@ -15,46 +15,22 @@ end
 local function loadData()
   local data = ds.read(FILE_NAME)
   if (data) then return data end
-  return LEVEL_DATA
-end
-
--- local functions, helpers
-
-local function assertValidInput(world, level)
-  local isValidInputWorld = world > 0 and world <= #LEVEL_DATA.worlds
-  local isValidInputLevel = level > 0 and level <= #LEVEL_DATA.worlds[world].levels
-
-  -- PLAYTESTING: Throw error.
-  if BUILD_FLAG.DEBUG or BUILD_FLAG.PLAYTESTING then
-    assert(isValidInputWorld, "`world` is out of range.", 2)
-    assert(isValidInputLevel, "`level` is out of range.", 2)
-  end
-
-  -- DEBUG ONLY: Overwrite level data if data is invalid.
-  if BUILD_FLAG.DEBUG then
-    local currentData = loadData()
-
-    if #currentData.worlds ~= #LEVEL_DATA.worlds or #currentData.worlds[world].levels ~= #LEVEL_DATA.worlds[world].levels then
-      saveData(LEVEL_DATA)
-    end
-  end
+  return {}
 end
 
 -- static functions, to be called by other classes
 
 -- sets the rescued bots for the level
 -- ideally called when a bot is rescued
-function MemoryCard.setRescuedBotsForLevel(world, level, rescued)
-  assertValidInput(world, level)
+function MemoryCard.setRescuedBotsForLevel(level, rescued)
   local data = loadData()
-  data.worlds[world].levels[level].rescued = rescued
+  data[level] = rescued
   saveData(data)
 end
 
-function MemoryCard.setLastPlayed(world, level)
-  assertValidInput(world, level)
+function MemoryCard.setLastPlayed(level)
   local data = loadData()
-  data.lastPlayed = { world = world, level = level }
+  data.lastPlayed = level
   saveData(data)
 end
 
@@ -67,18 +43,26 @@ function MemoryCard.getLastPlayed()
     return nil
   end
 
-  return data.lastPlayed.world, data.lastPlayed.level
+  -- For backwards-compatibility
+  if data.lastPlayed.world and data.lastPlayed.level then
+    return nil
+  end
+
+  return data.lastPlayed
 end
 
 -- returns total, rescued representing
 -- the player's progress in a level
-function MemoryCard.getLevelCompletion(world, level)
-  assertValidInput(world, level)
+function MemoryCard.getLevelCompletion(level)
   local data = loadData()
-  local r = data.worlds[world].levels[level]
-  return r.total, r.rescued or 0
+
+  if data[level] then
+    return 3, data[level].rescued or 0
+  end
+
+  return 3, 0
 end
 
 function MemoryCard.resetProgress()
-  saveData(LEVEL_DATA)
+  saveData({})
 end
