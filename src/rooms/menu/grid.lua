@@ -162,7 +162,7 @@ end
 function MenuGridView:drawSectionHeader(section, x, y, width, height)
 	local fontHeight = gfx.getSystemFont():getHeight()
   gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-	gfx.drawTextAligned("*WORLD " .. section .. "*", x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
+	gfx.drawTextAligned("*LEVEL SELECT*", x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
 end
 
 function MenuGridView:drawCell(section, row, _, selected, x, y, width, height)
