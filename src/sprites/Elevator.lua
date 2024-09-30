@@ -7,7 +7,6 @@ local imageElevator <const> = gfx.image.new(assets.images.elevator)
 
 local tileAdjustmentPx <const> = 4
 
-
 ---
 ---
 --- Private class methods
@@ -53,7 +52,7 @@ local function checkIfCollides(spriteToCheck, idealX, idealY, spritesToIgnore)
   local isCollisionCheckPassed = true
 
   for _, collision in pairs(collisions) do
-    local shouldSkipCollision = spritesToIgnore[collision.other]
+    local shouldSkipCollision = spritesToIgnore[collision.other] or collision.type == gfx.sprite.kCollisionTypeOverlap
 
     if not shouldSkipCollision then
       -- Block collision
@@ -249,7 +248,11 @@ function Elevator:postInit()
   self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self, { displacement = self.displacement })
 end
 
-function Elevator:collisionResponse(_)
+function Elevator:collisionResponse(other)
+  if other:getTag() == TAGS.Dialog then
+    return gfx.sprite.kCollisionTypeOverlap
+  end
+
   return gfx.sprite.kCollisionTypeSlide
 end
 
