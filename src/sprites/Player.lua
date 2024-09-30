@@ -240,6 +240,8 @@ function Player:handleCollision(collisionData)
 
     if tag == TAGS.Elevator then
         if collisionData.normal.y == -1 then
+            other:setChild(self)
+
             local key
             if self:isMovingDown() then
                 key = KEYNAMES.Down

@@ -126,21 +126,20 @@ local function setDisplacement(self, displacement)
 end
 
 --- Update method for movement
-local function updateMovement(self, movement, skipCollisionCheck)
+local function updateMovement(self, movement)
   -- Get new position using displacement
 
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
 
-  if not skipCollisionCheck then
-    -- Check collisions for self
+  -- Check collisions for self
 
-    local isCollisionCheckPassed
-    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, { [self.spriteChild] = true })
+  local spritesToIgnore = self.spriteChild and { [self.spriteChild] = true } or {}
+  local isCollisionCheckPassed
+  isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, spritesToIgnore)
 
-    -- Skip movement if collision happened
-    if not isCollisionCheckPassed then
-      return false
-    end
+  -- Skip movement if collision happened
+  if not isCollisionCheckPassed then
+    return false
   end
 
   if self.spriteChild then
@@ -166,11 +165,7 @@ local function updateMovement(self, movement, skipCollisionCheck)
     )
   end
 
-  -- Move to new position using displacement
-
---  self:moveTo(x, y)
-
-  -- Update displacement to reflect new position
+  -- Move to new displacement
 
   setDisplacement(self, self.displacement + movement)
 
@@ -281,8 +276,6 @@ function Elevator:activate(sprite, key)
 
   -- If activated, set update variables for movement
   if activationMovement ~= 0 then
-    -- Set child sprite for collision check
-    self.spriteChild = sprite
 
     -- Set movement update scalar
     self.movement = activationMovement
@@ -291,15 +284,12 @@ function Elevator:activate(sprite, key)
   return activationMovement
 end
 
---- Used specifically for when jumping while moving up with elevator.
-function Elevator:disableCollisionsForFrame()
-  self:setCollisionsEnabled(false)
-
-  self.isCollisionsDisabledForFrame = true
-end
-
 function Elevator:update()
   Elevator.super.update(self)
+
+  -- Reset update variables (Pre-update)
+
+  self.didActivationSuccess = false
 
   -- Get if elevator has been activated
   local movement = self.movement
@@ -312,12 +302,17 @@ function Elevator:update()
     if movement ~= 0 then
       -- Call without delta_time to avoid very small, inconsequential movements
 
-      updateMovement(self, movement, true)
+      updateMovement(self, movement)
     end
   else
     -- If any movement occurs, update elevator position based on movement * delta_time
 
-    self.didActivationSuccess = updateMovement(self, movement * _G.delta_time)
+    -- If movement is very small, don't multiply by delta_time.
+    if not (math.abs(movement) < 0.1) then
+      movement = movement * _G.delta_time
+    end
+
+    self.didActivationSuccess = updateMovement(self, movement)
   end
 
   -- Reset collisions if disabled
@@ -332,7 +327,13 @@ function Elevator:update()
 
   self.movement = 0
   self.spriteChild = nil
-  self.didActivationSuccess = false
+end
+
+--- Used specifically for when jumping while moving up with elevator.
+function Elevator:disableCollisionsForFrame()
+  self:setCollisionsEnabled(false)
+
+  self.isCollisionsDisabledForFrame = true
 end
 
 function Elevator:wasActivationSuccessful()
@@ -343,4 +344,8 @@ function Elevator:handleCheckpointRevert(state)
   self.movement = 0
 
   setDisplacement(self, state.displacement)
+end
+
+function Elevator:setChild(sprite)
+  self.spriteChild = sprite
 end
