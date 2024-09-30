@@ -38,18 +38,29 @@ local last_time = 0
 
 local function updateDeltaTime()
   local current_time = playdate.getCurrentTimeMilliseconds();
+
   _G.delta_time = (current_time - last_time) / 100;
+
   last_time = current_time;
 end
 
 function playdate.update()
-  updateDeltaTime();
-
-  -- Update sprites
-  gfx.sprite.update()
   timer.updateTimers()
   gfx.animation.blinker.updateAll()
 
+  -- Sprite Update
+
+  updateDeltaTime()
+
+  if _G.delta_time > 1 then
+    -- Safeguard against large delta_times (happens when loading)
+    return
+  end
+
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
+
+  -- Update sprites
+  gfx.sprite.update()
+
 end
