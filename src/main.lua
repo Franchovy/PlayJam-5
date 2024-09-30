@@ -45,22 +45,18 @@ local function updateDeltaTime()
 end
 
 function playdate.update()
-  timer.updateTimers()
-  gfx.animation.blinker.updateAll()
-
-  -- Sprite Update
 
   updateDeltaTime()
 
-  if _G.delta_time > 1 then
-    -- Safeguard against large delta_times (happens when loading)
-    return
+  -- Safeguard against large delta_times (happens when loading)
+  if _G.delta_time < 1 then
+    -- Update sprites
+    gfx.sprite.update()
   end
+
+  timer.updateTimers()
+  gfx.animation.blinker.updateAll()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
-
-  -- Update sprites
-  gfx.sprite.update()
-
 end
