@@ -50,8 +50,8 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local groundAcceleration <const> = 7
-local airAcceleration <const> = 1.5
+local groundAcceleration <const> = 3.5
+local airAcceleration <const> = 1.4
 local jumpSpeed <const> = 27
 local jumpHoldTimeInTicks <const> = 4
 
@@ -598,9 +598,9 @@ function Player:updateAnimationState()
 
     -- Handle direction (flip)
 
-    if velocity.dx < 1 then
+    if velocity.dx < 0 then
         self.states[animationState].flip = 1
-    elseif velocity.dx < -1 then
+    elseif velocity.dx > 0 then
         self.states[animationState].flip = 0
     end
 
