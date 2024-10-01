@@ -7046,15 +7046,15 @@
 							"height": 24,
 							"defUid": 19,
 							"px": [278,565],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Down", "Left", "Right" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Down", "Right", "Left" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Down"]
 							}, {
 								"id": "V_String",
-								"params": ["Left"]
+								"params": ["Right"]
 							}, {
 								"id": "V_String",
-								"params": ["Right"]
+								"params": ["Left"]
 							} ] }],
 							"__worldX": 2038,
 							"__worldY": -779
@@ -7792,11 +7792,11 @@
 							"defUid": 204,
 							"px": [352,288],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "4", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "3", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["4"]
+									"params": ["3"]
 								}] },
-								{ "__identifier": "saveNumber", "__type": "Int", "__value": 4, "__tile": null, "defUid": 418, "realEditorValues": [{ "id": "V_Int", "params": [4] }] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 3, "__tile": null, "defUid": 418, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 419, "realEditorValues": [{
 									"id": "V_Bool",
 									"params": [ true ]
