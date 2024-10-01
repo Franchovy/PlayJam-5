@@ -355,7 +355,11 @@ function Player:update()
 
         -- RigidBody update
 
-        self.rigidBody:update()
+        local collisions = self.rigidBody:update()
+
+        for _, collision in pairs(collisions) do
+            self:handleCollision(collision)
+        end
     end
 
     -- Update dialog

@@ -92,11 +92,5 @@ function RigidBody:update()
     self.velocity.x = 0
   end
 
-  -- Call sprite's extra collision handling if available
-
-  for _, c in pairs(sdkCollisions) do
-    if sprite.handleCollision then
-      sprite:handleCollision(c)
-    end
-  end
+  return sdkCollisions
 end
