@@ -24,14 +24,15 @@ local blinkerPressStart
 
 class("Start").extends(Room)
 
-function Start:enter(previous, inFileplayer)
+function Start:enter(previous)
   -- Set sceneManager reference
   sceneManager = self.manager
 
-  -- fileplayer input
-  if inFileplayer then
-    fileplayer = inFileplayer
+  if not FilePlayer.isPlaying() then
+    FilePlayer.play(assets.music.menu)
   end
+
+  local isFirstTimePlay = MemoryCard.getLastPlayed() == nil
 
   -- Draw background sprites
 
@@ -46,27 +47,26 @@ function Start:enter(previous, inFileplayer)
   spriteRobot:playAnimation()
 
   spriteContinueButton = gfx.sprite.new()
-  spriteSelectLevelButton = gfx.sprite.new()
-  self:setStartLabelText("PRESS A TO RESUME")
-  self:setSecondaryLabelText("PRESS B TO SELECT LEVEL")
+
+  if isFirstTimePlay then
+    self:setStartLabelText("PRESS A TO START")
+  else
+    self:setStartLabelText("PRESS A TO CONTINUE")
+  end
 
   spriteContinueButton:add()
   spriteContinueButton:moveTo(200, 180)
 
-  spriteSelectLevelButton:add()
-  spriteSelectLevelButton:moveTo(200, 200)
+  if not isFirstTimePlay then
+    spriteSelectLevelButton = gfx.sprite.new()
+    self:setSecondaryLabelText("PRESS B TO SELECT LEVEL")
+    spriteSelectLevelButton:add()
+    spriteSelectLevelButton:moveTo(200, 200)
+  end
 
   -- Reset draw offset
 
   gfx.setDrawOffset(0, 0)
-
-  -- Music
-
-  if not fileplayer then
-    fileplayer = assert(pd.sound.fileplayer.new("assets/music/03_Factory"))
-  end
-
-  fileplayer:play()
 
   -- Little fancy animation(s)
 
@@ -127,6 +127,10 @@ function Start:setStartLabelText(text)
 end
 
 function Start:setSecondaryLabelText(text)
+  if not spriteSelectLevelButton then
+    return
+  end
+
   assert(text and type(text) == "string")
 
   local textImage = gfx.imageWithText(text, 300, 120, nil, nil, nil, kTextAlignment.center)
@@ -140,12 +144,15 @@ function Start:leave(next, ...)
   spriteTitle:remove()
   spriteRobot:remove()
   spriteContinueButton:remove()
-  spriteSelectLevelButton:remove()
+
+  if spriteSelectLevelButton then
+    spriteSelectLevelButton:remove()
+  end
 
   -- Music
 
   if next.super.className == "Game" then
-    fileplayer:stop()
+    FilePlayer.stop()
   end
 
   -- Start animation timer
@@ -159,6 +166,13 @@ end
 function Start:AButtonDown()
   local levelFile = MemoryCard.getLastPlayed()
 
+  if not levelFile then
+    -- Start with first level
+    local levels = ReadFile.getLevelFiles()
+
+    levelFile = levels[1]
+  end
+
   if levelFile then
     LDtk.load(assets.path.levels..levelFile..".ldtk")
     spButton:play(1)
@@ -170,5 +184,5 @@ function Start:AButtonDown()
 end
 
 function Start:BButtonDown()
-  sceneManager:enter(sceneManager.scenes.menu, { fileplayer = fileplayer })
+  sceneManager:enter(sceneManager.scenes.menu)
 end

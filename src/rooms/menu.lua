@@ -1,11 +1,9 @@
 import "menu/grid"
 
-local pd <const> = playdate
-local sound <const> = pd.sound
-local gfx <const> = pd.graphics
-local systemMenu <const> = pd.getSystemMenu()
+local gfx <const> = playdate.graphics
+local systemMenu <const> = playdate.getSystemMenu()
 
-local spButton <const> = sound.sampleplayer.new(assets.sounds.menuSelect)
+local spButton <const> = playdate.sound.sampleplayer.new(assets.sounds.menuSelect)
 
 class ("Menu").extends(Room)
 
@@ -17,7 +15,10 @@ local sceneManager
 --
 function Menu:enter(previous, data)
   local data = data or {}
-  self.fileplayer = data.fileplayer
+
+  if not FilePlayer.isPlaying() then
+    FilePlayer.play(assets.music.menu)
+  end
 
   sceneManager = self.manager
 
@@ -53,7 +54,7 @@ end
 ---
 
 function Menu:AButtonDown()
-  fileplayer:stop()
+  FilePlayer.stop()
 
   local level = self.gridView:getSelectedLevel()
   if level then

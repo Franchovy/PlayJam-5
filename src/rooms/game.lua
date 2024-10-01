@@ -139,10 +139,8 @@ function Game:update()
         pd.ui.crankIndicator:draw()
     end
 
-    if fileplayer == nil then
-        self:setupFilePlayer()
-
-        fileplayer:play()
+    if not FilePlayer.isPlaying() then
+        FilePlayer.play(assets.music.game)
     end
 
     if spriteGuiRescueCounter:isAllSpritesRescued() then
@@ -171,8 +169,7 @@ function Game:leave(next, ...)
 
         -- Stop the music!
 
-        fileplayer:stop()
-        fileplayer = nil
+        FilePlayer.stop()
     end
 end
 
@@ -185,20 +182,7 @@ function Game:handleCheckpointRevert(state)
     end
 end
 
--- Fileplayer
-
-function Game:setupFilePlayer()
-    fileplayer = SuperFilePlayer()
-
-    fileplayer:loadFiles(assets.music.world1)
-
-    fileplayer:setPlayConfig(1)
-end
-
 -- Event-based methods
-
-
-local maxLevels <const> = 10
 
 function Game:levelComplete(data)
     local direction = data.direction

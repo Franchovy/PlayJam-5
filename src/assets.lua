@@ -25,6 +25,7 @@ _G.assets = {
         menuSelect = "assets/sfx/menu-select",
     },
     music = {
-        world1 = "assets/music/world_1"
+        game = "assets/music/world_1",
+        menu = "assets/music/03_Factory"
     }
 }
