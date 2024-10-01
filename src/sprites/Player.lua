@@ -391,23 +391,13 @@ function Player:update()
         self.crankWarpController:moveTo(self.x, self.y)
     end
 
-    -- Camera Movement
-
-    local playerX, playerY = self.x, self.y
-    local idealX, idealY = playerX - 200, playerY - 100
-
-    -- Positon camera within level bounds
-
-    local cameraOffsetX = math.max(math.min(idealX, levelWidth - 400), 0)
-    local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
-
-    gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+    self:updateCamera()
 
     -- Check if player is in top-left of level (overlap with GUI)
 
     local isOverlappingWithGUIPrevious = isOverlappingWithGUI
 
-    if playerX < 100 and playerY < 40 then
+    if self.x < 100 and self.y < 40 then
         isOverlappingWithGUI = true
     else
         isOverlappingWithGUI = false
@@ -422,22 +412,38 @@ function Player:update()
 
     local direction
 
-    if playerX > levelWidth then
+    if self.x > levelWidth then
         direction = DIRECTION.RIGHT
-    elseif playerX < 0 then
+    elseif self.x < 0 then
         direction = DIRECTION.LEFT
     end
 
-    if playerY > levelHeight then
+    if self.y > levelHeight then
         direction = DIRECTION.BOTTOM
-    elseif playerY < 0 then -- Add a margin to not trigger level change so easily.
+    elseif self.y < 0 then -- Add a margin to not trigger level change so easily.
         direction = DIRECTION.TOP
     end
 
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
-            { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
+            { direction = direction, coordinates = { x = self.x + levelGX, y = self.y + levelGY } })
     end
+end
+
+function Player:updateCamera()
+
+    -- Camera Movement
+
+    local playerX, playerY = self.x, self.y
+    local idealX, idealY = playerX - 200, playerY - 100
+
+    -- Positon camera within level bounds
+
+    local cameraOffsetX = math.max(math.min(idealX, levelWidth - 400), 0)
+    local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
+
+    gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+
 end
 
 function Player:revertCheckpoint()
@@ -556,6 +562,10 @@ function Player:enterLevel(direction, levelBounds)
             timerCooldownCheckpoint = nil
         end
     end
+
+    -- Update Camera
+
+    self:updateCamera()
 end
 
 -- Animation Handling
