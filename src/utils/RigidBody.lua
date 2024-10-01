@@ -87,6 +87,11 @@ function RigidBody:update()
     self.velocity.y = self.velocity.y + (self.velocity.y * airFrictionCoefficient * _G.delta_time)
   end
 
+  -- If x velocity is very small, reduce to zero.
+  if math.abs(self.velocity.x) < 0.1 then
+    self.velocity.x = 0
+  end
+
   -- Call sprite's extra collision handling if available
 
   for _, c in pairs(sdkCollisions) do
