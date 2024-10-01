@@ -40,6 +40,8 @@ local _instance
 
 function AbilityPanel.getInstance() return _instance end
 
+function AbilityPanel.destroy() _instance = nil end
+
 --
 
 -- Static Reference

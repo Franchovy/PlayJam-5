@@ -68,11 +68,13 @@ function Game:enter(previous, data)
 
         -- Set up GUI
 
-        if not spriteGuiRescueCounter then
-            spriteGuiRescueCounter = SpriteRescueCounter()
+        local spriteRescueCounter = SpriteRescueCounter.getInstance()
+
+        if not spriteRescueCounter then
+            spriteRescueCounter = SpriteRescueCounter()
         end
 
-        spriteGuiRescueCounter:setRescueSpriteCount(botRescueCount)
+        spriteRescueCounter:setRescueSpriteCount(botRescueCount)
     end
 
     -- This should run only once to initialize the game instance.
@@ -143,7 +145,7 @@ function Game:update()
         FilePlayer.play(assets.music.game)
     end
 
-    if spriteGuiRescueCounter:isAllSpritesRescued() then
+    if SpriteRescueCounter.getInstance():isAllSpritesRescued() then
         spriteLevelCompleteText:add()
         spriteLevelCompleteHintText:add()
     end
@@ -160,6 +162,18 @@ function Game:leave(next, ...)
     --
 
     if next.super.className == "Start" or next.super.className == "Menu" then
+        -- Clear player data
+
+        Player.destroy()
+
+        -- Clear checkpoints
+
+        Checkpoint.clearAll()
+
+        -- Clear rescued sprites
+
+        SpriteRescueCounter.destroy()
+
         -- Remove system/PD menu items
 
         systemMenu:removeAllMenuItems()
@@ -197,9 +211,10 @@ function Game:levelComplete(data)
 end
 
 function Game:botRescued(bot, botNumber)
-    spriteGuiRescueCounter:setSpriteRescued(botNumber)
+    local spriteRescueCounter = SpriteRescueCounter.getInstance()
+    spriteRescueCounter:setSpriteRescued(botNumber)
 
-    if spriteGuiRescueCounter:isAllSpritesRescued() then
+    if spriteRescueCounter:isAllSpritesRescued() then
         spriteLevelCompleteText:add()
         spriteLevelCompleteHintText:add()
 
@@ -221,13 +236,13 @@ function Game:checkpointIncrement()
 end
 
 function Game:checkpointRevert()
-    if not spriteGuiRescueCounter:isAllSpritesRescued() then
+    if not SpriteRescueCounter.getInstance():isAllSpritesRescued() then
         -- Revert checkpoint
         Checkpoint.goToPrevious()
     else
         -- If all bots have been rescued, then finish the level.
 
-        Player.getInstance():setWarpLoopAnimation()
+        Player.getInstance():setWarpLoopAnimation(true)
 
         playdate.timer.performAfterDelay(3000, function()
             sceneManager:enter(sceneManager.scenes.menu)

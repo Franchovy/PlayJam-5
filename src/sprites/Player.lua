@@ -68,6 +68,7 @@ class("Player").extends(AnimatedSprite)
 local _instance
 
 function Player.getInstance() return _instance end
+function Player.destroy() _instance = nil end
 
 function Player:init(entity)
     _instance = self
@@ -203,8 +204,8 @@ function Player:setBlueprints(blueprints)
     self.blueprints = blueprints
 end
 
-function Player:setWarpLoopAnimation()
-    self.crankWarpController:setLoop()
+function Player:setWarpLoopAnimation(shouldLoopAnimation)
+    self.crankWarpController:setLoop(shouldLoopAnimation)
 end
 
 -- Collision Response
@@ -597,9 +598,9 @@ function Player:updateAnimationState()
 
     -- Handle direction (flip)
 
-    if velocity.dx < 0 then
+    if velocity.dx < 1 then
         self.states[animationState].flip = 1
-    elseif velocity.dx > 0 then
+    elseif velocity.dx < -1 then
         self.states[animationState].flip = 0
     end
 

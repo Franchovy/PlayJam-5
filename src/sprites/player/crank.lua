@@ -11,7 +11,7 @@ local animationStates = {
     start = "start",
     loop = "loop",
     finish = "finish",
-    complete = "complete"
+    none = "none"
 }
 
 --- Indexes in the `totalCrankAngleToWarp` imagetable. Imagetable
@@ -21,7 +21,7 @@ local indexesImageTableWarp = {
     [animationStates.start] = 91,
     [animationStates.loop] = 60,
     [animationStates.finish] = 30,
-    [animationStates.complete] = 1
+    [animationStates.none] = 1
 }
 
 local function setState(self, state)
@@ -44,7 +44,7 @@ function CrankWarpController:init()
     self:add()
     self:setZIndex(99)
 
-    self.state = animationStates.complete
+    self.state = animationStates.none
     self.index = indexesImageTableWarp[animationStates.start]
     self.crankMomentum = 0
     self.isLoopingMode = false
@@ -55,7 +55,7 @@ function CrankWarpController:isActive()
 end
 
 function CrankWarpController:handleCrankChange()
-    if self.state == animationStates.complete then
+    if self.state == animationStates.none then
         self.state = animationStates.start
     end
 
@@ -103,8 +103,8 @@ function CrankWarpController:handleCrankChange()
     elseif self.state == animationStates.finish then
         self.index -= 1
 
-        if self.index <= indexesImageTableWarp[animationStates.complete] then
-            setState(self, animationStates.complete)
+        if self.index <= indexesImageTableWarp[animationStates.none] then
+            setState(self, animationStates.none)
         end
     end
 
@@ -118,7 +118,7 @@ function CrankWarpController:updateImage()
     self:setImage(imageTableWarp[self.index])
 end
 
-function CrankWarpController:setLoop()
-    self.isLoopingMode = true
-    self.state = animationStates.loop
+function CrankWarpController:setLoop(shouldLoopAnimation)
+    self.isLoopingMode = shouldLoopAnimation
+    self.state = shouldLoopAnimation and animationStates.loop or animationStates.none
 end

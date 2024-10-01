@@ -62,31 +62,33 @@ function Dialog:init(entity)
 
     -- Break up text into lines
 
-    self.dialogs = {}
-    for text in string.gmatch(text, "([^\n]+)") do
-        local dialog = {
-            text = text,
-            lines = {},
-            width = 0,
-            height = 0
-        }
+    if text then
+        self.dialogs = {}
+        for text in string.gmatch(text, "([^\n]+)") do
+            local dialog = {
+                text = text,
+                lines = {},
+                width = 0,
+                height = 0
+            }
 
-        for text in string.gmatch(text, "[^/]+") do
-            -- Get dialog width by getting max width of all lines
-            local textWidth = font:getTextWidth(text)
-            if dialog.width < textWidth then
-                dialog.width = textWidth
+            for text in string.gmatch(text, "[^/]+") do
+                -- Get dialog width by getting max width of all lines
+                local textWidth = font:getTextWidth(text)
+                if dialog.width < textWidth then
+                    dialog.width = textWidth
+                end
+
+                -- Add line to dialog lines
+                table.insert(dialog.lines, text)
             end
 
-            -- Add line to dialog lines
-            table.insert(dialog.lines, text)
+            -- Add dialog height based on num. lines
+            dialog.height = font:getHeight() * #dialog.lines
+
+            -- Add dialog to list
+            table.insert(self.dialogs, dialog)
         end
-
-        -- Add dialog height based on num. lines
-        dialog.height = font:getHeight() * #dialog.lines
-
-        -- Add dialog to list
-        table.insert(self.dialogs, dialog)
     end
 
     -- Set up child sprite
@@ -188,22 +190,25 @@ function Dialog:collapse()
 end
 
 function Dialog:update()
-    if self.isActivated then
-        -- Consume update variable
-        self.isActivated = false
 
-        if not self.isStateExpanded then
-            self:expand()
+    if self.dialogs then
+        if self.isActivated then
+            -- Consume update variable
+            self.isActivated = false
+
+            if not self.isStateExpanded then
+                self:expand()
+            end
+        elseif self.isStateExpanded then
+            self:collapse()
         end
-    elseif self.isStateExpanded then
-        self:collapse()
-    end
 
-    if self.isStateExpandedPrevious ~= self.isStateExpanded
-        or self.currentLinePrevious ~= self.currentLine then
-        self:updateDialog()
-    end
+        if self.isStateExpandedPrevious ~= self.isStateExpanded
+            or self.currentLinePrevious ~= self.currentLine then
+            self:updateDialog()
+        end
 
-    self.isStateExpandedPrevious = self.isStateExpanded
-    self.currentLinePrevious = self.currentLine
+        self.isStateExpandedPrevious = self.isStateExpanded
+        self.currentLinePrevious = self.currentLine
+    end
 end

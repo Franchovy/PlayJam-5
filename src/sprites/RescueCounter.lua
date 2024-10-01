@@ -17,9 +17,8 @@ SpriteRescueCounter = Class("SpriteRescueCounter", gfx.sprite)
 
 local _instance
 
-function SpriteRescueCounter.getInstance()
-    return _instance
-end
+function SpriteRescueCounter.getInstance() return _instance end
+function SpriteRescueCounter.destroy() _instance = nil end
 
 function SpriteRescueCounter:init()
     SpriteRescueCounter.super.init(self)

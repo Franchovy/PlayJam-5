@@ -32,6 +32,11 @@ local checkpointHandlers = table.create(32, 0)
 
 -- Static methods - managing save state at the game level
 
+function Checkpoint.clearAll()
+    checkpointNumber = 1
+    checkpointHandlers = table.create(32, 0)
+end
+
 function Checkpoint.increment()
     checkpointNumber += 1
 end
