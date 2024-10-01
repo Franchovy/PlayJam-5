@@ -244,7 +244,7 @@ function Elevator:postInit()
 end
 
 function Elevator:collisionResponse(other)
-  if other:getTag() == TAGS.Dialog then
+  if other:getTag() == TAGS.Dialog or other:getTag() == TAGS.SavePoint then
     return gfx.sprite.kCollisionTypeOverlap
   end
 

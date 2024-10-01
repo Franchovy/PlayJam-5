@@ -20,12 +20,30 @@ end
 
 -- static functions, to be called by other classes
 
--- sets the rescued bots for the level
--- ideally called when a bot is rescued
-function MemoryCard.setRescuedBotsForLevel(level, rescued)
+function MemoryCard.setLevelComplete()
   local data = loadData()
-  data[level] = rescued
+
+  if data == nil or data.lastPlayed == nil then
+    return
+  end
+
+  if data.levels == nil then
+    data.levels = {}
+  end
+
+  data.levels[data.lastPlayed] = { complete = true }
+
   saveData(data)
+end
+
+function MemoryCard.getLevelCompleted(level)
+  local data = loadData()
+
+  if data == nil or data.levels == nil or data.levels[level] == nil then
+    return false
+  end
+
+  return data.levels[level].complete or false
 end
 
 function MemoryCard.setLastPlayed(level)

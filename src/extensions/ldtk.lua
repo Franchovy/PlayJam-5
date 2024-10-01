@@ -3,7 +3,6 @@ local gfx <const> = pd.graphics
 -- Add all layers as tilemaps
 
 function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
-    local hintCrank = LDtk.get_custom_data(levelName, "HintCrank")
     for layerName, layer in pairs(LDtk.get_layers(levelName)) do
         if layer.tiles then
             local tilemap = LDtk.create_tilemap(levelName, layerName)
@@ -23,7 +22,6 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
             end
         end
     end
-    return hintCrank
 end
 
 function LDtk.loadAllEntitiesAsSprites(levelName)
@@ -37,6 +35,11 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         local sprite
 
         if entity.name == "Player" and Player.getInstance() then
+            if entity.isOriginalPlayerSpawn then
+                -- If Player previously spawned here, skip.
+                goto continue
+            end
+
             -- If Player already exists and is playing, then create a SavePoint instead.
             sprite = SavePoint(entity)
         elseif entity.fields.consumed == true then

@@ -20,11 +20,18 @@ function SavePoint:init(entity)
     self:setScale(2)
     self:setCollideRect(0, 0, self:getSize())
     self:setTag(TAGS.SavePoint)
+    self.collisionResponse = gfx.sprite.kCollisionTypeOverlap
 
     -- State properties
 
-    self.isActivated = false
+    self.isActivated = entity.fields.isActivated or false
     self.blueprintsCurrentError = nil
+end
+
+function SavePoint:postInit()
+    -- Update
+
+    self:updateImage()
 end
 
 function SavePoint:update()
@@ -55,18 +62,14 @@ function SavePoint:activate()
 
     -- Check if blueprints match
 
-    local isMatchBlueprints = true
-    for i,blueprint in ipairs(self.blueprints) do
-        isMatchBlueprints = isMatchBlueprints and blueprintsPlayer[i] == blueprint
-    end
-
-    if isMatchBlueprints then
+    if self:isMatchBlueprints(blueprintsPlayer) then
         -- Activate / save game
         self.isActivated = true
+        self.fields.isActivated = true
 
         spWin:play(1)
 
-        self:setImage(imageTableSprite[2])
+        self:updateImage()
 
         Checkpoint.clearAllPrevious()
     else
@@ -77,4 +80,24 @@ function SavePoint:activate()
 
         spError:play(1)
     end
+end
+
+function SavePoint:updateImage()
+    if self.fields.isActivated then
+        self:setImage(imageTableSprite[2])
+    else
+        self:setImage(imageTableSprite[1])
+    end
+end
+
+function SavePoint:isMatchBlueprints(blueprints)
+    local isMatchBlueprints = #blueprints == #self.blueprints
+
+    if isMatchBlueprints then
+        for i,blueprint in ipairs(self.blueprints) do
+            isMatchBlueprints = isMatchBlueprints and blueprints[i] == blueprint
+        end
+    end
+
+    return isMatchBlueprints
 end

@@ -47,6 +47,7 @@ function CrankWarpController:init()
     self.state = animationStates.complete
     self.index = indexesImageTableWarp[animationStates.start]
     self.crankMomentum = 0
+    self.isLoopingMode = false
 end
 
 function CrankWarpController:isActive()
@@ -58,17 +59,21 @@ function CrankWarpController:handleCrankChange()
         self.state = animationStates.start
     end
 
-    -- Get crank change
-    local crankChange = pd.getCrankChange()
+    if not self.isLoopingMode then
+        -- Get crank change
+        local crankChange = pd.getCrankChange()
 
-    -- Increment totalCrankAngleToWarp
+        -- Increment totalCrankAngleToWarp
 
-    self.crankMomentum += crankChange
+        self.crankMomentum += crankChange
 
-    -- If in state start, apply resistance backwards.
-    local resistanceCrankMomentum = (self.crankMomentum) * coefficientCrankResistance
-    local maxCrankResistance = self.state == animationStates.start and maxCrankResistanceStart or maxCrankResistanceLoop
-    self.crankMomentum = math.max(0, self.crankMomentum - math.min(resistanceCrankMomentum, maxCrankResistance))
+        -- If in state start, apply resistance backwards.
+        local resistanceCrankMomentum = (self.crankMomentum) * coefficientCrankResistance
+        local maxCrankResistance = self.state == animationStates.start and maxCrankResistanceStart or maxCrankResistanceLoop
+        self.crankMomentum = math.max(0, self.crankMomentum - math.min(resistanceCrankMomentum, maxCrankResistance))
+    else
+        self.crankMomentum = 90
+    end
 
     if self.state == animationStates.start then
 
@@ -111,4 +116,9 @@ end
 
 function CrankWarpController:updateImage()
     self:setImage(imageTableWarp[self.index])
+end
+
+function CrankWarpController:setLoop()
+    self.isLoopingMode = true
+    self.state = animationStates.loop
 end

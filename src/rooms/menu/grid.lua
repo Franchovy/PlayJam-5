@@ -32,35 +32,61 @@ end
 local function isFirstOrLastCell(self, section, row)
   if row == 1 then
     -- is First cell
-    return false
+    return true
   elseif row == #levels then
     -- is last cell
-    return false
+    return true
   end
 
-  return true
+  return false
 end
 
 local function animateSelectionChange(self, callback, ...)
-  local sectionPrevious, rowPrevious = self.gridView:getSelection()
+  local _, rowPrevious = self.gridView:getSelection()
 
   callback(self.gridView, ...)
 
-  local section, row = self.gridView:getSelection()
+  local _, row = self.gridView:getSelection()
 
-  if sectionPrevious ~= section or rowPrevious ~= row then
+  if rowPrevious ~= row then
     -- [Franch] NOTE: There seems to be a bug where scrolling first or last cell to center
     -- blocks scrolling indefinitely. Not sure what's causing it.
     -- Work-around is to disable scrolling to center on those cells.
 
-    if isFirstOrLastCell(self, section, row) then
-      self.gridView:scrollCellToCenter(section, row, 1)
+    self.gridView:scrollCellToCenter(1, row, 1)
+    --[[if isFirstOrLastCell(self, 1, row) then
     else
-      self.gridView:scrollToCell(section, row, 1)
-    end
+      self.gridView:scrollCellToCenter(1, row, 1)
+    end]]
 
     resetAnimator(self)
   end
+end
+
+-- Draw Methods
+
+local function drawSectionHeader(self, _, _, x, y, width, height)
+	local fontHeight = gfx.getSystemFont():getHeight()
+  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+	gfx.drawTextAligned("*LEVEL SELECT*", x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
+end
+
+local function drawCell(self, _, _, row, _, selected, x, y, width, height)
+  gfx.setDitherPattern(0.1, gfx.image.kDitherTypeDiagonalLine)
+  if selected then
+    gfx.fillRoundRect(x, y, self.animatorGridCell:currentValue(), CELL_HEIGHT, 10)
+    gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
+    gfx.setLineWidth(3)
+  else
+    gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+    gfx.setLineWidth(1)
+  end
+	local fontHeight = 50
+
+  local filename = levels[row]
+	gfx.drawTextAligned(filename, x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
+  gfx.setColor(gfx.kColorWhite)
+  gfx.drawRoundRect(x, y, width, height, 10)
 end
 
 ---
@@ -73,12 +99,6 @@ end
 
 function MenuGridView:init()
   self.gridView = ui.gridview.new(0, CELL_HEIGHT)
-
-  -- No super init call available on gridView, so let's redirect missed function calls on super to the gridview object.
-  local mt = {
-    __index = self.gridView
-  }
-  setmetatable(MenuGridView.super, mt)
 
   -- Get levels
 
@@ -94,7 +114,7 @@ function MenuGridView:init()
   self.gridView:setContentInset(CELL_INSETS, CELL_INSETS, CELL_INSETS, CELL_INSETS)
   self.gridView:setSectionHeaderHeight(48)
   self.gridView:setNumberOfColumns(1)
-  self.gridView.scrollCellsToCenter = false -- [Franch] NOTE: See note in `animateSelectionChange()`.
+  self.gridView.scrollCellsToCenter = true -- [Franch] NOTE: See note in `animateSelectionChange()`.
 
   -- Set animator
 
@@ -102,13 +122,17 @@ function MenuGridView:init()
 
   -- Local gridview function overrides
 
-  self.gridView.drawSectionHeader = function(...) self:drawSectionHeader(...) end
-  self.gridView.drawCell = function(...) self:drawCell(...) end
+  self.gridView.drawSectionHeader = function(...) drawSectionHeader(self, ...) end
+  self.gridView.drawCell = function(...) drawCell(self, ...) end
 end
 
 ---
 --- Public/API methods
 ---
+
+function MenuGridView:update()
+  self.gridView:drawInRect(0, 0, 400, 240)
+end
 
 --- Selection Methods: Automatically animated if selection has changed.
 
@@ -132,22 +156,7 @@ function MenuGridView:selectPreviousRow()
   )
 end
 
-function MenuGridView:setSelection(rowOrLevel)
-  local row
-
-  if type(rowOrLevel) == "number" then
-    row = math.max(rowOrLevel, #levels)
-  elseif type(rowOrLevel) == "string" then
-    -- Get number from
-    for i, level in ipairs(levels) do
-      if level == rowOrLevel then
-        row = i
-      end
-    end
-  end
-
-  row = row or 1
-
+function MenuGridView:setSelection(row)
   animateSelectionChange(
     self,
     self.gridView.setSelection,
@@ -157,33 +166,18 @@ function MenuGridView:setSelection(rowOrLevel)
   )
 end
 
--- Draw Methods
-
-function MenuGridView:drawSectionHeader(section, x, y, width, height)
-	local fontHeight = gfx.getSystemFont():getHeight()
-  gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-	gfx.drawTextAligned("*LEVEL SELECT*", x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
-end
-
-function MenuGridView:drawCell(section, row, _, selected, x, y, width, height)
-  gfx.setDitherPattern(0.1, gfx.image.kDitherTypeDiagonalLine)
-  if selected then
-    gfx.fillRoundRect(x, y, self.animatorGridCell:currentValue(), CELL_HEIGHT, 10)
-    gfx.setImageDrawMode(gfx.kDrawModeFillBlack)
-    gfx.setLineWidth(3)
-  else
-    gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
-    gfx.setLineWidth(1)
-  end
-	local fontHeight = 50
-
-  local filename = levels[row]
-	gfx.drawTextAligned(filename, x + width / 2, y + (height/2 - fontHeight/2) + 2, kTextAlignment.center)
-  gfx.setColor(gfx.kColorWhite)
-  gfx.drawRoundRect(x, y, width, height, 10)
-end
-
 function MenuGridView:getSelectedLevel()
-  local _, row = self:getSelection()
+  local _, row = self.gridView:getSelection()
   return levels[row]
+end
+
+function MenuGridView:setSelectionNextLevel()
+  for i, level in ipairs(levels) do
+    if not MemoryCard.getLevelCompleted(level) then
+      self:setSelection(i)
+      return
+    end
+  end
+
+  self.gridView:setSelectedRow(1)
 end

@@ -8,6 +8,10 @@ local padding <const> = 3
 local maxSpriteCounters <const> = 16
 local spriteCounters <const> = {}
 
+local function isSet(self)
+    return self:getImage() == imagetableSprite[2]
+end
+
 ---@class CrankWarpController: playdate.graphics.sprite
 SpriteRescueCounter = Class("SpriteRescueCounter", gfx.sprite)
 
@@ -27,10 +31,15 @@ function SpriteRescueCounter:init()
     for i=1,maxSpriteCounters do
         local spriteCounter = gfx.sprite.new(image)
 
+        -- Sprite config for
+
         spriteCounter:setCenter(0, 0)
         spriteCounter:moveTo(400 - i * (spriteWidth + padding), padding)
         spriteCounter:setIgnoresDrawOffset(true)
         spriteCounter:setZIndex(100)
+
+        -- Provide helper function for checking if state set or not set
+        spriteCounter.isSet = isSet
 
         table.insert(spriteCounters, spriteCounter)
     end
@@ -71,5 +80,15 @@ function SpriteRescueCounter:setRescueSpriteCount(count)
 end
 
 function SpriteRescueCounter:setSpriteRescued(number)
-    spriteCounters[number]:setImage(imagetableSprite[2])
+    spriteCounters[self.rescueSpriteCount - number + 1]:setImage(imagetableSprite[2])
+end
+
+function SpriteRescueCounter:isAllSpritesRescued()
+    for i=1,self.rescueSpriteCount do
+        if not spriteCounters[i]:isSet() then
+            return false
+        end
+    end
+
+    return true
 end

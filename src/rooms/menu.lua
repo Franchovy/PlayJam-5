@@ -15,26 +15,21 @@ local sceneManager
 --- LIFECYCLE
 ---
 --
-function Menu:enter(fileplayer)
-  self.fileplayer = fileplayer
+function Menu:enter(previous, data)
+  local data = data or {}
+  self.fileplayer = data.fileplayer
 
   sceneManager = self.manager
 
-  self.gridView = MenuGridView.new()
+  gfx.setDrawOffset(0, 0)
+
+  if not self.gridView then
+    self.gridView = MenuGridView.new()
+  end
 
   systemMenu:addMenuItem("reset progress", MemoryCard.resetProgress)
 
-  -- TODO: if last played is 100% complete, select _next_ level
-  -- and if all levels are 100% complete, just set to 1-1
-  -- STRETCH: cool new state or animationg for 100% completion
-  local level = MemoryCard.getLastPlayed()
-
-  -- Position current row in center of screen
-  -- Wrapped in a timer delay to allow the gridview to initialize.
-
-  playdate.timer.performAfterDelay(1, function()
-    self.gridView:setSelection(level or 1)
-  end)
+  self.gridView:setSelectionNextLevel()
 end
 
 function Menu:leave()
@@ -50,7 +45,7 @@ function Menu:setMenuLabelText(text)
 end
 
 function Menu:update()
-  self.gridView:drawInRect(0, 0, 400, 240)
+  self.gridView:update()
 end
 
 ---

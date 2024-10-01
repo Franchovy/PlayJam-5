@@ -15,6 +15,10 @@ local initialLevelName <const> = "Level_0"
 local currentLevelName
 local checkpointPlayerStart
 
+local spriteLevelCompleteText
+local spriteLevelCompleteHintText
+local blinkerLevelComplete
+
 -- Sprites
 
 local botsToRescueCount <const> = 3
@@ -36,6 +40,19 @@ end
 
 function Game:init()
     self.checkpointHandler = CheckpointHandler.getOrCreate("game", self)
+
+    spriteLevelCompleteText = gfx.sprite.spriteWithText("Level Complete", 200, 80, nil, nil, nil, kTextAlignment.center)
+    spriteLevelCompleteText:setScale(1.5)
+    spriteLevelCompleteText:getImage():setInverted(true)
+    spriteLevelCompleteText:moveTo(200, 60)
+    spriteLevelCompleteText:setIgnoresDrawOffset(true)
+
+    spriteLevelCompleteHintText = gfx.sprite.spriteWithText("Crank to Finish", 200, 80, nil, nil, nil, kTextAlignment.center)
+    spriteLevelCompleteHintText:getImage():setInverted(true)
+    spriteLevelCompleteHintText:moveTo(200, 90)
+    spriteLevelCompleteHintText:setIgnoresDrawOffset(true)
+
+    blinkerLevelComplete = gfx.animation.blinker.new(700, 300, true)
 end
 
 function Game:enter(previous, data)
@@ -86,14 +103,7 @@ function Game:enter(previous, data)
         self.checkpointHandler:pushState({ levelName = currentLevelName })
     end
 
-    local hintCrank = LDtk.loadAllLayersAsSprites(currentLevelName)
-
-    pd.timer.new(1500, function()
-        self.hintCrank = hintCrank
-        pd.timer.new(3000, function()
-            self.hintCrank = false
-        end)
-    end)
+    LDtk.loadAllLayersAsSprites(currentLevelName)
 
     LDtk.loadAllEntitiesAsSprites(currentLevelName)
 
@@ -134,6 +144,14 @@ function Game:update()
 
         fileplayer:play()
     end
+
+    if spriteGuiRescueCounter:isAllSpritesRescued() then
+        spriteLevelCompleteText:add()
+        spriteLevelCompleteHintText:add()
+    end
+
+    spriteLevelCompleteText:setVisible(blinkerLevelComplete.on)
+    spriteLevelCompleteHintText:setVisible(blinkerLevelComplete.on)
 end
 
 function Game:leave(next, ...)
@@ -196,6 +214,17 @@ end
 
 function Game:botRescued(bot, botNumber)
     spriteGuiRescueCounter:setSpriteRescued(botNumber)
+
+    if spriteGuiRescueCounter:isAllSpritesRescued() then
+        spriteLevelCompleteText:add()
+        spriteLevelCompleteHintText:add()
+
+        blinkerLevelComplete:startLoop()
+
+        -- Set level complete in data
+
+        MemoryCard.setLevelComplete()
+    end
 end
 
 function Game:updateBlueprints()
@@ -208,7 +237,18 @@ function Game:checkpointIncrement()
 end
 
 function Game:checkpointRevert()
-    Checkpoint.goToPrevious()
+    if not spriteGuiRescueCounter:isAllSpritesRescued() then
+        -- Revert checkpoint
+        Checkpoint.goToPrevious()
+    else
+        -- If all bots have been rescued, then finish the level.
+
+        Player.getInstance():setWarpLoopAnimation()
+
+        playdate.timer.performAfterDelay(3000, function()
+            sceneManager:enter(sceneManager.scenes.menu)
+        end)
+    end
 end
 
 function Game:hideOrShowGui(shouldHide)

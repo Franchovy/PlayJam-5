@@ -74,6 +74,8 @@ function Player:init(entity)
 
     Player.super.init(self, imagetablePlayer)
 
+    entity.isOriginalPlayerSpawn = true
+
     -- AnimatedSprite states
 
     local function pauseAnimation()
@@ -199,6 +201,10 @@ end
 
 function Player:setBlueprints(blueprints)
     self.blueprints = blueprints
+end
+
+function Player:setWarpLoopAnimation()
+    self.crankWarpController:setLoop()
 end
 
 -- Collision Response
