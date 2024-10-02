@@ -5,7 +5,6 @@ local gfx <const> = playdate.graphics
 
 -- Assets
 
-local imageSpeech <const> = gfx.image.new(assets.images.speech)
 local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17, 17)
 local spSpeech <const> = playdate.sound.sampleplayer.new(assets.sounds.speech)
 
@@ -38,10 +37,11 @@ end
 
 --
 
-class("Dialog").extends(gfx.sprite)
+---@class Dialog: playdate.graphics.sprite
+Dialog = Class("Dialog", gfx.sprite)
 
 function Dialog:init(entity)
-    Dialog.super.init(self, imageSpeech)
+    Dialog.super.init(self)
 
     -- Sprite setup
 
@@ -51,6 +51,22 @@ function Dialog:init(entity)
 
     self.isRescuable = entity.fields.save
     self.rescueNumber = entity.fields.saveNumber
+
+    -- Load image based on rescuable & entity ID
+
+    local image
+
+    if self.isRescuable then
+        local spriteNumber = math.random(1, 7)
+        local imagetable = assert(gfx.imagetable.new(assets.imageTables.bots[spriteNumber]))
+        image = imagetable[1]
+    else
+        local imagetable = assert(gfx.imagetable.new(assets.imageTables.bots.helper))
+        image = imagetable[1]
+    end
+
+    self:setSize(0, 0, image:getSize())
+    self:setImage(image)
 
     -- Get text from LDtk entity
 
