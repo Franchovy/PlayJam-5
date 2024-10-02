@@ -3849,6 +3849,29 @@
 							}] }],
 							"__worldX": 382,
 							"__worldY": 30
+						},
+						{
+							"__identifier": "Dialog",
+							"__grid": [10,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#FFFFFF",
+							"iid": "ff136590-73f0-11ef-8e93-8bd92736dc9d",
+							"width": 16,
+							"height": 16,
+							"defUid": 204,
+							"px": [320,416],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 427, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 428, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 320,
+							"__worldY": 224
 						}
 					]
 				},
@@ -4208,34 +4231,8 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Dialog",
-							"__grid": [1,11],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#FFFFFF",
-							"iid": "d84fcfe0-73f0-11ef-a4fd-e1063d13ec05",
-							"width": 16,
-							"height": 16,
-							"defUid": 204,
-							"px": [32,352],
-							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "1", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["1"]
-								}] },
-								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 427, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
-								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 428, "realEditorValues": [{
-									"id": "V_Bool",
-									"params": [ true ]
-								}] }
-							],
-							"__worldX": 544,
-							"__worldY": 160
-						},
-						{
 							"__identifier": "Player",
-							"__grid": [3,10],
+							"__grid": [0,10],
 							"__pivot": [-0.3,-0.333],
 							"__tags": [],
 							"__tile": null,
@@ -4244,7 +4241,7 @@
 							"width": 20,
 							"height": 24,
 							"defUid": 19,
-							"px": [118,341],
+							"px": [22,341],
 							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Right", "Down", "Up" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Right"]
@@ -4255,7 +4252,7 @@
 								"id": "V_String",
 								"params": ["Up"]
 							} ] }],
-							"__worldX": 630,
+							"__worldX": 534,
 							"__worldY": 149
 						},
 						{
@@ -5171,10 +5168,7 @@
 							"defUid": 204,
 							"px": [128,192],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "2", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["2"]
-								}] },
+								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [null] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": 2, "__tile": null, "defUid": 427, "realEditorValues": [{ "id": "V_Int", "params": [2] }] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 428, "realEditorValues": [{
 									"id": "V_Bool",
@@ -6864,12 +6858,12 @@
 							"defUid": 204,
 							"px": [288,160],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "3", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["3"]
-								}] },
+								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [null] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": 3, "__tile": null, "defUid": 427, "realEditorValues": [{ "id": "V_Int", "params": [3] }] },
-								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 428, "realEditorValues": [] }
+								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 428, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
 							"__worldX": 2272,
 							"__worldY": 1152

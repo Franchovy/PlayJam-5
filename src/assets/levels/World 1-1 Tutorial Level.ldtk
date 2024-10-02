@@ -2864,6 +2864,31 @@
 							}] }],
 							"__worldX": 254,
 							"__worldY": -482
+						},
+						{
+							"__identifier": "Dialog",
+							"__grid": [8,17],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#FFFFFF",
+							"iid": "58859c20-73f0-11ef-bb33-63c18ebf0090",
+							"width": 16,
+							"height": 16,
+							"defUid": 204,
+							"px": [256,544],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "Welcome to the/mines, DRLBOT.\nYou can't do what/you want here.\nChoose your actions/carefully.", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": [
+										"Welcome to the/mines, DRLBOT.\\nYou can't do what/you want here.\\nChoose your actions/carefully."
+									]
+								}] },
+								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 412, "realEditorValues": [] }
+							],
+							"__worldX": 256,
+							"__worldY": -128
 						}
 					]
 				},
@@ -3234,9 +3259,9 @@
 							"defUid": 204,
 							"px": [96,64],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "2", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "\n", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["2"]
+									"params": ["\\n"]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 411, "realEditorValues": [{
 									"id": "V_Bool",
@@ -3246,6 +3271,29 @@
 							],
 							"__worldX": 480,
 							"__worldY": -256
+						},
+						{
+							"__identifier": "Dialog",
+							"__grid": [9,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#FFFFFF",
+							"iid": "812f00d0-73f0-11ef-bb33-414b398d8db8",
+							"width": 16,
+							"height": 16,
+							"defUid": 204,
+							"px": [288,160],
+							"fieldInstances": [
+								{ "__identifier": "text", "__type": "String", "__value": "Looks like you're/getting the hang of this.\nScale that tunnel/and save some bots!", "__tile": null, "defUid": 205, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Looks like you're/getting the hang of this.\\nScale that tunnel/and save some bots!"]
+								}] },
+								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
+								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 412, "realEditorValues": [] }
+							],
+							"__worldX": 672,
+							"__worldY": -160
 						}
 					]
 				},
@@ -3460,7 +3508,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Dialog",
-							"__grid": [7,6],
+							"__grid": [2,4],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -3469,20 +3517,17 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 204,
-							"px": [224,192],
+							"px": [64,128],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "1", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["1"]
-								}] },
+								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [null] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 411, "realEditorValues": [{
 									"id": "V_Bool",
 									"params": [ true ]
 								}] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 412, "realEditorValues": [{ "id": "V_Int", "params": [1] }] }
 							],
-							"__worldX": -160,
-							"__worldY": -128
+							"__worldX": -320,
+							"__worldY": -192
 						},
 						{
 							"__identifier": "ButtonPickup",
@@ -3525,7 +3570,7 @@
 					"optionalRules": [],
 					"intGridCsv": [
 						1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,
-						1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,
+						1,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,
 						0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 						1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
@@ -3545,6 +3590,7 @@
 						{ "px": [224,160], "src": [32,192], "f": 0, "t": 73, "d": [344,67], "a": 1 },
 						{ "px": [256,160], "src": [32,192], "f": 0, "t": 73, "d": [344,68], "a": 1 },
 						{ "px": [288,160], "src": [32,192], "f": 0, "t": 73, "d": [344,69], "a": 1 },
+						{ "px": [64,128], "src": [32,224], "f": 0, "t": 85, "d": [342,50], "a": 1 },
 						{ "px": [160,192], "src": [32,224], "f": 0, "t": 85, "d": [342,77], "a": 1 },
 						{ "px": [192,192], "src": [32,224], "f": 0, "t": 85, "d": [342,78], "a": 1 },
 						{ "px": [224,192], "src": [32,224], "f": 0, "t": 85, "d": [342,79], "a": 1 },
@@ -3553,9 +3599,10 @@
 						{ "px": [320,192], "src": [32,224], "f": 0, "t": 85, "d": [342,82], "a": 1 },
 						{ "px": [128,64], "src": [32,160], "f": 0, "t": 61, "d": [340,28], "a": 1 },
 						{ "px": [160,64], "src": [32,160], "f": 0, "t": 61, "d": [340,29], "a": 1 },
+						{ "px": [64,96], "src": [32,160], "f": 0, "t": 61, "d": [340,38], "a": 1 },
 						{ "px": [256,128], "src": [32,160], "f": 0, "t": 61, "d": [340,56], "a": 1 },
 						{ "px": [320,160], "src": [32,160], "f": 0, "t": 61, "d": [340,70], "a": 1 },
-						{ "px": [64,128], "src": [0,224], "f": 0, "t": 84, "d": [339,50], "a": 1 },
+						{ "px": [32,128], "src": [0,224], "f": 0, "t": 84, "d": [339,49], "a": 1 },
 						{ "px": [96,160], "src": [0,224], "f": 0, "t": 84, "d": [339,63], "a": 1 },
 						{ "px": [128,192], "src": [0,224], "f": 0, "t": 84, "d": [339,76], "a": 1 },
 						{ "px": [352,192], "src": [64,224], "f": 0, "t": 86, "d": [338,83], "a": 1 },
@@ -3564,7 +3611,7 @@
 						{ "px": [288,128], "src": [64,160], "f": 0, "t": 62, "d": [337,57], "a": 1 },
 						{ "px": [352,160], "src": [64,160], "f": 0, "t": 62, "d": [337,71], "a": 1 },
 						{ "px": [96,64], "src": [0,160], "f": 0, "t": 60, "d": [336,27], "a": 1 },
-						{ "px": [64,96], "src": [0,160], "f": 0, "t": 60, "d": [336,38], "a": 1 },
+						{ "px": [32,96], "src": [0,160], "f": 0, "t": 60, "d": [336,37], "a": 1 },
 						{ "px": [0,0], "src": [32,32], "f": 0, "t": 13, "d": [392,0], "a": 1 },
 						{ "px": [32,0], "src": [32,32], "f": 0, "t": 13, "d": [392,1], "a": 1 },
 						{ "px": [64,0], "src": [32,32], "f": 0, "t": 13, "d": [392,2], "a": 1 },
@@ -3583,14 +3630,10 @@
 						{ "px": [288,32], "src": [32,32], "f": 0, "t": 13, "d": [392,21], "a": 1 },
 						{ "px": [320,32], "src": [32,32], "f": 0, "t": 13, "d": [392,22], "a": 1 },
 						{ "px": [352,32], "src": [32,32], "f": 0, "t": 13, "d": [392,23], "a": 1 },
-						{ "px": [0,64], "src": [32,32], "f": 0, "t": 13, "d": [392,24], "a": 1 },
 						{ "px": [288,64], "src": [32,32], "f": 0, "t": 13, "d": [392,33], "a": 1 },
 						{ "px": [320,64], "src": [32,32], "f": 0, "t": 13, "d": [392,34], "a": 1 },
 						{ "px": [352,64], "src": [32,32], "f": 0, "t": 13, "d": [392,35], "a": 1 },
-						{ "px": [0,96], "src": [32,32], "f": 0, "t": 13, "d": [392,36], "a": 1 },
 						{ "px": [352,96], "src": [32,32], "f": 0, "t": 13, "d": [392,47], "a": 1 },
-						{ "px": [0,128], "src": [32,32], "f": 0, "t": 13, "d": [392,48], "a": 1 },
-						{ "px": [0,160], "src": [32,32], "f": 0, "t": 13, "d": [392,60], "a": 1 },
 						{ "px": [0,192], "src": [32,32], "f": 0, "t": 13, "d": [392,72], "a": 1 },
 						{ "px": [32,192], "src": [32,32], "f": 0, "t": 13, "d": [392,73], "a": 1 },
 						{ "px": [0,224], "src": [32,32], "f": 0, "t": 13, "d": [392,84], "a": 1 },
@@ -3624,18 +3667,20 @@
 						{ "px": [256,64], "src": [0,128], "f": 0, "t": 48, "d": [391,32], "a": 1 },
 						{ "px": [320,96], "src": [0,128], "f": 0, "t": 48, "d": [391,46], "a": 1 },
 						{ "px": [64,32], "src": [32,128], "f": 0, "t": 49, "d": [390,14], "a": 1 },
-						{ "px": [32,64], "src": [32,128], "f": 0, "t": 49, "d": [390,25], "a": 1 },
-						{ "px": [32,160], "src": [32,96], "f": 0, "t": 37, "d": [389,61], "a": 1 },
+						{ "px": [0,64], "src": [32,128], "f": 0, "t": 49, "d": [390,24], "a": 1 },
+						{ "px": [0,160], "src": [32,96], "f": 0, "t": 37, "d": [389,60], "a": 1 },
 						{ "px": [64,192], "src": [32,96], "f": 0, "t": 37, "d": [389,74], "a": 1 },
 						{ "px": [96,224], "src": [32,96], "f": 0, "t": 37, "d": [389,87], "a": 1 },
 						{ "px": [96,32], "src": [32,64], "f": 0, "t": 25, "d": [386,15], "a": 1 },
 						{ "px": [128,32], "src": [32,64], "f": 0, "t": 25, "d": [386,16], "a": 1 },
 						{ "px": [160,32], "src": [32,64], "f": 0, "t": 25, "d": [386,17], "a": 1 },
 						{ "px": [192,32], "src": [32,64], "f": 0, "t": 25, "d": [386,18], "a": 1 },
+						{ "px": [32,64], "src": [32,64], "f": 0, "t": 25, "d": [386,25], "a": 1 },
 						{ "px": [288,96], "src": [32,64], "f": 0, "t": 25, "d": [386,45], "a": 1 },
 						{ "px": [352,128], "src": [32,64], "f": 0, "t": 25, "d": [386,59], "a": 1 },
-						{ "px": [32,96], "src": [64,32], "f": 0, "t": 14, "d": [385,37], "a": 1 },
-						{ "px": [32,128], "src": [64,32], "f": 0, "t": 14, "d": [385,49], "a": 1 },
+						{ "px": [0,96], "src": [64,32], "f": 0, "t": 14, "d": [385,36], "a": 1 },
+						{ "px": [0,128], "src": [64,32], "f": 0, "t": 14, "d": [385,48], "a": 1 },
+						{ "px": [32,160], "src": [32,0], "f": 0, "t": 1, "d": [384,61], "a": 1 },
 						{ "px": [128,224], "src": [32,0], "f": 0, "t": 1, "d": [384,88], "a": 1 },
 						{ "px": [160,224], "src": [32,0], "f": 0, "t": 1, "d": [384,89], "a": 1 },
 						{ "px": [192,224], "src": [32,0], "f": 0, "t": 1, "d": [384,90], "a": 1 },
@@ -4828,10 +4873,7 @@
 							"defUid": 204,
 							"px": [192,256],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "3", "__tile": null, "defUid": 205, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["3"]
-								}] },
+								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [null] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 411, "realEditorValues": [{
 									"id": "V_Bool",
 									"params": [ true ]
