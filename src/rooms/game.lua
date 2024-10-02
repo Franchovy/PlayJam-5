@@ -162,6 +162,10 @@ function Game:leave(next, ...)
     --
 
     if next.super.className == "Start" or next.super.className == "Menu" then
+        -- Remove end timer
+        self.timerEndSceneTransition:remove()
+        self.timerEndSceneTransition = nil
+
         -- Clear player data
 
         Player.destroy()
@@ -239,12 +243,12 @@ function Game:checkpointRevert()
     if not SpriteRescueCounter.getInstance():isAllSpritesRescued() then
         -- Revert checkpoint
         Checkpoint.goToPrevious()
-    else
+    elseif not self.timerEndSceneTransition then
         -- If all bots have been rescued, then finish the level.
 
         Player.getInstance():setWarpLoopAnimation(true)
 
-        playdate.timer.performAfterDelay(3000, function()
+        self.timerEndSceneTransition = playdate.timer.performAfterDelay(3000, function()
             sceneManager:enter(sceneManager.scenes.menu)
         end)
     end

@@ -16,6 +16,14 @@ local durationDialog <const> = 3000
 local collideRectSize <const> = 90
 local yOffset <const> = 16
 
+local botAnimationSpeeds <const> = botAnimationSpeeds
+local ANIMATION_STATES <const> = {
+    Idle = 1,
+    Talking = 2,
+    NeedsRescue = 3,
+    Rescued = 4
+}
+
 -- Child class functions
 
 local function drawSpeechBubble(self, x, y, w, h)
@@ -34,14 +42,57 @@ local function drawSpeechBubble(self, x, y, w, h)
     end
 end
 
-
 --
 
 ---@class Dialog: playdate.graphics.sprite
-Dialog = Class("Dialog", gfx.sprite)
+Dialog = Class("Dialog", AnimatedSprite)
 
 function Dialog:init(entity)
-    Dialog.super.init(self)
+
+    -- Load image based on rescuable & entity ID
+
+    local imagetable
+    local botAnimationSpeed = 2
+
+    if entity.fields.save then
+        -- Get or create the sprite to use
+        local spriteNumber = entity.fields.spriteNumber or math.random(1, 7)
+
+        -- Set the rate at which the bot should animate
+        botAnimationSpeed = botAnimationSpeeds[spriteNumber]
+
+        -- Set the sprite number on the LDtk entity
+        entity.fields.spriteNumber = spriteNumber
+
+        -- Grab the imagetable corresponding to this sprite
+        imagetable = assert(gfx.imagetable.new(assets.imageTables.bots[spriteNumber]))
+    else
+        -- Helper bots have a set imagetable.
+        imagetable = assert(gfx.imagetable.new(assets.imageTables.bots.helper))
+    end
+
+    -- Super init call
+    Dialog.super.init(self, imagetable)
+
+    -- Add animation states
+
+    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = botAnimationSpeed }).asDefault()
+    self:addState(ANIMATION_STATES.Talking, 5, 8, { tickStep = botAnimationSpeed })
+
+    -- Set up animation states (Sad / Happy) if needs rescue
+
+    if entity.fields.save then
+        self:addState(ANIMATION_STATES.NeedsRescue, 9, 12, { tickStep = botAnimationSpeed })
+        self:addState(ANIMATION_STATES.Rescued, 12, 16, { tickStep = botAnimationSpeed })
+
+        if entity.fields.isRescued then
+            self:changeState(ANIMATION_STATES.Rescued)
+        else
+            self:changeState(ANIMATION_STATES.NeedsRescue)
+        end
+    end
+
+    self:playAnimation()
 
     -- Sprite setup
 
@@ -51,22 +102,6 @@ function Dialog:init(entity)
 
     self.isRescuable = entity.fields.save
     self.rescueNumber = entity.fields.saveNumber
-
-    -- Load image based on rescuable & entity ID
-
-    local image
-
-    if self.isRescuable then
-        local spriteNumber = math.random(1, 7)
-        local imagetable = assert(gfx.imagetable.new(assets.imageTables.bots[spriteNumber]))
-        image = imagetable[1]
-    else
-        local imagetable = assert(gfx.imagetable.new(assets.imageTables.bots.helper))
-        image = imagetable[1]
-    end
-
-    self:setSize(0, 0, image:getSize())
-    self:setImage(image)
 
     -- Get text from LDtk entity
 
@@ -113,7 +148,6 @@ function Dialog:init(entity)
     self.spriteBubble.draw = drawSpeechBubble
     self.spriteBubble:moveTo(self.x, self.y)
     self.spriteBubble:setZIndex(2)
-    self.spriteBubble:add()
 
     -- Self state
 
@@ -142,6 +176,7 @@ end
 function Dialog:updateDialog()
     -- If line is greater than current lines, mimic collapse.
     if self.isStateExpanded and not (self.currentLine > #self.dialogs) then
+
         -- Update sprite size using dialog size
 
         local dialog = self.dialogs[self.currentLine]
@@ -157,9 +192,8 @@ function Dialog:updateDialog()
         self.spriteBubble:setSize(width, height)
         self.spriteBubble:moveTo(self.x, self.y - height - yOffset)
     else
-        self.spriteBubble.dialog = nil
-        self.spriteBubble:setSize(defaultSize, defaultSize)
-        self.spriteBubble:moveTo(self.x, self.y)
+        self.spriteBubble:remove()
+        self:changeState(ANIMATION_STATES.Idle)
     end
 
     -- Mark dirty for redraw
@@ -176,8 +210,12 @@ function Dialog:activate()
     self.isActivated = true
 
     if not self.isRescued and self.isRescuable then
+        -- Animate to rescued animation state
+        self:changeState(ANIMATION_STATES.Rescued)
+
         -- Send message that has been rescued
         self.isRescued = true
+        self.fields.isRescued = true
 
         Manager.emitEvent(EVENTS.BotRescued, self, self.rescueNumber)
     end
@@ -188,26 +226,41 @@ function Dialog:expand()
         return
     end
 
+    -- Show speech bubble
+    self.spriteBubble:add()
     self.isStateExpanded = true
 
     -- Play SFX
     spSpeech:play(1)
+
+    -- Play speaking animation if not a rescue bot
+    if not self.isRescuable then
+        self:changeState(ANIMATION_STATES.Talking)
+    end
 end
 
 function Dialog:collapse()
-    -- Set state to collapsed
 
+    -- Hide speech bubble
+    self.spriteBubble:remove()
     self.isStateExpanded = false
+
+    -- Reset dialog progress
     self.currentLine = 1
 
     -- Stop any ongoing timers
-
     self.timer:pause()
+
+    -- Play idle animation if not a rescue bot
+    if not self.isRescuable then
+        self:changeState(ANIMATION_STATES.Idle)
+    end
 end
 
 function Dialog:update()
+    Dialog.super.update(self)
 
-    if self.dialogs then
+    if not self.isRescuable then
         if self.isActivated then
             -- Consume update variable
             self.isActivated = false
