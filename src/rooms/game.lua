@@ -163,8 +163,11 @@ function Game:leave(next, ...)
 
     if next.super.className == "Start" or next.super.className == "Menu" then
         -- Remove end timer
-        self.timerEndSceneTransition:remove()
-        self.timerEndSceneTransition = nil
+
+        if timerEndSceneTransition then
+            self.timerEndSceneTransition:remove()
+            self.timerEndSceneTransition = nil
+        end
 
         -- Clear player data
 

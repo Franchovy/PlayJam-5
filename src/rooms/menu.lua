@@ -37,14 +37,6 @@ function Menu:leave()
     systemMenu:removeAllMenuItems()
 end
 
-function Menu:setMenuLabelText(text)
-  assert(text and type(text) == "string")
-
-  local textImage = gfx.imageWithText(text, 300, 80, nil, nil, nil, kTextAlignment.center)
-
-  spritePressStart:setImage(textImage:invertedImage())
-end
-
 function Menu:update()
   self.gridView:update()
 end
