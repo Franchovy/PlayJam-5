@@ -33,6 +33,13 @@ _G.assets = {
         errorAction = "assets/sfx/error-action",
         errorSavePoint = "assets/sfx/error-save-point",
         menuSelect = "assets/sfx/menu-select",
+        robotSave = {
+            [1] = "assets/sfx/robot-save",
+            [2] = "assets/sfx/robot-save-2",
+            [3] = "assets/sfx/robot-save-3"
+        },
+        warpAmbient = "assets/sfx/warp-ambient",
+        warpAction = "assets/sfx/warp-action"
     },
     music = {
         game = "assets/music/world_1",

@@ -9,7 +9,12 @@ FilePlayer = Class("FilePlayer")
 local self = FilePlayer
 
 function FilePlayer.play(file)
-    if self.fileCurrent == file then
+    if self.fileCurrent == file and self.fileplayer:isPlaying() then
+        return
+    end
+
+    if file == nil and self.fileplayer then
+        self.fileplayer:play(0)
         return
     end
 

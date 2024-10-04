@@ -7,6 +7,9 @@ class("Game").extends(Room)
 local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
 
+local spCheckpointRevert <const> = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
+local spWarpAction <const> = playdate.sound.sampleplayer.new(assets.sounds.warpAction)
+
 local fileplayer
 
 -- LDtk current level name
@@ -91,9 +94,28 @@ function Game:enter(previous, data)
 
         self.abilityPanel = AbilityPanel()
 
+        -- Load if music should play:
+
+        local shouldEnableMusic = MemoryCard.getShouldEnableMusic()
+
+        -- Play music if enabled
+
+        if shouldEnableMusic then
+            FilePlayer.play(assets.music.game)
+        end
+
         -- Menu items
 
-        systemMenu:addMenuItem("back to start", goToStart)
+        systemMenu:addMenuItem("main menu", goToStart)
+        systemMenu:addCheckmarkMenuItem("music", shouldEnableMusic, function(shouldEnableMusic)
+            if shouldEnableMusic then
+                FilePlayer.play(assets.music.game)
+            else
+                FilePlayer.stop()
+            end
+
+            MemoryCard.setShouldEnableMusic(shouldEnableMusic)
+        end)
     end
 
     -- Load level --
@@ -141,10 +163,6 @@ function Game:update()
         pd.ui.crankIndicator:draw()
     end
 
-    if not FilePlayer.isPlaying() then
-        FilePlayer.play(assets.music.game)
-    end
-
     if SpriteRescueCounter.getInstance():isAllSpritesRescued() then
         spriteLevelCompleteText:add()
         spriteLevelCompleteHintText:add()
@@ -169,8 +187,14 @@ function Game:leave(next, ...)
             self.timerEndSceneTransition = nil
         end
 
+        -- Clear ability panel
+
+        AbilityPanel.getInstance():remove()
+        AbilityPanel.destroy()
+
         -- Clear player data
 
+        Player.getInstance():remove()
         Player.destroy()
 
         -- Clear checkpoints
@@ -222,10 +246,16 @@ function Game:botRescued(bot, botNumber)
     spriteRescueCounter:setSpriteRescued(botNumber)
 
     if spriteRescueCounter:isAllSpritesRescued() then
+        -- Add on-screen text
+
         spriteLevelCompleteText:add()
         spriteLevelCompleteHintText:add()
 
         blinkerLevelComplete:startLoop()
+
+        -- Set player state to game end
+
+        Player.getInstance():setLevelEndReady()
 
         -- Set level complete in data
 
@@ -244,12 +274,15 @@ end
 
 function Game:checkpointRevert()
     if not SpriteRescueCounter.getInstance():isAllSpritesRescued() then
+        -- SFX
+
+        spWarpAction:play(1)
+        spCheckpointRevert:play(1)
+
         -- Revert checkpoint
         Checkpoint.goToPrevious()
     elseif not self.timerEndSceneTransition then
         -- If all bots have been rescued, then finish the level.
-
-        Player.getInstance():setWarpLoopAnimation(true)
 
         self.timerEndSceneTransition = playdate.timer.performAfterDelay(3000, function()
             sceneManager:enter(sceneManager.scenes.menu)

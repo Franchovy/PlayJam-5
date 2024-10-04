@@ -210,6 +210,10 @@ function Dialog:activate()
     self.isActivated = true
 
     if not self.isRescued and self.isRescuable then
+        local indexSfx = math.random(1, #assets.sounds.robotSave)
+        local spRescue = playdate.sound.sampleplayer.new(assets.sounds.robotSave[indexSfx])
+        spRescue:play(1)
+
         -- Animate to rescued animation state
         self:changeState(ANIMATION_STATES.Rescued)
 

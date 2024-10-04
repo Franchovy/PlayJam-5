@@ -28,7 +28,9 @@ function Start:enter(previous)
   -- Set sceneManager reference
   sceneManager = self.manager
 
-  if not FilePlayer.isPlaying() then
+  local shouldEnableMusic = MemoryCard.getShouldEnableMusic()
+
+  if not FilePlayer.isPlaying() and shouldEnableMusic then
     FilePlayer.play(assets.music.menu)
   end
 

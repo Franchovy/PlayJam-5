@@ -49,7 +49,7 @@ function ElevatorTrack:init(trackLengthInTiles, orientation)
         self:setCenter(0.5, 0)
         self:setSize(TILE_SIZE, TILE_SIZE * numberOfTiles)
     else
-        self:setCenter(0.5, 0.75)
+        self:setCenter(0, 0.75)
         self:setSize(TILE_SIZE * numberOfTiles, TILE_SIZE)
     end
 
@@ -60,7 +60,7 @@ function ElevatorTrack:setInitialPosition(initialPosition)
     if self.orientation == ORIENTATION.Vertical then
         self:moveTo(initialPosition.x, initialPosition.y - TILE_SIZE / 2)
     else
-        self:moveTo(initialPosition.x + TILE_SIZE, initialPosition.y)
+        self:moveTo(initialPosition.x - TILE_SIZE / 2, initialPosition.y)
     end
 end
 

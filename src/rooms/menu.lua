@@ -16,7 +16,9 @@ local sceneManager
 function Menu:enter(previous, data)
   local data = data or {}
 
-  if not FilePlayer.isPlaying() then
+  local shouldEnableMusic = MemoryCard.getShouldEnableMusic()
+
+  if not FilePlayer.isPlaying() and shouldEnableMusic then
     FilePlayer.play(assets.music.menu)
   end
 

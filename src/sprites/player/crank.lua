@@ -1,6 +1,8 @@
 local pd <const> = playdate
 local gfx <const> = playdate.graphics
 
+local spWarpAmbient <const> = playdate.sound.sampleplayer.new(assets.sounds.warpAmbient)
+
 local imageTableWarp <const> = gfx.imagetable.new(assets.imageTables.warp)
 local angleCrankToWarpTotal <const> = 300
 local coefficientCrankResistance <const> = 0.3
@@ -21,17 +23,12 @@ local indexesImageTableWarp = {
     [animationStates.start] = 91,
     [animationStates.loop] = 60,
     [animationStates.finish] = 30,
-    [animationStates.none] = 1
+    [animationStates.none] = 99
 }
 
 local function setState(self, state)
     self.index = indexesImageTableWarp[state]
     self.state = state
-
-    if self.state == animationStates.loop then
-        -- Reset momentum
-        self.crankMomentum = 0
-    end
 end
 
 ---@class CrankWarpController: playdate.graphics.sprite
@@ -50,16 +47,23 @@ function CrankWarpController:init()
     self.isLoopingMode = false
 end
 
+function CrankWarpController:remove()
+    CrankWarpController.super.remove(self)
+
+    spWarpAmbient:stop()
+end
+
 function CrankWarpController:isActive()
     return self.state == animationStates.loop
 end
 
 function CrankWarpController:handleCrankChange()
-    if self.state == animationStates.none then
-        self.state = animationStates.start
-    end
 
-    if not self.isLoopingMode then
+    if self.isLoopingMode and self.state == animationStates.loop then
+        -- In looping mode, we keep crank momentum constant
+
+        self.crankMomentum = 90
+    elseif self.state ~= animationStates.finish then
         -- Get crank change
         local crankChange = pd.getCrankChange()
 
@@ -71,11 +75,13 @@ function CrankWarpController:handleCrankChange()
         local resistanceCrankMomentum = (self.crankMomentum) * coefficientCrankResistance
         local maxCrankResistance = self.state == animationStates.start and maxCrankResistanceStart or maxCrankResistanceLoop
         self.crankMomentum = math.max(0, self.crankMomentum - math.min(resistanceCrankMomentum, maxCrankResistance))
-    else
-        self.crankMomentum = 90
     end
 
-    if self.state == animationStates.start then
+    local previousState = self.state
+
+    if self.state == animationStates.none and self.crankMomentum > 15 then
+        self.state = animationStates.start
+    elseif self.state == animationStates.start then
 
         -- Update index
         self.index = indexesImageTableWarp[animationStates.start] - math.floor(self.crankMomentum / angleCrankToWarpTotal * 30)
@@ -84,7 +90,7 @@ function CrankWarpController:handleCrankChange()
             -- Transition to loop state
             setState(self, animationStates.loop)
 
-            -- Reset momentum
+            -- Reset momentum - ensure the player is cranking
             self.crankMomentum = 0
         end
     elseif self.state == animationStates.loop then
@@ -96,21 +102,49 @@ function CrankWarpController:handleCrankChange()
             -- If crank momentum is high enough, loop again.
             if self.crankMomentum > 60 then
                 setState(self, animationStates.loop)
+
+                -- Reset momentum - ensures the player is still cranking
+                self.crankMomentum = 0
             else
                 setState(self, animationStates.finish)
+
+                self.crankMomentum = 60
             end
         end
     elseif self.state == animationStates.finish then
         self.index -= 1
 
-        if self.index <= indexesImageTableWarp[animationStates.none] then
+        -- Fade out crank momentum
+        self.crankMomentum -= 2.2
+
+        if self.index <= 0 then
             setState(self, animationStates.none)
+
+            self.crankMomentum = 0
         end
     end
 
     self:updateImage()
 
-    -- Get whether a warp has happened
+    -- Update audio according to state
+
+    local volume = math.min(self.crankMomentum / 60, 1)
+
+    if self.state ~= animationStates.loop then
+        -- Don't set volume while in loop (the crank momentum gets set to 0)
+        spWarpAmbient:setVolume(volume)
+    end
+
+    if not spWarpAmbient:isPlaying() and self.state == animationStates.start then
+        spWarpAmbient:play(0)
+    elseif self.state == animationStates.finish and previousState == animationStates.loop then
+        --
+    elseif self.state == animationStates.none and spWarpAmbient:isPlaying() then
+        spWarpAmbient:stop()
+    end
+
+    -- Return whether a warp has happened
+
     return self.index == indexesImageTableWarp[animationStates.loop]
 end
 
@@ -118,7 +152,6 @@ function CrankWarpController:updateImage()
     self:setImage(imageTableWarp[self.index])
 end
 
-function CrankWarpController:setLoop(shouldLoopAnimation)
-    self.isLoopingMode = shouldLoopAnimation
-    self.state = shouldLoopAnimation and animationStates.loop or animationStates.none
+function CrankWarpController:setEndGameLoop()
+    self.isLoopingMode = true
 end

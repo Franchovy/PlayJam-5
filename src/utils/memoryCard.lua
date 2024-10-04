@@ -39,7 +39,7 @@ end
 function MemoryCard.getLevelCompleted(level)
   local data = loadData()
 
-  if data == nil or data.levels == nil or data.levels[level] == nil then
+  if data.levels == nil or data.levels[level] == nil then
     return false
   end
 
@@ -83,4 +83,22 @@ end
 
 function MemoryCard.resetProgress()
   saveData({})
+end
+
+-- User Preferences
+
+function MemoryCard.setShouldEnableMusic(shouldEnableMusic)
+  local data = loadData()
+  data.shouldEnableMusic = shouldEnableMusic
+  saveData(data)
+end
+
+function MemoryCard.getShouldEnableMusic()
+  local data = loadData()
+
+  if data.shouldEnableMusic ~= nil then
+    return data.shouldEnableMusic
+  end
+
+  return true
 end

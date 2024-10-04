@@ -9,7 +9,6 @@ local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
 local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
 local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
 local spDrill <const> = sound.sampleplayer.new("assets/sfx/drill-start")
-local spCheckpointRevert <const> = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
 local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
@@ -138,7 +137,7 @@ function Player:add()
 end
 
 function Player:remove()
-    Player.super.add(self)
+    Player.super.remove(self)
 
     if self.crankWarpController then
         self.crankWarpController:remove()
@@ -204,8 +203,8 @@ function Player:setBlueprints(blueprints)
     self.blueprints = blueprints
 end
 
-function Player:setWarpLoopAnimation(shouldLoopAnimation)
-    self.crankWarpController:setLoop(shouldLoopAnimation)
+function Player:setLevelEndReady()
+    self.crankWarpController:setEndGameLoop()
 end
 
 -- Collision Response
@@ -458,10 +457,6 @@ function Player:updateCamera()
 end
 
 function Player:revertCheckpoint()
-    -- SFX
-
-    spCheckpointRevert:play(1)
-
     -- Emit the event for the rest of the scene
 
     Manager.emitEvent(EVENTS.CheckpointRevert)
