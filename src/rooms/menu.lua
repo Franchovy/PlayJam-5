@@ -30,7 +30,7 @@ function Menu:enter(previous, data)
     self.gridView = MenuGridView.new()
   end
 
-  systemMenu:addMenuItem("reset progress", MemoryCard.resetProgress)
+  systemMenu:addMenuItem("reset", MemoryCard.resetProgress)
 
   self.gridView:setSelectionNextLevel()
 end
