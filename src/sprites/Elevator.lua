@@ -9,68 +9,6 @@ local tileAdjustmentPx <const> = 4
 
 ---
 ---
---- Private Static methods
----
-
-class("Elevator").extends(gfx.sprite)
-
-function Elevator:init(entity)
-  Elevator.super.init(self, imageElevator)
-
-  self:setTag(TAGS.Elevator)
-  self:setCenter(0.5, 1)
-
-  -- LDtk fields
-
-  self.fields = table.deepcopy(entity.fields)
-
-  -- Set Displacement initial, start and end scalars (1D) based on entity fields
-
-  self.displacement = (self.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
-  self.displacementEnd = self.fields.distance * TILE_SIZE
-
-  -- RigidBody config
-
-  self.rigidBody = RigidBody(self)
-
-  -- Elevator-specific fields
-
-  self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
-  self.movement = 0 -- Update scalar for movement.
-  self.didActivationSuccess = false -- Update value for checking if activation was successful
-
-  -- Create elevator track
-
-  self.spriteElevatorTrack = ElevatorTrack(self.fields.distance, entity.fields.orientation)
-end
-
-function Elevator:postInit()
-  -- Checkpoint Handling setup
-
-  self.checkpointHandler = CheckpointHandler(self, { x = self.x, y = self.y, displacement = self.displacement })
-
-  -- Save initial position
-
-  if self.fields.orientation == ORIENTATION.Horizontal then
-    self.initialPosition = gmt.point.new(self.x - self.displacement, self.y)
-    self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
-  else
-    self.initialPosition = gmt.point.new(self.x, self.y - self.displacement)
-    self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
-  end
-
-  -- Positon elevator track
-
-  self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
-  self.spriteElevatorTrack:add()
-end
-
-function Elevator:collisionResponse(_)
-  return gfx.sprite.kCollisionTypeSlide
-end
-
----
----
 --- Private class methods
 ---
 
@@ -114,7 +52,7 @@ local function checkIfCollides(spriteToCheck, idealX, idealY, spritesToIgnore)
   local isCollisionCheckPassed = true
 
   for _, collision in pairs(collisions) do
-    local shouldSkipCollision = spritesToIgnore[collision.other]
+    local shouldSkipCollision = spritesToIgnore[collision.other] or collision.type == gfx.sprite.kCollisionTypeOverlap
 
     if not shouldSkipCollision then
       -- Block collision
@@ -171,7 +109,7 @@ local function getAdjustmentToTile(self)
 end
 
 --- Convenience method to get the X & Y position based on a displacement.
-function getPositionFromDisplacement(self, displacement)
+local function getPositionFromDisplacement(self, displacement)
   if self.fields.orientation == ORIENTATION.Horizontal then
     return self.initialPosition.x + displacement, self.initialPosition.y
   else
@@ -179,22 +117,29 @@ function getPositionFromDisplacement(self, displacement)
   end
 end
 
+local function setDisplacement(self, displacement)
+  self.displacement = displacement
+  self.fields.displacement = displacement
+
+  local x, y = getPositionFromDisplacement(self, displacement)
+  self:moveTo(x, y)
+end
+
 --- Update method for movement
-local function updateMovement(self, movement, skipCollisionCheck)
+local function updateMovement(self, movement)
   -- Get new position using displacement
 
   local x, y = getPositionFromDisplacement(self, self.displacement + movement)
 
-  if not skipCollisionCheck then
-    -- Check collisions for self
+  -- Check collisions for self
 
-    local isCollisionCheckPassed
-    isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, { [self.spriteChild] = true })
+  local spritesToIgnore = self.spriteChild and { [self.spriteChild] = true } or {}
+  local isCollisionCheckPassed
+  isCollisionCheckPassed, x, y = checkIfCollides(self, x, y, spritesToIgnore)
 
-    -- Skip movement if collision happened
-    if not isCollisionCheckPassed then
-      return false
-    end
+  -- Skip movement if collision happened
+  if not isCollisionCheckPassed then
+    return false
   end
 
   if self.spriteChild then
@@ -220,19 +165,90 @@ local function updateMovement(self, movement, skipCollisionCheck)
     )
   end
 
-  -- Move to new position using displacement
+  -- Move to new displacement
 
-  self:moveTo(x, y)
-
-  -- Update displacement to reflect new position
-
-  self.displacement += movement
+  setDisplacement(self, self.displacement + movement)
 
   -- Update checkpoint state
 
-  self.checkpointHandler:pushState({x = self.x, y = self.y, displacement = self.displacement})
+  self.checkpointHandler:pushState({displacement = self.displacement})
 
   return true
+end
+
+---
+---
+--- Private Static methods
+---
+
+class("Elevator").extends(gfx.sprite)
+
+function Elevator:init(entity)
+  Elevator.super.init(self, imageElevator)
+
+  self:setTag(TAGS.Elevator)
+  self:setCenter(0.5, 1)
+
+  -- Set Displacement initial, start and end scalars (1D) based on entity fields
+
+  self.displacementInitial = (entity.fields.initialDistance or 0) * TILE_SIZE -- The initial displacement can be greater than 0.
+  self.displacementEnd = entity.fields.distance * TILE_SIZE
+
+  -- RigidBody config
+
+  self.rigidBody = RigidBody(self)
+
+  -- Elevator-specific fields
+
+  self.speed = 5 -- Constant, but could be modified on a per-elevator basis in the future.
+  self.movement = 0 -- Update scalar for movement.
+  self.didActivationSuccess = false -- Update value for checking if activation was successful
+
+  -- Create elevator track
+
+  self.spriteElevatorTrack = ElevatorTrack(entity.fields.distance, entity.fields.orientation)
+end
+
+function Elevator:postInit()
+
+  -- Save initial position
+
+  if self.fields.orientation == ORIENTATION.Horizontal then
+    self.initialPosition = gmt.point.new(self.x - self.displacementInitial, self.y)
+    self.finalPosition = gmt.point.new(self.initialPosition.x + self.displacementEnd, self.y)
+  else
+    self.initialPosition = gmt.point.new(self.x, self.y - self.displacementInitial)
+    self.finalPosition = gmt.point.new(self.x, self.initialPosition.y + self.displacementEnd)
+  end
+
+  -- Positon elevator track
+
+  self.spriteElevatorTrack:setInitialPosition(self.initialPosition)
+  self.spriteElevatorTrack:add()
+
+  -- Load displacement from previous data or initial LDtk setup
+
+  if self.fields.displacement then
+    self.displacement = self.fields.displacement
+  else
+    self.displacement = self.displacementInitial
+  end
+
+  -- Set position based on displacement
+
+  setDisplacement(self, self.displacement)
+
+  -- Checkpoint Handling setup
+
+  self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self, { displacement = self.displacement })
+end
+
+function Elevator:collisionResponse(other)
+  if other:getTag() == TAGS.Dialog or other:getTag() == TAGS.SavePoint then
+    return gfx.sprite.kCollisionTypeOverlap
+  end
+
+  return gfx.sprite.kCollisionTypeSlide
 end
 
 ---
@@ -260,8 +276,6 @@ function Elevator:activate(sprite, key)
 
   -- If activated, set update variables for movement
   if activationMovement ~= 0 then
-    -- Set child sprite for collision check
-    self.spriteChild = sprite
 
     -- Set movement update scalar
     self.movement = activationMovement
@@ -270,15 +284,12 @@ function Elevator:activate(sprite, key)
   return activationMovement
 end
 
---- Used specifically for when jumping while moving up with elevator.
-function Elevator:disableCollisionsForFrame()
-  self:setCollisionsEnabled(false)
-
-  self.isCollisionsDisabledForFrame = true
-end
-
 function Elevator:update()
   Elevator.super.update(self)
+
+  -- Reset update variables (Pre-update)
+
+  self.didActivationSuccess = false
 
   -- Get if elevator has been activated
   local movement = self.movement
@@ -291,12 +302,17 @@ function Elevator:update()
     if movement ~= 0 then
       -- Call without delta_time to avoid very small, inconsequential movements
 
-      updateMovement(self, movement, true)
+      updateMovement(self, movement)
     end
   else
     -- If any movement occurs, update elevator position based on movement * delta_time
 
-    self.didActivationSuccess = updateMovement(self, movement * _G.delta_time)
+    -- If movement is very small, don't multiply by delta_time.
+    if not (math.abs(movement) < 0.1) then
+      movement = movement * _G.delta_time
+    end
+
+    self.didActivationSuccess = updateMovement(self, movement)
   end
 
   -- Reset collisions if disabled
@@ -311,7 +327,13 @@ function Elevator:update()
 
   self.movement = 0
   self.spriteChild = nil
-  self.didActivationSuccess = false
+end
+
+--- Used specifically for when jumping while moving up with elevator.
+function Elevator:disableCollisionsForFrame()
+  self:setCollisionsEnabled(false)
+
+  self.isCollisionsDisabledForFrame = true
 end
 
 function Elevator:wasActivationSuccessful()
@@ -321,7 +343,9 @@ end
 function Elevator:handleCheckpointRevert(state)
   self.movement = 0
 
-  self:moveTo(state.x, state.y)
+  setDisplacement(self, state.displacement)
+end
 
-  self.displacement = state.displacement
+function Elevator:setChild(sprite)
+  self.spriteChild = sprite
 end

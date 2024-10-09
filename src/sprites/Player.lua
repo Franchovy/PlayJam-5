@@ -1,14 +1,15 @@
+import "player/crank"
+
 local pd <const> = playdate
 local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local imagetablePlayer = gfx.imagetable.new(assets.imageTables.player)
-local spJump = sound.sampleplayer.new("assets/sfx/Jump")
-local spError = sound.sampleplayer.new("assets/sfx/Error")
-local spDrill = sound.sampleplayer.new("assets/sfx/drill-start")
-local spCheckpointRevert = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
-local spCollect = sound.sampleplayer.new("assets/sfx/Collect")
+local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
+local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
+local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
+local spDrill <const> = sound.sampleplayer.new("assets/sfx/drill-start")
+local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -48,8 +49,8 @@ KEYS = {
     [KEYNAMES.B] = pd.kButtonB
 }
 
-local groundAcceleration <const> = 7
-local airAcceleration <const> = 1.5
+local groundAcceleration <const> = 3.5
+local airAcceleration <const> = 1.4
 local jumpSpeed <const> = 27
 local jumpHoldTimeInTicks <const> = 4
 
@@ -66,15 +67,18 @@ class("Player").extends(AnimatedSprite)
 local _instance
 
 function Player.getInstance() return _instance end
+function Player.destroy() _instance = nil end
 
 function Player:init(entity)
     _instance = self
 
     Player.super.init(self, imagetablePlayer)
 
+    entity.isOriginalPlayerSpawn = true
+
     -- AnimatedSprite states
 
-    function pauseAnimation()
+    local function pauseAnimation()
         self:pauseAnimation()
     end
 
@@ -111,11 +115,33 @@ function Player:init(entity)
 
     self.rigidBody = RigidBody(self, rigidBodyConfig)
 
-    -- Add Checkpoint handling
+    -- Add Crank controller
 
-    self.checkpointHandler = CheckpointHandler(self)
+    self.crankWarpController = CrankWarpController()
 
     self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
+end
+
+function Player:postInit()
+    -- Add Checkpoint handling
+
+    self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self)
+end
+
+function Player:add()
+    Player.super.add(self)
+
+    if self.crankWarpController then
+        self.crankWarpController:add()
+    end
+end
+
+function Player:remove()
+    Player.super.remove(self)
+
+    if self.crankWarpController then
+        self.crankWarpController:remove()
+    end
 end
 
 function Player:handleCheckpointRevert(state)
@@ -177,6 +203,10 @@ function Player:setBlueprints(blueprints)
     self.blueprints = blueprints
 end
 
+function Player:setLevelEndReady()
+    self.crankWarpController:setEndGameLoop()
+end
+
 -- Collision Response
 
 function Player:collisionResponse(other)
@@ -216,6 +246,8 @@ function Player:handleCollision(collisionData)
 
     if tag == TAGS.Elevator then
         if collisionData.normal.y == -1 then
+            other:setChild(self)
+
             local key
             if self:isMovingDown() then
                 key = KEYNAMES.Down
@@ -252,6 +284,10 @@ function Player:handleCollision(collisionData)
     if tag == TAGS.Dialog then
         activeDialog = other
     end
+
+    if tag == TAGS.SavePoint then
+        other:activate()
+    end
 end
 
 function Player:update()
@@ -261,10 +297,14 @@ function Player:update()
 
     -- Checkpoint Handling
 
-    self:handleCheckpoint()
+    local hasWarped = self.crankWarpController:handleCrankChange()
+
+    if hasWarped then
+        self:revertCheckpoint()
+    end
 
     -- Skip movement handling if timer cooldown is active
-    if not timerCooldownCheckpoint then
+    if not self.crankWarpController:isActive() then
 
         -- Movement handling (update velocity X and Y)
 
@@ -314,7 +354,11 @@ function Player:update()
 
         -- RigidBody update
 
-        self.rigidBody:update()
+        local collisions = self.rigidBody:update()
+
+        for _, collision in pairs(collisions) do
+            self:handleCollision(collision)
+        end
     end
 
     -- Update dialog
@@ -351,23 +395,19 @@ function Player:update()
 
     self:updateAnimationState()
 
-    -- Camera Movement
+    -- Update warp overlay
 
-    local playerX, playerY = self.x, self.y
-    local idealX, idealY = playerX - 200, playerY - 100
+    if self.crankWarpController then
+        self.crankWarpController:moveTo(self.x, self.y)
+    end
 
-    -- Positon camera within level bounds
-
-    local cameraOffsetX = math.max(math.min(idealX, levelWidth - 400), 0)
-    local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
-
-    gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+    self:updateCamera()
 
     -- Check if player is in top-left of level (overlap with GUI)
 
     local isOverlappingWithGUIPrevious = isOverlappingWithGUI
 
-    if playerX < 100 and playerY < 40 then
+    if self.x < 100 and self.y < 40 then
         isOverlappingWithGUI = true
     else
         isOverlappingWithGUI = false
@@ -382,29 +422,41 @@ function Player:update()
 
     local direction
 
-    if playerX > levelWidth then
+    if self.x > levelWidth then
         direction = DIRECTION.RIGHT
-    elseif playerX < 0 then
+    elseif self.x < 0 then
         direction = DIRECTION.LEFT
     end
 
-    if playerY > levelHeight then
+    if self.y > levelHeight then
         direction = DIRECTION.BOTTOM
-    elseif playerY < 0 then -- Add a margin to not trigger level change so easily.
+    elseif self.y < 0 then -- Add a margin to not trigger level change so easily.
         direction = DIRECTION.TOP
     end
 
     if direction then
         Manager.emitEvent(EVENTS.LevelComplete,
-            { direction = direction, coordinates = { x = playerX + levelGX, y = playerY + levelGY } })
+            { direction = direction, coordinates = { x = self.x + levelGX, y = self.y + levelGY } })
     end
 end
 
+function Player:updateCamera()
+
+    -- Camera Movement
+
+    local playerX, playerY = self.x, self.y
+    local idealX, idealY = playerX - 200, playerY - 100
+
+    -- Positon camera within level bounds
+
+    local cameraOffsetX = math.max(math.min(idealX, levelWidth - 400), 0)
+    local cameraOffsetY = math.max(math.min(idealY, levelHeight - 240), 0)
+
+    gfx.setDrawOffset(-cameraOffsetX + levelOffsetX, -cameraOffsetY + levelOffsetY)
+
+end
+
 function Player:revertCheckpoint()
-    -- SFX
-
-    spCheckpointRevert:play(1)
-
     -- Emit the event for the rest of the scene
 
     Manager.emitEvent(EVENTS.CheckpointRevert)
@@ -516,6 +568,10 @@ function Player:enterLevel(direction, levelBounds)
             timerCooldownCheckpoint = nil
         end
     end
+
+    -- Update Camera
+
+    self:updateCamera()
 end
 
 -- Animation Handling

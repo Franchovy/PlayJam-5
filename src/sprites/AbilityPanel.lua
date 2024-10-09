@@ -18,6 +18,8 @@ local imageTableIndexes = {
   [KEYNAMES.B] = 6,
 }
 
+local imageButtonDefault = gfx.image.new(1, 1, gfx.kColorWhite)
+
 local buttonSprites = table.create(3, 0)
 for _ = 1, 3 do
   table.insert(buttonSprites, gfx.sprite.new())
@@ -39,6 +41,8 @@ local timerAnimation = nil
 local _instance
 
 function AbilityPanel.getInstance() return _instance end
+
+function AbilityPanel.destroy() _instance = nil end
 
 --
 
@@ -62,6 +66,7 @@ function AbilityPanel:init()
   for _, sprite in pairs(buttonSprites) do
     sprite:setZIndex(100)
     sprite:setIgnoresDrawOffset(true)
+    sprite:setImage(imageButtonDefault)
   end
 
   -- These calls affect both this sprite and the children. See overrides below

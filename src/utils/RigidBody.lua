@@ -6,7 +6,7 @@ class("RigidBody").extends()
 
 local gravity <const> = 8
 local airFrictionCoefficient <const> = -0.2
-local groundFrictionCoefficient <const> = -1.8
+local groundFrictionCoefficient <const> = -0.8
 
 function RigidBody:init(sprite, config)
   self.sprite = sprite
@@ -87,11 +87,10 @@ function RigidBody:update()
     self.velocity.y = self.velocity.y + (self.velocity.y * airFrictionCoefficient * _G.delta_time)
   end
 
-  -- Call sprite's extra collision handling if available
-
-  for _, c in pairs(sdkCollisions) do
-    if sprite.handleCollision then
-      sprite:handleCollision(c)
-    end
+  -- If x velocity is very small, reduce to zero.
+  if math.abs(self.velocity.x) < 0.1 then
+    self.velocity.x = 0
   end
+
+  return sdkCollisions
 end

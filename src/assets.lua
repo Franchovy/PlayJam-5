@@ -14,12 +14,35 @@ _G.assets = {
         menuArrows = "assets/images/menu-arrows",
         player = "assets/images/player",
         elevatorTrack = "assets/images/elevator-track",
-        objectiveArrow = "assets/images/objective-arrow"
+        warp = "assets/images/warp",
+        guiRescueBots = "assets/images/gui-rescued-bots",
+        bots = {
+            helper = "assets/images/bots/A",
+            [1] = "assets/images/bots/B",
+            [2] = "assets/images/bots/C",
+            [3] = "assets/images/bots/D",
+            [4] = "assets/images/bots/E",
+            [5] = "assets/images/bots/F",
+            [6] = "assets/images/bots/G",
+            [7] = "assets/images/bots/H",
+        }
     },
     sounds = {
-        speech = "assets/sfx/speech"
+        speech = "assets/sfx/speech",
+        win = "assets/sfx/Win",
+        errorAction = "assets/sfx/error-action",
+        errorSavePoint = "assets/sfx/error-save-point",
+        menuSelect = "assets/sfx/menu-select",
+        robotSave = {
+            [1] = "assets/sfx/robot-save",
+            [2] = "assets/sfx/robot-save-2",
+            [3] = "assets/sfx/robot-save-3"
+        },
+        warpAmbient = "assets/sfx/warp-ambient",
+        warpAction = "assets/sfx/warp-action"
     },
     music = {
-        world1 = "assets/music/world_1"
+        game = "assets/music/world_1",
+        menu = "assets/music/03_Factory"
     }
 }

@@ -3,7 +3,6 @@ local gfx <const> = pd.graphics
 -- Add all layers as tilemaps
 
 function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
-    local hintCrank = LDtk.get_custom_data(levelName, "HintCrank")
     for layerName, layer in pairs(LDtk.get_layers(levelName)) do
         if layer.tiles then
             local tilemap = LDtk.create_tilemap(levelName, layerName)
@@ -23,7 +22,6 @@ function LDtk.loadAllLayersAsSprites(levelName, levelX, levelY)
             end
         end
     end
-    return hintCrank
 end
 
 function LDtk.loadAllEntitiesAsSprites(levelName)
@@ -34,17 +32,23 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
             goto continue
         end
 
-        -- If Player already exists and is playing, then don't create a new player.
+        local sprite
+
         if entity.name == "Player" and Player.getInstance() then
-            goto continue
-        end
+            if entity.isOriginalPlayerSpawn then
+                -- If Player previously spawned here, skip.
+                goto continue
+            end
 
-        -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. DrillableBlock, ButtonPickup)
-        if entity.fields.consumed == true then
+            -- If Player already exists and is playing, then create a SavePoint instead.
+            sprite = SavePoint(entity)
+        elseif entity.fields.consumed == true then
+            -- If sprite has been marked "consumed" then we shouldn't add it in. (e.g. DrillableBlock, ButtonPickup)
             goto continue
+        else
+            -- Create sprite using LDtk naming
+            sprite = _G[entity.name](entity)
         end
-
-        local sprite = _G[entity.name](entity)
         local tileCenterX, tileCenterY = entity.position.x + 16, entity.position.y + 16
 
         if entity.name == "Player" then
@@ -57,6 +61,10 @@ function LDtk.loadAllEntitiesAsSprites(levelName)
         sprite:moveTo(tileCenterX, tileCenterY)
         sprite:setZIndex(entity.zIndex)
         sprite:add()
+
+        -- Give sprite references to LDtk data
+        sprite.id = entity.iid
+        sprite.fields = entity.fields
 
         -- Optional Post-init call for overriding default configurations
         if sprite.postInit then

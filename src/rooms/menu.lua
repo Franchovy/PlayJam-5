@@ -1,11 +1,9 @@
 import "menu/grid"
 
-local pd <const> = playdate
-local sound <const> = pd.sound
-local gfx <const> = pd.graphics
-local systemMenu <const> = pd.getSystemMenu()
+local gfx <const> = playdate.graphics
+local systemMenu <const> = playdate.getSystemMenu()
 
-local spButton <const> = sound.sampleplayer.new("assets/sfx/ButtonSelect")
+local spButton <const> = playdate.sound.sampleplayer.new(assets.sounds.menuSelect)
 
 class ("Menu").extends(Room)
 
@@ -15,43 +13,34 @@ local sceneManager
 --- LIFECYCLE
 ---
 --
-function Menu:enter()
+function Menu:enter(previous, data)
+  local data = data or {}
+
+  local shouldEnableMusic = MemoryCard.getShouldEnableMusic()
+
+  if not FilePlayer.isPlaying() and shouldEnableMusic then
+    FilePlayer.play(assets.music.menu)
+  end
+
   sceneManager = self.manager
 
-  self.gridView = MenuGridView.new()
+  gfx.setDrawOffset(0, 0)
 
-  systemMenu:addMenuItem("reset progress", MemoryCard.resetProgress)
-
-  -- TODO: if last played is 100% complete, select _next_ level
-  -- and if all levels are 100% complete, just set to 1-1
-  -- STRETCH: cool new state or animationg for 100% completion
-  local world, level = MemoryCard.getLastPlayed()
-  if not world then
-    world = 1
-  end
-  if not level then
-    level = 1
+  if not self.gridView then
+    self.gridView = MenuGridView.new()
   end
 
-  -- Position current row in center of screen
+  systemMenu:addMenuItem("reset", MemoryCard.resetProgress)
 
-  self.gridView:setSelection(world, level, 1, false)
+  self.gridView:setSelectionNextLevel()
 end
 
 function Menu:leave()
     systemMenu:removeAllMenuItems()
 end
 
-function Menu:setMenuLabelText(text)
-  assert(text and type(text) == "string")
-
-  local textImage = gfx.imageWithText(text, 300, 80, nil, nil, nil, kTextAlignment.center)
-
-  spritePressStart:setImage(textImage:invertedImage())
-end
-
 function Menu:update()
-  self.gridView:drawInRect(0, 0, 400, 240)
+  self.gridView:update()
 end
 
 ---
@@ -59,14 +48,16 @@ end
 ---
 
 function Menu:AButtonDown()
-  local section, row = self.gridView:getSelection()
-  local levelFile = ReadFile.getLevel(section, row)
-  if levelFile then
-    LDtk.load(assets.path.levels..levelFile)
+  FilePlayer.stop()
+
+  local level = self.gridView:getSelectedLevel()
+  if level then
+    LDtk.load(assets.path.levels..level..".ldtk")
     spButton:play(1)
-    MemoryCard.setLastPlayed(section, row)
-    sceneManager.scenes.currentGame = Game(0)
-    sceneManager:enter(sceneManager.scenes.currentGame)
+    MemoryCard.setLastPlayed(level)
+
+    sceneManager.scenes.currentGame = Game()
+    sceneManager:enter(sceneManager.scenes.currentGame, {isInitialLoad = true})
   end
 end
 

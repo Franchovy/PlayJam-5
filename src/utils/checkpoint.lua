@@ -28,9 +28,14 @@ local DEBUG_PRINT <const> = false
 class("Checkpoint").extends()
 
 local checkpointNumber = 1
-local checkpointHandlers = table.create(0, 32)
+local checkpointHandlers = table.create(32, 0)
 
 -- Static methods - managing save state at the game level
+
+function Checkpoint.clearAll()
+    checkpointNumber = 1
+    checkpointHandlers = table.create(32, 0)
+end
 
 function Checkpoint.increment()
     checkpointNumber += 1
@@ -66,9 +71,31 @@ function Checkpoint.getCheckpointNumber()
     return checkpointNumber
 end
 
+function Checkpoint.clearAllPrevious()
+    -- Loop over all checkpoint handlers.
+    for _, handler in pairs(checkpointHandlers) do
+        -- Set initial state to the most recent state.
+        handler:clearAllPrevious()
+    end
+end
+
 -- Instance methods - individual sprite methods for managing state
 
 class("CheckpointHandler").extends()
+
+function CheckpointHandler.getOrCreate(id, sprite, initialState)
+    local checkpointHandlerExisting = checkpointHandlers[id]
+    if checkpointHandlerExisting then
+        -- Update sprite reference
+        checkpointHandlerExisting.sprite = sprite
+
+        return checkpointHandlerExisting
+    else
+        local checkpointHandlerNew = CheckpointHandler(sprite, initialState)
+        checkpointHandlers[id] = checkpointHandlerNew
+        return checkpointHandlerNew
+    end
+end
 
 function CheckpointHandler:init(sprite, initialState)
     assert(sprite, "Checkpoint handler needs sprite to initialize.")
@@ -77,8 +104,6 @@ function CheckpointHandler:init(sprite, initialState)
     if initialState ~= nil then
         self.states = LinkedList(initialState, 0)
     end
-
-    table.insert(checkpointHandlers, self)
 end
 
 -- Init / Setup methods
@@ -146,4 +171,11 @@ function CheckpointHandler:revertState()
     end
 
     return hasChangedState
+end
+
+function CheckpointHandler:clearAllPrevious()
+    local lastCheckpointState = self.states:getLast()
+
+    -- Create new list with last as initial
+    self.states = LinkedList(table.deepcopy(lastCheckpointState), 0)
 end

@@ -22,12 +22,11 @@ class("ConsumableSprite").extends(gfx.sprite)
 
 function ConsumableSprite:init(entity)
     ConsumableSprite.super.init(self)
+end
 
-    -- Set local reference to ldtk load file
-    self.fields = entity.fields
-
+function ConsumableSprite:postInit()
     -- Setup checkpoint handler with initial state (not consumed)
-    self.checkpointHandler = CheckpointHandler(self, checkpointStateNotConsumed)
+    self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self, checkpointStateNotConsumed)
 end
 
 function ConsumableSprite:consume()

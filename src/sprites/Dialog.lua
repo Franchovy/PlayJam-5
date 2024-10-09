@@ -5,7 +5,6 @@ local gfx <const> = playdate.graphics
 
 -- Assets
 
-local imageSpeech <const> = gfx.image.new(assets.images.speech)
 local nineSliceSpeech <const> = gfx.nineSlice.new(assets.images.speech, 7, 7, 17, 17)
 local spSpeech <const> = playdate.sound.sampleplayer.new(assets.sounds.speech)
 
@@ -16,6 +15,14 @@ local textMarginX <const>, textMarginY <const> = 10, 2
 local durationDialog <const> = 3000
 local collideRectSize <const> = 90
 local yOffset <const> = 16
+
+local botAnimationSpeeds <const> = botAnimationSpeeds
+local ANIMATION_STATES <const> = {
+    Idle = 1,
+    Talking = 2,
+    NeedsRescue = 3,
+    Rescued = 4
+}
 
 -- Child class functions
 
@@ -35,22 +42,70 @@ local function drawSpeechBubble(self, x, y, w, h)
     end
 end
 
-
 --
 
-class("Dialog").extends(gfx.sprite)
+---@class Dialog: playdate.graphics.sprite
+Dialog = Class("Dialog", AnimatedSprite)
 
 function Dialog:init(entity)
-    Dialog.super.init(self, imageSpeech)
+
+    -- Load image based on rescuable & entity ID
+
+    local imagetable
+    local botAnimationSpeed = 2
+
+    if entity.fields.save then
+        -- Get or create the sprite to use
+        local spriteNumber = entity.fields.spriteNumber or math.random(1, 7)
+
+        -- Set the rate at which the bot should animate
+        botAnimationSpeed = botAnimationSpeeds[spriteNumber]
+
+        -- Set the sprite number on the LDtk entity
+        entity.fields.spriteNumber = spriteNumber
+
+        -- Grab the imagetable corresponding to this sprite
+        imagetable = assert(gfx.imagetable.new(assets.imageTables.bots[spriteNumber]))
+    else
+        -- Helper bots have a set imagetable.
+        imagetable = assert(gfx.imagetable.new(assets.imageTables.bots.helper))
+    end
+
+    -- Super init call
+    Dialog.super.init(self, imagetable)
+
+    -- Add animation states
+
+    self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = botAnimationSpeed }).asDefault()
+    self:addState(ANIMATION_STATES.Talking, 5, 8, { tickStep = botAnimationSpeed })
+
+    -- Set up animation states (Sad / Happy) if needs rescue
+
+    if entity.fields.save then
+        self:addState(ANIMATION_STATES.NeedsRescue, 9, 12, { tickStep = botAnimationSpeed })
+        self:addState(ANIMATION_STATES.Rescued, 12, 16, { tickStep = botAnimationSpeed })
+
+        if entity.fields.isRescued then
+            self:changeState(ANIMATION_STATES.Rescued)
+        else
+            self:changeState(ANIMATION_STATES.NeedsRescue)
+        end
+    end
+
+    self:playAnimation()
 
     -- Sprite setup
 
     self:setTag(TAGS.Dialog)
 
+    -- Set whether is "rescuable"
+
+    self.isRescuable = entity.fields.save
+    self.rescueNumber = entity.fields.saveNumber
+
     -- Get text from LDtk entity
 
     local text = entity.fields.text
-    assert(text)
 
     -- Get font used for calculating text size
 
@@ -58,31 +113,33 @@ function Dialog:init(entity)
 
     -- Break up text into lines
 
-    self.dialogs = {}
-    for text in string.gmatch(text, "([^\n]+)") do
-        local dialog = {
-            text = text,
-            lines = {},
-            width = 0,
-            height = 0
-        }
+    if text then
+        self.dialogs = {}
+        for text in string.gmatch(text, "([^\n]+)") do
+            local dialog = {
+                text = text,
+                lines = {},
+                width = 0,
+                height = 0
+            }
 
-        for text in string.gmatch(text, "[^/]+") do
-            -- Get dialog width by getting max width of all lines
-            local textWidth = font:getTextWidth(text)
-            if dialog.width < textWidth then
-                dialog.width = textWidth
+            for text in string.gmatch(text, "[^/]+") do
+                -- Get dialog width by getting max width of all lines
+                local textWidth = font:getTextWidth(text)
+                if dialog.width < textWidth then
+                    dialog.width = textWidth
+                end
+
+                -- Add line to dialog lines
+                table.insert(dialog.lines, text)
             end
 
-            -- Add line to dialog lines
-            table.insert(dialog.lines, text)
+            -- Add dialog height based on num. lines
+            dialog.height = font:getHeight() * #dialog.lines
+
+            -- Add dialog to list
+            table.insert(self.dialogs, dialog)
         end
-
-        -- Add dialog height based on num. lines
-        dialog.height = font:getHeight() * #dialog.lines
-
-        -- Add dialog to list
-        table.insert(self.dialogs, dialog)
     end
 
     -- Set up child sprite
@@ -91,7 +148,10 @@ function Dialog:init(entity)
     self.spriteBubble.draw = drawSpeechBubble
     self.spriteBubble:moveTo(self.x, self.y)
     self.spriteBubble:setZIndex(2)
-    self.spriteBubble:add()
+
+    -- Self state
+
+    self.isRescued = false
 
     -- Set state
 
@@ -116,6 +176,7 @@ end
 function Dialog:updateDialog()
     -- If line is greater than current lines, mimic collapse.
     if self.isStateExpanded and not (self.currentLine > #self.dialogs) then
+
         -- Update sprite size using dialog size
 
         local dialog = self.dialogs[self.currentLine]
@@ -131,9 +192,8 @@ function Dialog:updateDialog()
         self.spriteBubble:setSize(width, height)
         self.spriteBubble:moveTo(self.x, self.y - height - yOffset)
     else
-        self.spriteBubble.dialog = nil
-        self.spriteBubble:setSize(defaultSize, defaultSize)
-        self.spriteBubble:moveTo(self.x, self.y)
+        self.spriteBubble:remove()
+        self:changeState(ANIMATION_STATES.Idle)
     end
 
     -- Mark dirty for redraw
@@ -148,6 +208,21 @@ end
 --- Called from the player class on collide.
 function Dialog:activate()
     self.isActivated = true
+
+    if not self.isRescued and self.isRescuable then
+        local indexSfx = math.random(1, #assets.sounds.robotSave)
+        local spRescue = playdate.sound.sampleplayer.new(assets.sounds.robotSave[indexSfx])
+        spRescue:play(1)
+
+        -- Animate to rescued animation state
+        self:changeState(ANIMATION_STATES.Rescued)
+
+        -- Send message that has been rescued
+        self.isRescued = true
+        self.fields.isRescued = true
+
+        Manager.emitEvent(EVENTS.BotRescued, self, self.rescueNumber)
+    end
 end
 
 function Dialog:expand()
@@ -155,40 +230,58 @@ function Dialog:expand()
         return
     end
 
+    -- Show speech bubble
+    self.spriteBubble:add()
     self.isStateExpanded = true
 
     -- Play SFX
     spSpeech:play(1)
+
+    -- Play speaking animation if not a rescue bot
+    if not self.isRescuable then
+        self:changeState(ANIMATION_STATES.Talking)
+    end
 end
 
 function Dialog:collapse()
-    -- Set state to collapsed
 
+    -- Hide speech bubble
+    self.spriteBubble:remove()
     self.isStateExpanded = false
+
+    -- Reset dialog progress
     self.currentLine = 1
 
     -- Stop any ongoing timers
-
     self.timer:pause()
+
+    -- Play idle animation if not a rescue bot
+    if not self.isRescuable then
+        self:changeState(ANIMATION_STATES.Idle)
+    end
 end
 
 function Dialog:update()
-    if self.isActivated then
-        -- Consume update variable
-        self.isActivated = false
+    Dialog.super.update(self)
 
-        if not self.isStateExpanded then
-            self:expand()
+    if not self.isRescuable then
+        if self.isActivated then
+            -- Consume update variable
+            self.isActivated = false
+
+            if not self.isStateExpanded then
+                self:expand()
+            end
+        elseif self.isStateExpanded then
+            self:collapse()
         end
-    elseif self.isStateExpanded then
-        self:collapse()
-    end
 
-    if self.isStateExpandedPrevious ~= self.isStateExpanded
-        or self.currentLinePrevious ~= self.currentLine then
-        self:updateDialog()
-    end
+        if self.isStateExpandedPrevious ~= self.isStateExpanded
+            or self.currentLinePrevious ~= self.currentLine then
+            self:updateDialog()
+        end
 
-    self.isStateExpandedPrevious = self.isStateExpanded
-    self.currentLinePrevious = self.currentLine
+        self.isStateExpandedPrevious = self.isStateExpanded
+        self.currentLinePrevious = self.currentLine
+    end
 end
