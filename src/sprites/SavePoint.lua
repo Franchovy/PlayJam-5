@@ -1,7 +1,9 @@
 local gfx <const> = playdate.graphics
 
+local indexSfx = math.random(1, #assets.sounds.win)
+local spWin = playdate.sound.sampleplayer.new(assets.sounds.win[indexSfx])
+
 local imageTableSprite <const> = gfx.imagetable.new(assets.imageTables.guiRescueBots)
-local spWin <const> = playdate.sound.sampleplayer.new(assets.sounds.win)
 local spError <const> = playdate.sound.sampleplayer.new(assets.sounds.errorSavePoint)
 
 ---@class SavePont: playdate.graphics.sprite
@@ -67,7 +69,7 @@ function SavePoint:activate()
         self.isActivated = true
         self.fields.isActivated = true
 
-        spWin:play(1)
+            spWin:play(1)
 
         self:updateImage()
 
