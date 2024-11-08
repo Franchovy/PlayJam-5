@@ -8,7 +8,7 @@ local gfx <const> = pd.graphics
 local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
 local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
 local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
-local spDrill <const> = sound.sampleplayer.new("assets/sfx/drill-start")
+local spDrill <const> = sound.sampleplayer.new("assets/sfx/Mining-1")
 local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
@@ -236,8 +236,12 @@ function Player:handleCollision(collisionData)
     if tag == TAGS.DrillableBlock and self:isMovingDown() and collisionData.normal.y == -1  then
         -- Play drilling sound
         if not spDrill:isPlaying() then
+            local indexSfx = math.random(1, #assets.sounds.mining)
+            local spDrill = playdate.sound.sampleplayer.new(assets.sounds.mining[indexSfx])
             spDrill:play(1)
-        end
+                else
+                spDrill:stop()
+                end
 
         self.isActivatingDrillableBlock = other
     elseif self.isActivatingDrillableBlock then

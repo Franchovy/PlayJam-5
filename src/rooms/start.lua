@@ -4,7 +4,7 @@ local gfx <const> = pd.graphics
 
 -- Constants / Assets
 
-local imageSpriteTitle <const> = gfx.image.new("assets/images/title"):invertedImage()
+local imageSpriteTitle <const> = gfx.image.new("assets/images/title")
 local imageSpriteRobot <const> = gfx.imagetable.new(assets.imageTables.player)
 local spButton = assert(sound.sampleplayer.new(assets.sounds.menuSelect))
 
@@ -40,7 +40,7 @@ function Start:enter(previous)
 
   spriteTitle = gfx.sprite.new(imageSpriteTitle)
   spriteTitle:add()
-  spriteTitle:moveTo(200, 70)
+  spriteTitle:moveTo(200, 100)
 
   spriteRobot = AnimatedSprite.new(imageSpriteRobot)
   spriteRobot:addState("placeholder-name", 9, 12, { tickStep = 2 }).asDefault()
@@ -72,7 +72,7 @@ function Start:enter(previous)
 
   -- Little fancy animation(s)
 
-  local animationOffset = 10
+  local animationOffset = 5
   local showDelay = 15
   local hideDelay = 5
   local loopDelay = 2000

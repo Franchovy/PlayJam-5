@@ -38,6 +38,11 @@ _G.assets = {
             [2] = "assets/sfx/robot-save-2",
             [3] = "assets/sfx/robot-save-3"
         },
+        mining = {
+            [1] = "assets/sfx/Mining-1",
+            [2] = "assets/sfx/Mining-2",
+            [3] = "assets/sfx/Mining-3"
+        },
         warpAmbient = "assets/sfx/warp-ambient",
         warpAction = "assets/sfx/warp-action"
     },
