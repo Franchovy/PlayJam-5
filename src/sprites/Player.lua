@@ -93,7 +93,11 @@ function Player:init(entity)
     self:addState(ANIMATION_STATES.Drilling, 12, 16, { tickStep = 2 })
     self:addState(ANIMATION_STATES.Falling, 18, 20, { tickStep = 2 }) --thanks filigrani!
     self:addState(ANIMATION_STATES.PreFalling, 17, 17, { tickStep = 1, loopCount = 3 })
+<<<<<<< HEAD
     self:addState(ANIMATION_STATES.Unsure, 24, 30, { tickStep = 2, loopCount = 1}) --needs fix
+=======
+    --self:addState(ANIMATION_STATES.Unsure, 24, 30, { tickStep = 2 }) --needs fix
+>>>>>>> parent of 17b204e (Fixed fall animation timing)
     --self:addState(ANIMATION_STATES.Impact, 21, 23, { tickStep = 2, loopCount = 3 }) --needs fix
 
     self:playAnimation()
