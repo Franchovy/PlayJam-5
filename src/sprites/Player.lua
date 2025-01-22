@@ -92,7 +92,7 @@ function Player:init(entity)
     self:addState(ANIMATION_STATES.PreFalling, 17, 17,
         { tickStep = 1, loopCount = 3 })
     self:addState(ANIMATION_STATES.Unsure, 24, 30, { tickStep = 2, nextAnimation = ANIMATION_STATES.Idle })
-    self:addState(ANIMATION_STATES.Impact, 21, 23, { tickStep = 1, nextAnimation = ANIMATION_STATES.Idle })
+    self:addState(ANIMATION_STATES.Impact, 21, 23, { tickStep = 2, nextAnimation = ANIMATION_STATES.Idle })
 
     self:playAnimation()
 
