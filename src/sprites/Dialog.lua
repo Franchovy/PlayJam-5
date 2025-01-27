@@ -60,6 +60,10 @@ function Dialog:init(entity)
     local botAnimationSpeed = 2
     local imagetable
 
+    if entity.fields.noSprite then
+        self:setVisible(false)
+    end
+
     if entity.fields.save and not entity.fields.spriteNumber then
         -- Set a random sprite number for rescuable bots without a spriteNumber
         entity.fields.spriteNumber = math.random(1, 7)
@@ -304,4 +308,15 @@ function Dialog:update()
         self.isStateExpandedPrevious = self.isStateExpanded
         self.currentLinePrevious = self.currentLine
     end
+end
+
+function Dialog:hasKey()
+    return self.fields.button ~= nil
+end
+
+function Dialog:getKey()
+    local key = self.fields.button
+    self.fields.button = nil
+
+    return key
 end
