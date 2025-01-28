@@ -378,6 +378,12 @@ function Elevator:update()
   self.spriteChild = nil
 end
 
+function Elevator:enterLevel()
+  self:add()
+
+  self.spriteElevatorTrack:add()
+end
+
 --- Used specifically for when jumping while moving up with elevator.
 function Elevator:disableCollisionsForFrame()
   self:setCollisionsEnabled(false)
