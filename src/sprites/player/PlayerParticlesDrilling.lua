@@ -12,6 +12,7 @@ function PlayerParticlesDrilling:init(player)
     PlayerParticlesDrilling.super.init(self)
 
     self:setSize(imagetableParticles[1]:getSize())
+    self:setCenter(0.5, 0.5)
     self:setZIndex(Z_INDEX.Level.Overlay)
 
     self.player = player
@@ -19,24 +20,12 @@ function PlayerParticlesDrilling:init(player)
     self.isPlaying = false
 end
 
-function PlayerParticlesDrilling:moveToPlayer()
-    self:moveTo(self.blockX, self.blockY - 12)
-end
-
-function PlayerParticlesDrilling:play(blockX, blockY)
-    if self.isPlaying then
-        self:stop()
-    end
-
-    self.blockX, self.blockY = blockX, blockY
-
-    self.index = 1
+function PlayerParticlesDrilling:startAnimation()
+    self:setIndex(1)
 
     self.isPlaying = true
 
     self:add()
-
-    self:moveToPlayer()
 end
 
 function PlayerParticlesDrilling:endAnimation()
@@ -49,19 +38,21 @@ end
 
 function PlayerParticlesDrilling:stop()
     self.isPlaying = false
-    self.index = 1
+    self:setIndex(1)
     self:remove()
+end
+
+function PlayerParticlesDrilling:setIndex(index)
+    self.index = index
+    self:setImage(imagetableParticles[index])
 end
 
 function PlayerParticlesDrilling:update()
     if self.isPlaying then
         if self.index <= #imagetableParticles then
-            self.index += 1
+            self:setIndex(self.index + 1)
         else
             self:stop()
         end
-
-        self:moveToPlayer()
-        self:setImage(imagetableParticles[self.index])
     end
 end

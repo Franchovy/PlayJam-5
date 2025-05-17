@@ -10,7 +10,9 @@ TAGS = {
     Elevator = 9,
     Checkpoint = 10,
     Dialog = 11,
-    SavePoint = 12
+    SavePoint = 12,
+    Powerwall = 13,
+    ElevatorTrack = 14
 }
 
 PROPS = {

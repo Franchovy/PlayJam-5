@@ -209,7 +209,7 @@ function Game:enter(previous, data)
             player:moveTo(checkpoint.x, checkpoint.y)
         end
 
-        player:enterLevel(direction, levelBounds)
+        player:enterLevel(currentLevelName, direction)
 
         Camera.enterLevel(currentLevelName)
     end
@@ -320,7 +320,7 @@ function Game:levelComplete(data)
     end)
 end
 
-function Game:botRescued(bot, botNumber)
+function Game:botRescued(bot, botNumber, levelEnd)
     local spriteRescueCounter = SpriteRescueCounter.getInstance()
     spriteRescueCounter:setSpriteRescued(botNumber, bot.fields.spriteNumber)
 
@@ -328,23 +328,27 @@ function Game:botRescued(bot, botNumber)
     local rescuedSprites = spriteRescueCounter:getRescuedSprites()
     MemoryCard.setLevelCompletion(areaName, worldName, { rescuedSprites = rescuedSprites })
 
-    if spriteRescueCounter:isAllSpritesRescued() then
-        -- Add on-screen text
-
-        spriteGUILevelComplete:add()
-
-        -- Set player state to game end
-
-        Player.getInstance():setLevelEndReady()
-
-        -- Set level complete in data
-
-        local saveData = { complete = true, currentLevel = LEVEL_NAME_INITIAL }
-        MemoryCard.setLevelCompletion(areaName, worldName, saveData)
-
-        -- Remove progress file
-        MemoryCard.clearLevelCheckpoint(areaName, worldName)
+    if spriteRescueCounter:isAllSpritesRescued() and levelEnd then
+        self:levelEnd()
     end
+end
+
+function Game:levelEnd()
+    -- Add on-screen text
+
+    spriteGUILevelComplete:add()
+
+    -- Set player state to game end
+
+    Player.getInstance():setLevelEndReady()
+
+    -- Set level complete in data
+
+    local saveData = { complete = true, currentLevel = LEVEL_NAME_INITIAL }
+    MemoryCard.setLevelCompletion(areaName, worldName, saveData)
+
+    -- Remove progress file
+    MemoryCard.clearLevelCheckpoint(areaName, worldName)
 end
 
 function Game:updateBlueprints()

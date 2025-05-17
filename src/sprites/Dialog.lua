@@ -88,11 +88,6 @@ function Dialog:init(entity)
     self:addState(ANIMATION_STATES.Idle, 1, 4, { tickStep = botAnimationSpeed }).asDefault()
     self:addState(ANIMATION_STATES.Talking, 5, 8, { tickStep = botAnimationSpeed })
 
-    if entity.fields.flip then
-        self.states[ANIMATION_STATES.Idle].flip = 1
-        self.states[ANIMATION_STATES.Talking].flip = 1
-    end
-
     -- Set up animation states (Sad / Happy) if needs rescue
 
     if entity.fields.save then
@@ -103,6 +98,16 @@ function Dialog:init(entity)
             self:changeState(ANIMATION_STATES.Rescued)
         else
             self:changeState(ANIMATION_STATES.NeedsRescue)
+        end
+    end
+
+    if entity.fields.flip then
+        self.states[ANIMATION_STATES.Idle].flip = 1
+        self.states[ANIMATION_STATES.Talking].flip = 1
+
+        if entity.fields.save then
+            self.states[ANIMATION_STATES.NeedsRescue].flip = 1
+            self.states[ANIMATION_STATES.Rescued].flip = 1
         end
     end
 
@@ -121,41 +126,9 @@ function Dialog:init(entity)
 
     local text = entity.fields.text
 
-    -- Get font used for calculating text size
-
-    local font = gfx.getFont()
-
     -- Break up text into lines
 
-    if text then
-        self.dialogs = {}
-        for text in string.gmatch(text, "([^\n]+)") do
-            local dialog = {
-                text = text,
-                lines = {},
-                width = 0,
-                height = 0
-            }
-
-            for text in string.gmatch(text, "[^/]+") do
-                -- Get dialog width by getting max width of all lines
-                local textWidth = font:getTextWidth(text)
-                if dialog.width < textWidth then
-                    dialog.width = textWidth
-                end
-
-                -- Add line to dialog lines
-                table.insert(dialog.lines, text) -- Unchanged Case
-                -- table.insert(dialog.lines, string.upper(text)) -- UPPERCASE
-            end
-
-            -- Add dialog height based on num. lines
-            dialog.height = (font:getHeight() + textMarginSpacing) * #dialog.lines
-
-            -- Add dialog to list
-            table.insert(self.dialogs, dialog)
-        end
-    end
+    self:parseTextIntoDialog(text)
 
     -- Set up child sprite
 
@@ -197,6 +170,21 @@ function Dialog:updateDialog()
 
         local dialog = self.dialogs[self.currentLine]
 
+        if dialog.condition then
+            local player = Player.getInstance()
+
+            if player.blueprints[1] == dialog.condition[1]
+                and player.blueprints[2] == dialog.condition[2]
+                and player.blueprints[3] == dialog.condition[3] then
+                -- Condition passed
+            else
+                -- Condition failed
+                self:showNextLine()
+                self:updateDialog()
+                return
+            end
+        end
+
         -- Set timer to handle next line / collapse
         if self.timer then
             self.timer:remove()
@@ -215,7 +203,7 @@ function Dialog:updateDialog()
         -- If line is last one, send event
         if #self.dialogs < self.currentLine and self.fields.levelEnd then
             -- If level end sprite, show level end prompt
-            Manager.emitEvent(EVENTS.LevelComplete)
+            Manager.emitEvent(EVENTS.LevelEnd)
         end
 
         self.spriteBubble:remove()
@@ -252,8 +240,12 @@ function Dialog:activate()
         self.isRescued = true
         self.fields.isRescued = true
 
-        Manager.emitEvent(EVENTS.BotRescued, self, self.rescueNumber)
+        Manager.emitEvent(EVENTS.BotRescued, self, self.rescueNumber, self.fields.levelEnd)
     end
+end
+
+function Dialog:getShouldFreeze()
+    return self.fields.freeze == true
 end
 
 function Dialog:expand()
@@ -269,9 +261,7 @@ function Dialog:expand()
     spSpeech:play(1)
 
     -- Play speaking animation if not a rescue bot
-    if not self.isRescuable then
-        self:changeState(ANIMATION_STATES.Talking)
-    end
+    self:changeState(ANIMATION_STATES.Talking)
 end
 
 function Dialog:collapse()
@@ -294,7 +284,7 @@ end
 function Dialog:update()
     Dialog.super.update(self)
 
-    if (not self.isRescuable) and self.dialogs then
+    if self.dialogs then
         if self.isActivated then
             -- Consume update variable
             self.isActivated = false
@@ -325,4 +315,76 @@ function Dialog:getKey()
     self.fields.button = nil
 
     return key
+end
+
+function Dialog:parseTextIntoDialog(text)
+    if not text then
+        return
+    end
+
+    -- Get font used for calculating text size
+
+    local font = gfx.getFont()
+
+    -- Initialize empty dialog array or map
+    self.dialogs = {}
+
+    -- Condition, if used, is repeated for every line until changed.
+    local condition
+
+    for lineRaw in string.gmatch(text, "([^\n]+)") do
+        local conditionRaw = string.match(lineRaw, "%$%u%u%u")
+
+        if conditionRaw then
+            condition = self:parseConditionIntoActions(conditionRaw)
+            goto continue
+        end
+
+        local dialog = {
+            text = lineRaw,
+            condition = condition,
+            lines = {},
+            width = 0,
+            height = 0
+        }
+
+        for text in string.gmatch(lineRaw, "[^/]+") do
+            -- Get dialog width by getting max width of all lines
+            local textWidth = font:getTextWidth(text)
+            if dialog.width < textWidth then
+                dialog.width = textWidth
+            end
+
+            -- Add line to dialog lines
+            table.insert(dialog.lines, text) -- Unchanged Case
+            -- table.insert(dialog.lines, string.upper(text)) -- UPPERCASE
+        end
+
+        -- Add dialog height based on num. lines
+        dialog.height = (font:getHeight() + textMarginSpacing) * #dialog.lines
+
+        -- Add dialog to list
+        table.insert(self.dialogs, dialog)
+
+        ::continue::
+    end
+end
+
+local lettersToActions = {
+    ["A"] = KEYNAMES.A,
+    ["B"] = KEYNAMES.B,
+    ["U"] = KEYNAMES.Up,
+    ["L"] = KEYNAMES.Left,
+    ["R"] = KEYNAMES.Right,
+    ["D"] = KEYNAMES.Down,
+}
+
+function Dialog:parseConditionIntoActions(conditionRaw)
+    local actions = {}
+
+    for c in string.gmatch(string.sub(conditionRaw, 2), ".") do
+        table.insert(actions, lettersToActions[c])
+    end
+
+    return actions
 end

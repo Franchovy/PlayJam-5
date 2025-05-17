@@ -1,0 +1,102 @@
+local gfx <const> = playdate.graphics
+
+-- Local constants
+
+local imageTableElevatorTrack <const> = gfx.imagetable.new(assets.imageTables.elevatorTrack)
+
+local TILE_ID <const> = {
+    [ORIENTATION.Vertical] = {
+        START = 4,
+        BODY = 7,
+        END = 10,
+    },
+    [ORIENTATION.Horizontal] = {
+        START = 1,
+        BODY = 2,
+        END = 3
+    }
+}
+
+-- Class definition
+
+---@class ElevatorTrack : playdate.graphics.sprite
+ElevatorTrack = Class("ElevatorTrack", gfx.sprite)
+
+-- Constructors for LDtk name reference
+
+function ElevatorTrackH(entity)
+    return ElevatorTrack(entity, ORIENTATION.Horizontal)
+end
+
+function ElevatorTrackV(entity)
+    return ElevatorTrack(entity, ORIENTATION.Vertical)
+end
+
+function ElevatorTrack:init(entity, orientation)
+    ElevatorTrack.super.init(self)
+
+    -- Set tag
+
+    self:setTag(TAGS.ElevatorTrack)
+    self.collisionResponse = gfx.sprite.kCollisionTypeOverlap
+
+    -- Create Tilemap
+
+    local numberOfTiles = (orientation == ORIENTATION.Horizontal and entity.size.width or
+        entity.size.height) / TILE_SIZE * 2 - 1
+
+    -- Create tilemap data using length
+    local dataTilemap = table.create(numberOfTiles, 0)
+
+    for i = 1, numberOfTiles do
+        local tileID = i == 1 and TILE_ID[orientation].START or i == numberOfTiles and TILE_ID[orientation].END or
+            TILE_ID[orientation].BODY
+
+        table.insert(dataTilemap, tileID)
+    end
+
+    -- Create tilemap for elevator track
+    local tilemap = gfx.tilemap.new()
+    tilemap:setImageTable(imageTableElevatorTrack)
+    tilemap:setTiles(dataTilemap, orientation == ORIENTATION.Vertical and 1 or numberOfTiles)
+
+    self.tilemap = tilemap
+    self.orientation = orientation
+end
+
+function ElevatorTrack:postInit()
+    -- Sprite config
+
+    if self.orientation == ORIENTATION.Vertical then
+        self:setSize(self.entity.size.width, self.entity.size.height - TILE_SIZE / 2)
+    else
+        -- Offset horizontal tracks to center of tile
+        self:setSize(self.entity.size.width - TILE_SIZE / 2, self.entity.size.height)
+        self:moveBy(TILE_SIZE / 4, 0)
+    end
+
+    self:setCollideRect(0, 0, self:getSize())
+
+    self:setZIndex(Z_INDEX.Level.Neutral)
+end
+
+function ElevatorTrack:setInitialPosition(initialPosition)
+    if self.orientation == ORIENTATION.Vertical then
+        self:moveTo(initialPosition.x, initialPosition.y + TILE_SIZE / 2)
+    else
+        self:moveTo(initialPosition.x - TILE_SIZE / 2, initialPosition.y + TILE_SIZE)
+    end
+end
+
+function ElevatorTrack:draw(x, y, width, height)
+    self.tilemap:draw(0, 0)
+end
+
+function ElevatorTrack:getOrientation()
+    return self.orientation
+end
+
+function ElevatorTrack:clampElevatorPoint(x, y)
+    return math.min(math.max(self:left() + TILE_SIZE / 4, x), self:right() - TILE_SIZE / 4),
+        math.min(math.max(self:top() - TILE_SIZE / 2, y), self:bottom() - TILE_SIZE)
+end
