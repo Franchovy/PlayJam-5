@@ -1,5 +1,4 @@
 local gfx <const> = playdate.graphics
-local gmt <const> = playdate.geometry
 
 local imagetableElevator <const> = gfx.imagetable.new(assets.imageTables.elevator)
 
@@ -13,17 +12,14 @@ local downwardsOffsetMax <const> = 2
 ---@class Elevator : playdate.graphics.sprite
 Elevator = Class("Elevator", gfx.sprite)
 
--- TODO:
--- Change all instances of displacement to directly refer to position
--- On init, get the elevator track on tile (with matching id <-> trackId if there are multiple)
--- When moving, check the elevator track position to see where to move
-
 function Elevator:init(entity)
   Elevator.super.init(self, imagetableElevator[1])
 
-  self:setTag(TAGS.Elevator)
+  -- Collisions
 
-  self.rigidBody = RigidBody(self)
+  self:setTag(TAGS.Elevator)
+  self:setGroups({ GROUPS.Solid, GROUPS.Ground })
+  self:setCollidesWithGroups(GROUPS.Solid)
 
   -- Elevator-specific fields
 
@@ -49,17 +45,11 @@ function Elevator:postInit()
 end
 
 function Elevator:collisionResponse(other)
-  if other == self.spriteChild then
-    -- Avoid colliding with player
-    return gfx.sprite.kCollisionTypeOverlap
+  if other:getGroupMask() & GROUPS.Solid ~= 0 then
+    return gfx.sprite.kCollisionTypeSlide
   end
 
-  local tag = other:getTag()
-  if tag == TAGS.Dialog or tag == TAGS.SavePoint or tag == TAGS.Ability or tag == TAGS.Powerwall or tag == TAGS.ElevatorTrack then
-    return gfx.sprite.kCollisionTypeOverlap
-  end
-
-  return gfx.sprite.kCollisionTypeSlide
+  return gfx.sprite.kCollisionTypeOverlap
 end
 
 ---

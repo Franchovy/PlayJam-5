@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 555,
+	"nextUid": 559,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2895,11 +2895,11 @@
 			"pivotY": 0.5,
 			"fieldDefs": [
 				{
-					"identifier": "id",
+					"identifier": "index",
 					"doc": null,
-					"__type": "String",
-					"uid": 541,
-					"type": "F_String",
+					"__type": "Int",
+					"uid": 558,
+					"type": "F_Int",
 					"isArray": false,
 					"canBeNull": false,
 					"arrayMinLength": null,
@@ -3405,10 +3405,10 @@
 							"defUid": 204,
 							"px": [144,273],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "Hey!...\nI can't believe it...\n...I'VE...\n...JUST...\n...RESCUED!!!...\nYou can thank me. Your/new life now begins.\n...\nOk, I'm gonna need some/assistance to get out of here.\nBut it looks like you/can go LEFT.\nSo go ahead and spread the word that...\n...RB-401...\n...IS...\n...KING!!!\n(jokes aside you'll/meet the team.)\n$X\nHead LEFT to meet my team!!", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "{\"bleepCount\":3, \"bleepVoice\":\"BOT_MEDIUM\"}\nHey!...\n{\"bleepCount\":6}\nI can't believe it...\n{\"bleepDuration\":3,\"bleepCount\":1}\n...I'VE...\n...JUST...\n{\"bleepDuration\":2,\"bleepCount\":4}\n...RESCUED!!!...\n{\"bleepDuration\":1,\"bleepCount\":7}\nYou can thank me. Your new life now begins.\n{\"repeats\":true}\nHead LEFT to meet my team!!", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"Hey!...\nI can't believe it...\n...I'VE...\n...JUST...\n...RESCUED!!!...\nYou can thank me. Your/new life now begins.\n...\nOk, I'm gonna need some/assistance to get out of here.\nBut it looks like you/can go LEFT.\nSo go ahead and spread the word that...\n...RB-401...\n...IS...\n...KING!!!\n(jokes aside you'll/meet the team.)\n$X\nHead LEFT to meet my team!!"
+										"{\"bleepCount\":3, \"bleepVoice\":\"BOT_MEDIUM\"}\\nHey!...\\n{\"bleepCount\":6}\\nI can't believe it...\\n{\"bleepDuration\":3,\"bleepCount\":1}\\n...I'VE...\\n...JUST...\\n{\"bleepDuration\":2,\"bleepCount\":4}\\n...RESCUED!!!...\\n{\"bleepDuration\":1,\"bleepCount\":7}\\nYou can thank me. Your new life now begins.\\n{\"repeats\":true}\\nHead LEFT to meet my team!!"
 									]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
@@ -12069,10 +12069,10 @@
 							"defUid": 204,
 							"px": [209,209],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "$ADL\nHey! Nice to see you/made it to us.\nI see you're equipped with/a LEFT arrow.\nWe need your help to reach/a bot on the left.\nIf you drill those blocks,/you can activate the elevator...\n...and reach the room on the left.\nSee if you can come back with the bot!\n$RLD\nNice job!...\n...\n...Did you bring them back?...\n...\n...Ok. Head down that elevator and/make your way back to the hub.\nWe'll take care of that bot.", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "$ADL\n{\"bleepVoice\":\"BOT_LOW\"}\nHey! Nice to see you/made it to us.\nI see you're equipped with/a LEFT arrow.\nWe need your help to reach/a bot on the left.\nIf you drill those blocks,/you can activate the elevator...\n...and reach the room on the left.\nSee if you can come back with the bot!\n$RLD\nNice job!...\n...\n...Did you bring them back?...\n...\n...Ok. Head down that elevator and/make your way back to the hub.\nWe'll take care of that bot.", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"$ADL\\nHey! Nice to see you/made it to us.\\nI see you're equipped with/a LEFT arrow.\\nWe need your help to reach/a bot on the left.\\nIf you drill those blocks,/you can activate the elevator...\\n...and reach the room on the left.\\nSee if you can come back with the bot!\\n$RLD\\nNice job!...\\n...\\n...Did you bring them back?...\\n...\\n...Ok. Head down that elevator and/make your way back to the hub.\\nWe'll take care of that bot."
+										"$ADL\\n{\"bleepVoice\":\"BOT_LOW\"}\\nHey! Nice to see you/made it to us.\\nI see you're equipped with/a LEFT arrow.\\nWe need your help to reach/a bot on the left.\\nIf you drill those blocks,/you can activate the elevator...\\n...and reach the room on the left.\\nSee if you can come back with the bot!\\n$RLD\\nNice job!...\\n...\\n...Did you bring them back?...\\n...\\n...Ok. Head down that elevator and/make your way back to the hub.\\nWe'll take care of that bot."
 									]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
@@ -12089,7 +12089,7 @@
 						},
 						{
 							"__identifier": "Dialog",
-							"__grid": [11,4],
+							"__grid": [10,4],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -12098,7 +12098,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 204,
-							"px": [368,144],
+							"px": [336,144],
 							"fieldInstances": [
 								{ "__identifier": "text", "__type": "String", "__value": "Woohoo! Another bot saved!", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
@@ -12116,7 +12116,7 @@
 								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
 								{ "__identifier": "freeze", "__type": "Bool", "__value": false, "__tile": null, "defUid": 527, "realEditorValues": [] }
 							],
-							"__worldX": 6992,
+							"__worldX": 6960,
 							"__worldY": -16
 						},
 						{
@@ -12669,10 +12669,10 @@
 							"defUid": 204,
 							"px": [272,306],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "...My savior!!!\nThank you for having/come here.\n...\n...I am weak. But I must/tell you this...\nYou have a special power...\n...and not all will recognize it.\nI can explain to you/more later.\nYou need to help me...\n&R\n...take this RIGHT/arrow from me.\nNow USE THE CRANK to/help me get out of here.\nTurn it TOWARDS YOU/and you'll see.", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "...My savior!!!\nThank you for having/come here.\n...\n...I am weak. But I must/tell you this...\nYou have a special power...\n...and not all will recognize it.\nI can explain to you/more later.\nYou need to help me...\n{\"giveChip\":\"Right\"}\n...take this RIGHT/arrow from me.\nNow USE THE CRANK to/help me get out of here.\nTurn it TOWARDS YOU/and you'll see.", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"...My savior!!!\nThank you for having/come here.\n...\n...I am weak. But I must/tell you this...\nYou have a special power...\n...and not all will recognize it.\nI can explain to you/more later.\nYou need to help me...\n&R\n...take this RIGHT/arrow from me.\nNow USE THE CRANK to/help me get out of here.\nTurn it TOWARDS YOU/and you'll see."
+										"...My savior!!!\\nThank you for having/come here.\\n...\\n...I am weak. But I must/tell you this...\\nYou have a special power...\\n...and not all will recognize it.\\nI can explain to you/more later.\\nYou need to help me...\\n{\"giveChip\":\"Right\"}\\n...take this RIGHT/arrow from me.\\nNow USE THE CRANK to/help me get out of here.\\nTurn it TOWARDS YOU/and you'll see."
 									]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 411, "realEditorValues": [{
@@ -12685,10 +12685,7 @@
 									"id": "V_Bool",
 									"params": [ false ]
 								}] },
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 505, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Right"]
-								}] },
+								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": null, "__tile": null, "defUid": 505, "realEditorValues": [null] },
 								{ "__identifier": "noSprite", "__type": "Bool", "__value": false, "__tile": null, "defUid": 506, "realEditorValues": [] },
 								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
 								{ "__identifier": "freeze", "__type": "Bool", "__value": true, "__tile": null, "defUid": 527, "realEditorValues": [{
@@ -13529,10 +13526,10 @@
 							"defUid": 204,
 							"px": [336,176],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "Hey! Nice job getting rescued!\nLooks like you're able/to move by yourself...\n...see if you can drill DOWN on/those blocks over there.\n$X\nTry pressing DOWN/while on top of those blocks.", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "Hey! Nice job getting rescued!\nLooks like you're able/to move by yourself...\n...see if you can drill DOWN on/those blocks over there.\n{\"repeats\":true}\nTry pressing DOWN/while on top of those blocks.", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"Hey! Nice job getting rescued!\nLooks like you're able/to move by yourself...\n...see if you can drill DOWN on/those blocks over there.\n$X\nTry pressing DOWN/while on top of those blocks."
+										"Hey! Nice job getting rescued!\nLooks like you're able/to move by yourself...\n...see if you can drill DOWN on/those blocks over there.\n{\"repeats\":true}\nTry pressing DOWN/while on top of those blocks."
 									]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
@@ -13898,10 +13895,10 @@
 							"defUid": 204,
 							"px": [240,177],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "Hey there! Looks like/you're able to move...\n...see if you can use/that elevator to go DOWN.\n$X\nStand on top of the/elevator and press DOWN.", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "Hey there! Looks like/you're able to move...\n...see if you can use/that elevator to go DOWN.\n{\"repeats\":true}\nStand on top of the/elevator and press DOWN.", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"Hey there! Looks like/you're able to move...\n...see if you can use/that elevator to go DOWN.\n$X\nStand on top of the/elevator and press DOWN."
+										"Hey there! Looks like/you're able to move...\n...see if you can use/that elevator to go DOWN.\n{\"repeats\":true}\nStand on top of the/elevator and press DOWN."
 									]
 								}] },
 								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
@@ -18891,10 +18888,7 @@
 							"height": 16,
 							"defUid": 540,
 							"px": [112,112],
-							"fieldInstances": [{ "__identifier": "id", "__type": "String", "__value": "disk-1", "__tile": null, "defUid": 541, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["disk-1"]
-							}] }],
+							"fieldInstances": [{ "__identifier": "index", "__type": "Int", "__value": 3, "__tile": null, "defUid": 558, "realEditorValues": [{ "id": "V_Int", "params": [3] }] }],
 							"__worldX": 6640,
 							"__worldY": 880
 						},
@@ -19080,10 +19074,7 @@
 							"height": 16,
 							"defUid": 540,
 							"px": [144,176],
-							"fieldInstances": [{ "__identifier": "id", "__type": "String", "__value": "2", "__tile": null, "defUid": 541, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["2"]
-							}] }],
+							"fieldInstances": [{ "__identifier": "index", "__type": "Int", "__value": 2, "__tile": null, "defUid": 558, "realEditorValues": [{ "id": "V_Int", "params": [2] }] }],
 							"__worldX": 5840,
 							"__worldY": 592
 						}

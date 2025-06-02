@@ -14,11 +14,11 @@ local spSpeech <const> = assert(playdate.sound.sampleplayer.new(assets.sounds.sp
 local defaultSize <const> = 16
 local textMarginX <const>, textMarginY <const> = 10, 8
 local textMarginSpacing <const> = 4
-local distanceAboveSprite <const> = 11
-local durationDialog <const> = 3000
+local distanceAboveSprite <const> = 6
+local durationDialog <const> = 2000
 local collideRectSize <const> = 90
-local yOffset <const> = 16
 
+local yOffset <const> = 16
 local botAnimationSpeeds <const> = botAnimationSpeeds
 local ANIMATION_STATES <const> = {
     Idle = 1,
@@ -26,30 +26,6 @@ local ANIMATION_STATES <const> = {
     NeedsRescue = 3,
     Rescued = 4
 }
-
--- Child class functions
-
-local function drawSpeechBubble(self, x, y, w, h)
-    -- Draw Speech Bubble
-
-    nineSliceSpeech:drawInRect(0, 0, self.width, self.height - 8)
-
-    --
-
-    imageSpeechBButton:drawAnchored(self.width - 6, self.height, 1, 1)
-
-    -- Draw Text
-
-    if self.dialog then
-        local font = gfx.getFont()
-
-        for i, line in ipairs(self.dialog.lines) do
-            font:drawText(line, textMarginX, textMarginY + (i - 1) * (textMarginSpacing + font:getHeight()))
-        end
-    end
-end
-
---
 
 ---@class Dialog: playdate.graphics.sprite
 Dialog = Class("Dialog", AnimatedSprite)
@@ -113,8 +89,20 @@ function Dialog:init(entity)
 
     self:playAnimation()
 
+    -- Utils
+
+    local num = math.random(3)
+    local voices = {
+        SCALES.BOT_LOW,
+        SCALES.BOT_MEDIUM,
+        SCALES.BOT_HIGH,
+    }
+    self.synth = Synth(
+        voices[num], 6 + num)
+
     -- Sprite setup
 
+    self:setGroups(GROUPS.Overlap)
     self:setTag(TAGS.Dialog)
 
     -- Set whether is "rescuable"
@@ -130,12 +118,9 @@ function Dialog:init(entity)
 
     self:parseTextIntoDialog(text)
 
-    -- Set up child sprite
+    -- Dialog variables
 
-    self.spriteBubble = gfx.sprite.new()
-    self.spriteBubble.draw = drawSpeechBubble
-    self.spriteBubble:moveTo(self.x, self.y)
-    self.spriteBubble:setCenter(0.5, 1)
+    self.repeatLine = nil
 
     -- Self state
 
@@ -152,8 +137,6 @@ function Dialog:init(entity)
 end
 
 function Dialog:postInit()
-    self.spriteBubble:setZIndex(Z_INDEX.Level.Overlay)
-
     -- Set collide rect to full size, centered on current center.
     self:setCollideRect(
         (self.width - collideRectSize) / 2,
@@ -185,20 +168,29 @@ function Dialog:updateDialog()
             end
         end
 
+        -- Read props
+        if dialog.props then
+            self:parseProps(dialog.props)
+        end
+
         -- Set timer to handle next line / collapse
         if self.timer then
             self.timer:remove()
         end
 
-        self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLine, self)
-
-        -- Update child sprite dialog
-        self.spriteBubble.dialog = dialog
-
         -- Set size and position
-        local width, height = dialog.width + textMarginX * 2, dialog.height + textMarginY * 2 + 8
-        self.spriteBubble:setSize(width, height)
-        self.spriteBubble:moveTo(self.x, self.y - distanceAboveSprite)
+        local width = dialog.width + textMarginX * 2
+
+        self:setupDialogBubble(
+            dialog.text,
+            self.x - width / 2,
+            self.y - distanceAboveSprite,
+            width
+        )
+
+        -- Speak dialog
+
+        self:playDialogSound()
     else
         -- If line is last one, send event
         if #self.dialogs < self.currentLine and self.fields.levelEnd then
@@ -206,12 +198,39 @@ function Dialog:updateDialog()
             Manager.emitEvent(EVENTS.LevelEnd)
         end
 
-        self.spriteBubble:remove()
         self:changeState(ANIMATION_STATES.Idle)
     end
+end
 
-    -- Mark dirty for redraw
-    self.spriteBubble:markDirty()
+function Dialog:setupDialogBubble(text, x, y, width)
+    local config = {
+        x = x,
+        y = y,
+        z = Z_INDEX.Level.Overlay, -- z-index not implemented.
+        width = width,
+        padding = 8,
+        nineSlice = nineSliceSpeech,
+        speed = 4.5,
+        onPageComplete = function()
+            self.timer = playdate.timer.performAfterDelay(durationDialog, self.showNextLine, self)
+        end
+    }
+
+    -- Clear previous dialog sprite
+
+    if self.dialogSprite then
+        self.dialogSprite:remove()
+    end
+
+    -- Create and add new dialog sprite
+
+    local dialogBox = pdDialogue.create(text, config)
+
+    self.dialogSprite = dialogBox:asSprite()
+
+    self.dialogSprite:setCenter(0.5, 1)
+    self.dialogSprite:moveTo(self:centerX(), self:top() - distanceAboveSprite)
+    self.dialogSprite:add()
 end
 
 function Dialog:showNextLine()
@@ -222,6 +241,13 @@ function Dialog:showNextLine()
     if self.timer then
         self.timer:reset()
     end
+end
+
+function Dialog:playDialogSound()
+    self.synth:playNotes(
+        self.bleepCount or 6,
+        9 / (self.bleepDuration or 1)
+    )
 end
 
 --- Called from the player class on collide.
@@ -254,26 +280,30 @@ function Dialog:expand()
     end
 
     -- Show speech bubble
-    self.spriteBubble:add()
     self.isStateExpanded = true
 
     -- Play SFX
-    spSpeech:play(1)
+
+    --self:playDialogSound()
 
     -- Play speaking animation if not a rescue bot
     self:changeState(ANIMATION_STATES.Talking)
 end
 
 function Dialog:collapse()
+    self.dialogSprite:remove()
+    self.dialogSprite = nil
+
     -- Hide speech bubble
-    self.spriteBubble:remove()
     self.isStateExpanded = false
 
     -- Reset dialog progress
-    self.currentLine = 1
+    self.currentLine = self.repeatLine or 1
 
     -- Stop any ongoing timers
-    self.timer:pause()
+    if self.timer then
+        self.timer:pause()
+    end
 
     -- Play idle animation if not a rescue bot
     if not self.isRescuable then
@@ -331,8 +361,11 @@ function Dialog:parseTextIntoDialog(text)
 
     -- Condition, if used, is repeated for every line until changed.
     local condition
+    local props
 
     for lineRaw in string.gmatch(text, "([^\n]+)") do
+        -- Dialog Action condition
+
         local conditionRaw = string.match(lineRaw, "%$%u%u%u")
 
         if conditionRaw then
@@ -340,30 +373,38 @@ function Dialog:parseTextIntoDialog(text)
             goto continue
         end
 
-        local dialog = {
-            text = lineRaw,
-            condition = condition,
-            lines = {},
-            width = 0,
-            height = 0
-        }
+        -- JSON for dynamic properties
 
-        for text in string.gmatch(lineRaw, "[^/]+") do
-            -- Get dialog width by getting max width of all lines
-            local textWidth = font:getTextWidth(text)
-            if dialog.width < textWidth then
-                dialog.width = textWidth
-            end
+        if string.match(lineRaw, "^%{") then
+            local _, data = pcall(json.decode, lineRaw)
 
-            -- Add line to dialog lines
-            table.insert(dialog.lines, text) -- Unchanged Case
-            -- table.insert(dialog.lines, string.upper(text)) -- UPPERCASE
+            props = data
+
+            goto continue
         end
 
-        -- Add dialog height based on num. lines
-        dialog.height = (font:getHeight() + textMarginSpacing) * #dialog.lines
+        -- Else, create dialog object
+
+        local dialog = {
+            text = lineRaw,
+            props = props,
+            condition = condition,
+            width = 0,
+        }
+
+        -- Clear dynamic properties after use
+
+        if props then
+            props = nil
+        end
+
+        -- Calculate width and height of dialog box
+
+        local textWidth = font:getTextWidth(lineRaw)
+        dialog.width = math.min(textWidth, 200)
 
         -- Add dialog to list
+
         table.insert(self.dialogs, dialog)
 
         ::continue::
@@ -387,4 +428,42 @@ function Dialog:parseConditionIntoActions(conditionRaw)
     end
 
     return actions
+end
+
+function Dialog:parseProps(props)
+    -- Repeating line
+
+    if props.repeats then
+        self.repeatLine = self.currentLine
+    end
+
+    -- Player Interactions
+
+    if props.unlockCrank then
+        local player = Player.getInstance()
+        player:unlockCrank()
+    end
+
+    if props.giveChip then
+        local player = Player.getInstance()
+        player:pickUpBlueprint(props.giveChip)
+    end
+
+    -- Bleeps config
+
+    if props.bleepsPerSecond then
+        self.bleepsPerSecond = props.bleepsPerSecond
+    end
+
+    if props.bleepDuration then
+        self.bleepDuration = props.bleepDuration
+    end
+
+    if props.bleepCount then
+        self.bleepCount = props.bleepCount
+    end
+
+    if props.bleepVoice then
+        self.synth:setVoice(SCALES[props.bleepVoice])
+    end
 end

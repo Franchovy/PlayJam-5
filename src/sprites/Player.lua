@@ -9,10 +9,13 @@ local gfx <const> = pd.graphics
 
 local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
 local imagetablePlayerDarkness <const> = gfx.imagetable.new(assets.imageTables.playerDarkness)
-local spJump <const> = sound.sampleplayer.new("assets/sfx/Jump")
+
+local spJump <const> = sound.sampleplayer.new(assets.sounds.jump)
 local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
 local spDrill <const> = sound.sampleplayer.new(assets.sounds.drill)
-local spCollect <const> = sound.sampleplayer.new("assets/sfx/Collect")
+local spCollect <const> = sound.sampleplayer.new(assets.sounds.collect)
+local spPowerUp <const> = sound.sampleplayer.new(assets.sounds.powerUp)
+local spPowerDown <const> = sound.sampleplayer.new(assets.sounds.powerDown)
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -43,6 +46,8 @@ local ANIMATION_STATES = {
     UnsureRun = 8,
     Impact = 9,
     ImpactRun = 10,
+    IdlePowerUp = 11,
+    MovingPowerUp = 12
 }
 
 KEYS = {
@@ -68,6 +73,7 @@ local VELOCITY_FALL_ANIMATION <const> = 6
 
 -- Setup
 
+--- @class Player : playdate.graphics.sprite
 Player = Class("Player", AnimatedSprite)
 
 -- Static Reference
@@ -88,13 +94,21 @@ function Player:init(entity)
     local imagetable = CONFIG.ADD_SUPER_DARKNESS_EFFECT and imagetablePlayerDarkness or imagetablePlayer
     Player.super.init(self, imagetable)
 
+    -- Set original spawn property on LDtk data
+
     entity.isOriginalPlayerSpawn = true
 
     -- AnimatedSprite states
 
     self:setupAnimationStates()
 
+    -- Collisions
+
+    self:setGroups(GROUPS.Player)
+    self:setCollidesWithGroups({ GROUPS.Solid, GROUPS.Overlap })
     self:setTag(TAGS.Player)
+
+    -- "Sub-States"
 
     self.activeDialog = false
     self.didPressedInvalidKey = false
@@ -120,21 +134,26 @@ function Player:init(entity)
 
     -- RigidBody config
 
-    local rigidBodyConfig = {
-        groundFriction = 2,
-        airFriction = 2,
-        gravity = 5
-    }
-
-    self.rigidBody = RigidBody(self, rigidBodyConfig)
+    self.rigidBody = RigidBody(self, {})
 
     self.latestCheckpointPosition = gmt.point.new(self.x, self.y)
 
+    -- Load abilities
+
+    local abilities = MemoryCard.getAbilities()
+
     -- Create child sprites
 
-    self.crankWarpController = PlayerCrankWarpController()
+    if abilities and abilities.crankWarp then
+        self.crankWarpController = PlayerCrankWarpController()
+    end
+
     self.questionMark = PlayerQuestionMark(self)
     self.particlesDrilling = PlayerParticlesDrilling(self)
+
+    -- Utils
+
+    self.synth = Synth(SCALES.PLAYER)
 end
 
 function Player:postInit()
@@ -151,6 +170,14 @@ function Player:postInit()
 
     if CONFIG.ADD_SUPER_DARKNESS_EFFECT then
         self:setZIndex(Z_INDEX.HUD.Main)
+    end
+end
+
+function Player:collisionResponse(other)
+    if other:getGroupMask() & GROUPS.Solid ~= 0 then
+        return gfx.sprite.kCollisionTypeSlide
+    else
+        return gfx.sprite.kCollisionTypeOverlap
     end
 end
 
@@ -199,6 +226,8 @@ function Player:setupAnimationStates()
         { tickStep = 3, nextAnimation = ANIMATION_STATES.Idle })
     self:addState(ANIMATION_STATES.Impact, 21, 23, { tickStep = 2, nextAnimation = ANIMATION_STATES.Idle })
     self:addState(ANIMATION_STATES.ImpactRun, 43, 45, { tickStep = 2, nextAnimation = ANIMATION_STATES.Idle })
+    self:addState(ANIMATION_STATES.IdlePowerUp, 50, 53, { tickStep = 3 })
+    self:addState(ANIMATION_STATES.MovingPowerUp, 54, 57, { tickStep = 2 })
 
     self.isAnimationFlip = 0
 
@@ -281,7 +310,9 @@ function Player:setBlueprints(blueprints)
 end
 
 function Player:setLevelEndReady()
-    self.crankWarpController:setEndGameLoop()
+    if self.crankWarpController then
+        self.crankWarpController:setEndGameLoop()
+    end
 end
 
 --------------------
@@ -305,6 +336,16 @@ function Player:revertCheckpoint()
             timerCooldownCheckpoint = nil
         end
     end
+end
+
+function Player:unlockCrank()
+    -- Create crank warp controller child sprite
+
+    self.crankWarpController = PlayerCrankWarpController()
+
+    -- Save ability to memory card
+
+    MemoryCard.setAbilities({ crankWarp = true })
 end
 
 function Player:pickUpBlueprint(blueprint)
@@ -342,19 +383,6 @@ end
 -- UPDATE METHODS --
 --------------------
 
-function Player:collisionResponse(other)
-    local tag = other:getTag()
-    if tag == TAGS.Wall or
-        tag == TAGS.ConveyorBelt or
-        tag == TAGS.Box or
-        tag == TAGS.DrillableBlock or
-        tag == TAGS.Elevator then
-        return gfx.sprite.kCollisionTypeSlide
-    else
-        return gfx.sprite.kCollisionTypeOverlap
-    end
-end
-
 -- Update Method
 
 function Player:update()
@@ -378,6 +406,14 @@ function Player:update()
 
     self:updateActivations()
 
+    -- Dialog
+
+    if self:justPressedInteractionKey() and not self.activeDialog then
+        self.synth:play()
+    elseif self:justReleasedInteractionKey() then
+        self.synth:stop()
+    end
+
     -- Skip movement handling if timer cooldown is active
 
     self:updateMovement()
@@ -385,6 +421,7 @@ function Player:update()
     -- Update variables set by collisions
 
     self.isTouchingGroundPrevious = self.rigidBody:getIsTouchingGround()
+    self.isTouchingPowerPrevious = self.isTouchingPower
     self.isTouchingPower = false
     self.didPressedInvalidKey = false
     self.activationsBottom = {}
@@ -422,7 +459,7 @@ function Player:update()
 end
 
 function Player:updateWarp()
-    if self.crankWarpController:hasTriggeredWarp() then
+    if self.crankWarpController and self.crankWarpController:hasTriggeredWarp() then
         self:revertCheckpoint()
 
         self.crankWarpController:resetWarp()
@@ -531,6 +568,10 @@ function Player:updateActivations()
             end
         end
 
+        if tag == TAGS.Collectible then
+            otherSprite:activate()
+        end
+
         if tag == TAGS.Dialog and not self.activeDialog then
             self.activeDialog = otherSprite
 
@@ -557,11 +598,33 @@ function Player:updateActivations()
 
         self.isActivatingDrillableBlock = nil
     end
+
+    -- Misc
+
+    if self.isTouchingPower and not self.isTouchingPowerPrevious then
+        -- Enter power area
+
+        spPowerUp:play()
+        spPowerDown:stop()
+
+        -- Update ChipSet GUI
+
+        Manager.emitEvent(EVENTS.UpdateBlueprints)
+    elseif self.isTouchingPowerPrevious and not self.isTouchingPower then
+        -- Exit power area
+
+        spPowerDown:play()
+        spPowerUp:stop()
+
+        -- Update ChipSet GUI
+
+        Manager.emitEvent(EVENTS.UpdateBlueprints)
+    end
 end
 
 function Player:updateMovement()
     -- If cooldown for warp is active, then skip movement update.
-    if self.crankWarpController:isActive() then
+    if self.crankWarpController and self.crankWarpController:isActive() then
         return
     end
 
@@ -637,10 +700,19 @@ function Player:updateRigidBody()
 end
 
 function Player:updateCollisions()
+    -- Check for special case event
+    local horizontalCornerBlock = false
+
     for _, collisionData in pairs(self.collisions) do
         local other = collisionData.other
         local tag = other:getTag()
         local normal = collisionData.normal
+
+        -- Special case/corner check for horizontal collisions
+
+        if collisionData.normal.x ~= 0 and collisionData.otherRect.y == collisionData.spriteRect.y + collisionData.spriteRect.height then
+            horizontalCornerBlock = collisionData.other
+        end
 
         -- Bottom activations
         if normal.y == -1 and (tag == TAGS.DrillableBlock or tag == TAGS.Elevator) then
@@ -649,13 +721,30 @@ function Player:updateCollisions()
         end
 
         -- Other activations
-        if tag == TAGS.SavePoint or tag == TAGS.Dialog or tag == TAGS.Ability then
+        if tag == TAGS.SavePoint or tag == TAGS.Dialog or tag == TAGS.Ability or tag == TAGS.Collectible then
             table.insert(self.activations, other)
         end
 
         -- Other (passive)
         if tag == TAGS.Powerwall then
             self.isTouchingPower = true
+        end
+    end
+
+    -- Special case move - this may be an SDK bug?
+    -- When player is on top of a block, and x coordinate is exactly on the tile +
+    -- There is a separate "wall" (like drillable block) corner touching drillbot corner
+    -- this appears to make the "slide" fail and no movement occurs.
+
+    if horizontalCornerBlock and self.rigidBody:getIsTouchingGround() then
+        if horizontalCornerBlock:collisionsEnabled() then
+            horizontalCornerBlock:setCollisionsEnabled(false)
+
+            -- Schedule reset for collisions
+            playdate.frameTimer.new(1,
+                function()
+                    horizontalCornerBlock:setCollisionsEnabled(true)
+                end)
         end
     end
 end
@@ -712,9 +801,17 @@ function Player:updateAnimationState()
                     animationState = ANIMATION_STATES.Impact
                 end
             elseif isMoving and not (self.isActivatingElevator and self.isActivatingElevator:wasActivationSuccessful()) then
-                animationState = ANIMATION_STATES.Moving
+                if self.isTouchingPower then
+                    animationState = ANIMATION_STATES.MovingPowerUp
+                else
+                    animationState = ANIMATION_STATES.Moving
+                end
             else
-                animationState = ANIMATION_STATES.Idle
+                if self.isTouchingPower then
+                    animationState = ANIMATION_STATES.IdlePowerUp
+                else
+                    animationState = ANIMATION_STATES.Idle
+                end
             end
         else
             if velocity.dy > VELOCITY_FALL_ANIMATION then
@@ -827,6 +924,10 @@ end
 
 function Player:justPressedInteractionKey()
     return playdate.buttonJustPressed(KEYNAMES.B)
+end
+
+function Player:justReleasedInteractionKey()
+    return playdate.buttonJustReleased(KEYNAMES.B)
 end
 
 -- Generic gated input handler

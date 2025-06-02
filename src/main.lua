@@ -2,7 +2,6 @@ import "const"
 import "debug"
 import "assets"
 import "libs"
-import "playdate"
 import "extensions"
 import "rooms"
 import "utils"
@@ -10,6 +9,7 @@ import "sprites"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
+local frameTimer <const> = playdate.frameTimer
 
 local imageLogo <const> = gfx.image.new(assets.images.logo)
 
@@ -32,8 +32,16 @@ local function init()
   local fontDefault = gfx.font.new(assets.fonts.dialog)
   gfx.setFont(fontDefault)
 
+  pdDialogue.setup({
+    font = fontDefault
+  })
+
   gfx.setBackgroundColor(0)
   gfx.clear(0)
+
+  -- DEBUG: - Memory Clear
+
+  -- MemoryCard.clearAll()
 
   -- Read file paths
 
@@ -57,14 +65,11 @@ local function init()
   -- Hide logo
 
   showLogo = false
-
-  -- DEBUG: - Memory Clear
-
-  --MemoryCard.clearAll()
 end
 
 function playdate.update()
   timer.updateTimers()
+  frameTimer.updateTimers()
 
   if showLogo then
     imageLogo:drawAnchored(200, 120, 0.5, 0.5)
