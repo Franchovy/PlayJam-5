@@ -1,7 +1,7 @@
 local gfx <const> = playdate.graphics
 
-local imageTableCollectibles <const> = gfx.imagetable.new(assets.imageTables.collectibles)
-local spCollectiblePickup <const> = playdate.sound.sampleplayer.new(assets.sounds.collectiblePickup)
+local imageTableCollectibles <const> = assert(gfx.imagetable.new(assets.imageTables.collectibles))
+local spCollectiblePickup <const> = assert(playdate.sound.sampleplayer.new(assets.sounds.collectiblePickup))
 
 --- @class Collectible : ConsumableSprite
 Collectible = Class("Collectible", ConsumableSprite)
@@ -26,8 +26,6 @@ function Collectible:init(entity)
     -- Generate hash from image
 
     self:generateImageHash()
-
-    print(self.imageHash)
 end
 
 function Collectible:postInit()

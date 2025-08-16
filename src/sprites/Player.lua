@@ -7,15 +7,12 @@ local sound <const> = pd.sound
 local gmt <const> = pd.geometry
 local gfx <const> = pd.graphics
 
-local imagetablePlayer <const> = gfx.imagetable.new(assets.imageTables.player)
-local imagetablePlayerDarkness <const> = gfx.imagetable.new(assets.imageTables.playerDarkness)
+local imagetablePlayer <const> = assert(gfx.imagetable.new(assets.imageTables.player))
+local imagetablePlayerDarkness <const> = assert(gfx.imagetable.new(assets.imageTables.playerDarkness))
 
-local spJump <const> = sound.sampleplayer.new(assets.sounds.jump)
-local spError <const> = sound.sampleplayer.new(assets.sounds.errorAction)
-local spDrill <const> = sound.sampleplayer.new(assets.sounds.drill)
-local spCollect <const> = sound.sampleplayer.new(assets.sounds.collect)
-local spPowerUp <const> = sound.sampleplayer.new(assets.sounds.powerUp)
-local spPowerDown <const> = sound.sampleplayer.new(assets.sounds.powerDown)
+local spJump <const> = assert(sound.sampleplayer.new(assets.sounds.jump))
+local spError <const> = assert(sound.sampleplayer.new(assets.sounds.errorAction))
+local spDrill <const> = assert(sound.sampleplayer.new(assets.sounds.drill))
 
 -- Level Bounds for camera movement (X,Y coords areas in global (world) coordinates)
 
@@ -23,7 +20,8 @@ local levelBounds
 
 -- Timer for handling cooldown on checkpoint revert
 
-local timerCooldownCheckpoint
+local warpCooldown
+local crankMomentum = 0
 
 -- Boolean to keep overlapping with GUI state
 
@@ -67,10 +65,6 @@ local jumpSpeedDrilledBlock <const> = -14
 local jumpHoldTimeInTicks <const> = 4
 local VELOCITY_FALL_ANIMATION <const> = 6
 
--- TODO: [Franch]
--- Set timer to pause movement when doing checkpoint resets (0.5s probably)
--- Abilities (blueprints) should come from a single source, read from panel (or game)
-
 -- Setup
 
 --- @class Player : playdate.graphics.sprite
@@ -113,7 +107,7 @@ function Player:init(entity)
     self.activeDialog = false
     self.didPressedInvalidKey = false
     self.activations = {}
-    self.activationsBottom = {}
+    self.activationsDown = {}
     self.activationsPrevious = {}
 
     -- Jumping mechanic variables
@@ -123,14 +117,9 @@ function Player:init(entity)
 
     -- Setup keys array and starting keys
 
-    self.blueprints = {}
+    assert(entity.fields.chipSet, "Error: no chipset was set!")
 
-    local startingKeys = entity.fields.blueprints
-    for _, key in ipairs(startingKeys) do
-        table.insert(self.blueprints, key)
-    end
-
-    Manager.emitEvent(EVENTS.UpdateBlueprints)
+    Manager.emitEvent(EVENTS.UpdateChipSet, { chipSet = entity.fields.chipSet, isActive = true })
 
     -- RigidBody config
 
@@ -140,14 +129,11 @@ function Player:init(entity)
 
     -- Load abilities
 
-    local abilities = MemoryCard.getAbilities()
+    self:loadAbilities()
 
     -- Create child sprites
 
-    if abilities and abilities.crankWarp then
-        self.crankWarpController = PlayerCrankWarpController()
-    end
-
+    self.crankWarpController = PlayerCrankWarpController()
     self.questionMark = PlayerQuestionMark(self)
     self.particlesDrilling = PlayerParticlesDrilling(self)
 
@@ -251,9 +237,6 @@ function Player:handleCheckpointRevert(state)
 
     self.latestCheckpointPosition.x = state.x
     self.latestCheckpointPosition.y = state.y
-    self.blueprints = state.blueprints
-
-    Manager.emitEvent(EVENTS.UpdateBlueprints)
 end
 
 -- Enter Level
@@ -274,7 +257,11 @@ function Player:enterLevel(levelName, direction)
     elseif direction == DIRECTION.BOTTOM then
         self:moveTo(self.x, levelBounds.y + 15)
     elseif direction == DIRECTION.TOP then
-        self:moveTo(self.x, levelBounds.bottom - 15)
+        -- Additional movement when jumping into bottom of level for reaching bottom tile
+        -- ... except if moving up with elevator.
+
+        local additionalBottomOffset = self.isActivatingElevator and 0 or 15
+        self:moveTo(self.x, levelBounds.bottom - 15 - additionalBottomOffset)
     end
 
     -- Bring any parents with player (for elevator)
@@ -287,31 +274,20 @@ function Player:enterLevel(levelName, direction)
     self.checkpointHandler:pushState({
         x = self.x,
         y = self.y,
-        blueprints = table.deepcopy(self.blueprints)
     })
 
     -- TODO: - Can this code be removed?
     -- Set a cooldown timer to prevent key presses on enter
 
-    timerCooldownCheckpoint = playdate.timer.new(50)
-    timerCooldownCheckpoint.timerEndedCallback = function(timer)
+    warpCooldown = playdate.timer.new(50)
+    warpCooldown.timerEndedCallback = function(timer)
         timer:remove()
 
         -- Since there can be multiple checkpoint-reverts in sequence, we want to
         -- ensure we're not removing a timer that's not this one.
-        if timerCooldownCheckpoint == timer then
-            timerCooldownCheckpoint = nil
+        if warpCooldown == timer then
+            warpCooldown = nil
         end
-    end
-end
-
-function Player:setBlueprints(blueprints)
-    self.blueprints = blueprints
-end
-
-function Player:setLevelEndReady()
-    if self.crankWarpController then
-        self.crankWarpController:setEndGameLoop()
     end
 end
 
@@ -326,57 +302,28 @@ function Player:revertCheckpoint()
 
     -- Cooldown timer for checkpoint revert
 
-    timerCooldownCheckpoint = playdate.timer.new(500)
-    timerCooldownCheckpoint.timerEndedCallback = function(timer)
+    warpCooldown = playdate.timer.new(200)
+    warpCooldown.timerEndedCallback = function(timer)
         timer:remove()
 
         -- Since there can be multiple checkpoint-reverts in sequence, we want to
         -- ensure we're not removing a timer that's not this one.
-        if timerCooldownCheckpoint == timer then
-            timerCooldownCheckpoint = nil
+        if warpCooldown == timer then
+            warpCooldown = nil
         end
     end
 end
 
+function Player:loadAbilities()
+    self.abilities = MemoryCard.getAbilities() or {}
+end
+
 function Player:unlockCrank()
-    -- Create crank warp controller child sprite
-
-    self.crankWarpController = PlayerCrankWarpController()
-
     -- Save ability to memory card
 
     MemoryCard.setAbilities({ crankWarp = true })
-end
 
-function Player:pickUpBlueprint(blueprint)
-    -- Emit pickup event for abilty panel
-
-    spCollect:play(1)
-
-    -- Update blueprints list
-
-    -- Keeping blueprints in separate table for checkpoint state purpose
-    local blueprintsNew = table.deepcopy(self.blueprints)
-
-    if #blueprintsNew == 3 then
-        table.remove(blueprintsNew, 1)
-    end
-
-    table.insert(blueprintsNew, blueprint)
-
-    self.blueprints = blueprintsNew
-
-    self.checkpointHandler:pushState({
-        x = self.x,
-        y = self.y,
-        blueprints = self.blueprints
-    })
-
-    Manager.emitEvent(EVENTS.UpdateBlueprints)
-
-    -- Update checkpoints
-
-    --Manager.emitEvent(EVENTS.CheckpointIncrement)
+    self:loadAbilities()
 end
 
 --------------------
@@ -412,20 +359,22 @@ function Player:update()
 
     -- Skip movement handling if timer cooldown is active
 
-    self:updateMovement()
+    if not warpCooldown then
+        self:updateMovement()
+    end
 
     -- Update variables set by collisions
 
     self.isTouchingGroundPrevious = self.rigidBody:getIsTouchingGround()
-    self.isTouchingPowerPrevious = self.isTouchingPower
-    self.isTouchingPower = false
     self.didPressedInvalidKey = false
-    self.activationsBottom = {}
+    self.activationsDown = {}
     self.activations = {}
 
     -- RigidBody update
 
     self:updateRigidBody()
+
+    self.rigidBody:setForcesCoefficient(1)
 
     -- Collisions Update
 
@@ -439,36 +388,85 @@ function Player:update()
 
     self:updateAnimationState()
 
-    -- Update warp overlay
-
-    if self.crankWarpController then
-        self.crankWarpController:moveTo(self.x, self.y)
-    end
-
     -- Check if player is in top-left of level (overlap with GUI)
 
     self:updateGUIOverlap()
 
     -- Check if player has moved into another level
 
-    self:updateLevelChange()
+    if not warpCooldown then
+        self:updateLevelChange()
+    end
 end
 
 function Player:updateWarp()
-    if self.crankWarpController and self.crankWarpController:hasTriggeredWarp() then
-        self:revertCheckpoint()
+    local crankChange = playdate.getCrankChange()
+    local direction = self.crankWarpController:getDirection()
 
-        self.crankWarpController:resetWarp()
+    -- If reverse direction but no dialog active, do nothing
+    if (direction == -1 or crankChange < 0) and not (self.activeDialog and self.activeDialog:getIsRescuable()) then
+        return
+    end
+
+    -- If forward direction but ability is not yet unlocked, do nothing
+    if not self.abilities.crankWarp and (direction == 1 or crankChange > 0) then
+        return
+    end
+
+    -- Add crank movement
+
+    self.crankWarpController:addCrankMovement(crankChange)
+
+    -- Re-read crank direction
+
+    local directionNew = self.crankWarpController:getDirection()
+
+    if directionNew == 0 then
+        return
+    end
+
+    -- Position warp controller
+
+    if directionNew == -1 then
+        self.crankWarpController:moveTo(self.activeDialog.x, self.activeDialog.y)
+    elseif directionNew == 1 then
+        self.crankWarpController:moveTo(self.x, self.y)
+    end
+
+    -- Handle trigger
+
+    if self.crankWarpController:hasTriggered() then
+        if directionNew == -1 then
+            -- Rescue bot
+            self.activeDialog:setRescued()
+        end
+    elseif directionNew == 1 and self.crankWarpController:isActivated() then
+        crankMomentum = (crankChange + crankMomentum) * 0.85
+
+        local crankThresholdWarp = 100
+        if crankMomentum >= crankThresholdWarp then
+            local warpSpeedFinal = math.min(crankMomentum / crankThresholdWarp, 10)
+
+            for i = 1, math.floor(warpSpeedFinal) do
+                self:revertCheckpoint()
+            end
+
+            self.rigidBody:setForcesCoefficient(0.1)
+        elseif crankMomentum > 1 and crankMomentum < crankThresholdWarp then
+            local coefficient = ((crankThresholdWarp - crankMomentum) / crankThresholdWarp) ^ 2
+
+            self.rigidBody:setForcesCoefficient(coefficient)
+        end
     end
 end
 
 function Player:updateActivations()
-    for i, otherSprite in ipairs(self.activationsBottom) do
+    for i, otherSprite in ipairs(self.activationsDown) do
         local tag = otherSprite:getTag()
         local isBelowCenter = self:centerX() < otherSprite:right() and self:centerX() > otherSprite:left()
 
         -- If there are two bottom activations, choose only the one that is directly below the player.
-        if #self.activationsBottom > 1 and not isBelowCenter then
+        if #self.activationsDown > 1 and not isBelowCenter then
             goto continue
         end
 
@@ -486,7 +484,7 @@ function Player:updateActivations()
 
                 -- Activate block drilling
 
-                otherSprite:activate()
+                otherSprite:activateDown()
 
                 -- If consumed or player stopped pressing, end animation.
                 if otherSprite:isConsumed() then
@@ -537,7 +535,7 @@ function Player:updateActivations()
                 otherSprite:disableCollisionsForFrame()
             else
                 -- Otherwise, activate elevator (set self as child)
-                otherSprite:activate(self, key)
+                otherSprite:activateDown(self, key)
 
                 if key or (not self.isActivatingElevator and otherSprite:hasMovedRemaining()) then
                     -- If activation happened or elevator is still moving with player
@@ -552,29 +550,19 @@ function Player:updateActivations()
     for i, otherSprite in ipairs(self.activations) do
         local tag = otherSprite:getTag()
 
-        if tag == TAGS.Ability then
+        if tag == TAGS.Chip then
             -- [FRANCH] This condition is useful in case there is more than one blueprint being picked up. However
             -- we should be handling the multiple blueprints as a single checkpoint.
             -- But it's also useful for debugging.
 
-            if not timerCooldownCheckpoint then
-                otherSprite:updateStatePickedUp()
-
-                self:pickUpBlueprint(otherSprite.abilityName)
+            if not warpCooldown then
+                otherSprite:activate()
             end
-        end
-
-        if tag == TAGS.Collectible then
-            otherSprite:activate()
-        end
-
-        if tag == TAGS.Dialog and not self.activeDialog then
+        elseif tag == TAGS.Dialog and not self.activeDialog then
             self.activeDialog = otherSprite
 
             self.activeDialog:activate()
-        end
-
-        if tag == TAGS.SavePoint then
+        else
             otherSprite:activate()
         end
     end
@@ -584,28 +572,6 @@ function Player:updateActivations()
         self.particlesDrilling:endAnimation()
 
         self.isActivatingDrillableBlock = nil
-    end
-
-    -- Misc
-
-    if self.isTouchingPower and not self.isTouchingPowerPrevious then
-        -- Enter power area
-
-        spPowerUp:play()
-        spPowerDown:stop()
-
-        -- Update ChipSet GUI
-
-        Manager.emitEvent(EVENTS.UpdateBlueprints)
-    elseif self.isTouchingPowerPrevious and not self.isTouchingPower then
-        -- Exit power area
-
-        spPowerDown:play()
-        spPowerUp:stop()
-
-        -- Update ChipSet GUI
-
-        Manager.emitEvent(EVENTS.UpdateBlueprints)
     end
 end
 
@@ -714,19 +680,12 @@ function Player:updateCollisions()
         end
 
         -- Bottom activations
-        if normal.y == -1 and (tag == TAGS.DrillableBlock or tag == TAGS.Elevator) then
+        if normal.y == -1 and other.activateDown then
             -- If colliding with bottom, activate
-            table.insert(self.activationsBottom, other)
-        end
-
-        -- Other activations
-        if tag == TAGS.SavePoint or tag == TAGS.Dialog or tag == TAGS.Ability or tag == TAGS.Collectible then
+            table.insert(self.activationsDown, other)
+        elseif other.activate then
+            -- Other activations
             table.insert(self.activations, other)
-        end
-
-        -- Other (passive)
-        if tag == TAGS.Powerwall then
-            self.isTouchingPower = true
         end
     end
 
@@ -749,23 +708,16 @@ function Player:updateCollisions()
 end
 
 function Player:updateCheckpointState()
-    local state = self.checkpointHandler:getStateCurrent()
-    if state then
-        -- Update the state directly. No need to push new
+    if self.x ~= self.latestCheckpointPosition.x or self.y ~= self.latestCheckpointPosition.y then
+        self.latestCheckpointPosition.x = self.x
+        self.latestCheckpointPosition.y = self.y
 
-        state.x = self.x
-        state.y = self.y
-        state.blueprints = self.blueprints
-    else
-        if self.x ~= self.latestCheckpointPosition.x or self.y ~= self.latestCheckpointPosition.y then
-            self.latestCheckpointPosition.x = self.x
-            self.latestCheckpointPosition.y = self.y
-            self.checkpointHandler:pushState({
-                x = self.latestCheckpointPosition.x,
-                y = self.latestCheckpointPosition.y,
-                blueprints = table.deepcopy(self.blueprints)
-            })
-        end
+        self.checkpointHandler:pushState({
+            x = self.latestCheckpointPosition.x,
+            y = self.latestCheckpointPosition.y,
+        })
+
+        Checkpoint.increment()
     end
 end
 
@@ -780,7 +732,9 @@ function Player:updateAnimationState()
     local shouldSkipStateCheck = self.states[self.currentState].nextAnimation == ANIMATION_STATES.Idle
 
     if not shouldSkipStateCheck then
-        if self.rigidBody:getIsTouchingGround() then
+        if self.crankWarpController:getDirection() == 1 then
+            animationState = ANIMATION_STATES.Falling
+        elseif self.rigidBody:getIsTouchingGround() then
             if self.isActivatingDrillableBlock and self:isHoldingDownKey() then
                 animationState = ANIMATION_STATES.Drilling
             elseif self.didPressedInvalidKey then
@@ -800,16 +754,16 @@ function Player:updateAnimationState()
                     animationState = ANIMATION_STATES.Impact
                 end
             elseif isMoving and not (self.isActivatingElevator and self.isActivatingElevator:wasActivationSuccessful()) then
-                if self.isTouchingPower then
-                    animationState = ANIMATION_STATES.MovingPowerUp
-                else
+                if GUIChipSet.getInstance():getIsActive() then
                     animationState = ANIMATION_STATES.Moving
+                else
+                    animationState = ANIMATION_STATES.MovingPowerUp
                 end
             else
-                if self.isTouchingPower then
-                    animationState = ANIMATION_STATES.IdlePowerUp
-                else
+                if GUIChipSet.getInstance():getIsActive() then
                     animationState = ANIMATION_STATES.Idle
+                else
+                    animationState = ANIMATION_STATES.IdlePowerUp
                 end
             end
         else
@@ -932,22 +886,25 @@ end
 -- Generic gated input handler
 
 function Player:isKeyPressedGated(key)
-    if self.isTouchingPower then
-        return pd.buttonIsPressed(key)
+    if not pd.buttonIsPressed(key) then
+        -- Button is not pressed.
+        return false
     end
 
-    for _, abilityName in ipairs(self.blueprints) do
-        if abilityName == key then
-            return pd.buttonIsPressed(abilityName)
-        end
-    end
-    if pd.buttonJustPressed(key) then
+    -- Check whether chipset contains key or is otherwise disabled
+
+    local chipset = GUIChipSet.getInstance()
+
+    if chipset:getButtonEnabled(key) then
+        return true
+    elseif pd.buttonJustPressed(key) then
         self.questionMark:play()
         screenShake(3, 1)
 
         self.didPressedInvalidKey = true
 
         spError:play(1)
+
+        return false
     end
-    return false
 end

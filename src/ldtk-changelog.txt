@@ -1,10 +1,36 @@
+# Version 0.1.4
+
+* Levels can have power turned on by default (useful for hub)
+* Removed unused level fields
+
+- Edit custom fields (for levels):
+--- Delete "HintCrank" field
+--- Add boolean field "power", nullable and false by default.
+- Entity "Dialog":
+--- Remove field "save", "button", "freeze"
+--- Replace field "spriteNumber" (int) with nullable string field "asset"
+--- ** NOTE: do not confuse with "saveNumber" - which signifies the order in which the
+--- ** sprites must be rescued.
+--- Add Array-Point field "points"
+
 # Version 0.1.3
 
 * Collectibles now use a numerical index to determine their appearance / value.
+* "ButtonPickup" renamed to "Chip"
+* Removed "crank" and "B" pickup button option, renamed enum to "Buttons"
+* Removed unused enums
 
 - Change sprite "Collectible" properties:
 --- Remove string property "id"
 --- Add non-nullable (default value 0) integer property "index".
+- Rename Entity "ButtonPickup" to "Chip"
+--- Rename field "blueprint" to "button"
+- Rename field "blueprints" for Entity "Player" to "chipSet"
+- enum "ObjectEnum":
+--- Remove options "crank" and "B"
+--- Rename enum to "Buttons
+- Delete enum "ConveyorDirection"
+- Delete enum "ElevatorOrientation"
 
 # Version 0.1.2
 

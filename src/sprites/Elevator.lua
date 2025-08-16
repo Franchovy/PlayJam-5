@@ -1,6 +1,6 @@
 local gfx <const> = playdate.graphics
 
-local imagetableElevator <const> = gfx.imagetable.new(assets.imageTables.elevator)
+local imagetableElevator <const> = assert(gfx.imagetable.new(assets.imageTables.elevator))
 
 local downwardsOffsetMax <const> = 2
 
@@ -42,6 +42,8 @@ function Elevator:postInit()
 
   self.checkpointHandler = CheckpointHandler.getOrCreate(self.id, self,
     { x = self.x, y = self.y, levelName = self.levelName })
+
+  self.latestCheckpointPosition = { x = 0, y = 0 }
 end
 
 function Elevator:collisionResponse(other)
@@ -61,15 +63,20 @@ function Elevator:getDirection()
   return self.track and self.track:getOrientation() or nil
 end
 
-function Elevator:savePosition()
+function Elevator:savePosition(skipSaveToCheckpoint)
   local x, y = self:getPosition()
 
   -- Update LDtk fields
   self.entity.world_position.x = x
   self.entity.world_position.y = y -- - levelBounds.y + TILE_SIZE / 2
 
-  -- Update checkpoint state
-  self.checkpointHandler:pushState({ x = x, y = y, levelName = self.levelName })
+  if not skipSaveToCheckpoint and (self.x ~= self.latestCheckpointPosition.x or self.y ~= self.latestCheckpointPosition.y) then
+    self.latestCheckpointPosition.x = self.x
+    self.latestCheckpointPosition.y = self.y
+
+    -- Update checkpoint state
+    self.checkpointHandler:pushState({ x = x, y = y, levelName = self.levelName })
+  end
 end
 
 function Elevator:update()
@@ -177,6 +184,11 @@ function Elevator:updatePosition()
 end
 
 function Elevator:moveToTarget(targetX, targetY, orientation, spriteChild, downwardsOffset)
+  if targetX == self.x and targetY == self.y then
+    -- No movement occurred.
+    return false
+  end
+
   -- Clamp point to track bounds
   local destinationX, destinationY = self.track:clampElevatorPoint(targetX, targetY)
 
@@ -190,7 +202,8 @@ function Elevator:moveToTarget(targetX, targetY, orientation, spriteChild, downw
   local isCollisionCheckPassed, actualX, actualY = self:isCollisionCheckPassed(self, destinationX, destinationY,
     spriteChild)
 
-  if not isCollisionCheckPassed then
+  if not isCollisionCheckPassed or (actualX == self.x and actualY == self.y) then
+    -- No movement occurred.
     return false
   end
 
@@ -255,7 +268,7 @@ end
 --- Sets movement to be executed in the next update() call using vector.
 --- *param* key - the player input key direction (KEYNAMES)
 --- *returns* the distance covered in the activation.
-function Elevator:activate(spriteChild, key)
+function Elevator:activateDown(spriteChild, key)
   -- Set child sprite
 
   self.spriteChild = spriteChild
@@ -398,7 +411,8 @@ end
 function Elevator:handleCheckpointRevert(state)
   self.movement = 0
 
-  self:moveToAndSave(state.x, state.y)
+  self:moveTo(state.x, state.y)
+  self:savePosition(true)
 
   if state.levelName ~= self.levelName then
     self:enterLevel(state.levelName)

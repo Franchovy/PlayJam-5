@@ -11,7 +11,7 @@
 	"iid": "b12745f0-d7b0-11ee-9f72-7bc5a2cd12f0",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 586,
+	"nextUid": 589,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2237,9 +2237,9 @@
 			"pivotY": 0.5,
 			"fieldDefs": [
 				{
-					"identifier": "blueprints",
+					"identifier": "chipSet",
 					"doc": null,
-					"__type": "Array<LocalEnum.ObjectEnum>",
+					"__type": "Array<LocalEnum.Buttons>",
 					"uid": 40,
 					"type": "F_Enum(37)",
 					"isArray": true,
@@ -2276,7 +2276,7 @@
 			]
 		},
 		{
-			"identifier": "ButtonPickup",
+			"identifier": "Chip",
 			"uid": 21,
 			"tags": [],
 			"exportToToc": false,
@@ -2310,9 +2310,9 @@
 			"pivotY": 0.5,
 			"fieldDefs": [
 				{
-					"identifier": "blueprint",
+					"identifier": "button",
 					"doc": null,
-					"__type": "LocalEnum.ObjectEnum",
+					"__type": "LocalEnum.Buttons",
 					"uid": 38,
 					"type": "F_Enum(37)",
 					"isArray": false,
@@ -2455,84 +2455,10 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "save",
-					"doc": null,
-					"__type": "Bool",
-					"uid": 411,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
 					"identifier": "saveNumber",
 					"doc": null,
 					"__type": "Int",
 					"uid": 412,
-					"type": "F_Int",
-					"isArray": false,
-					"canBeNull": true,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "spriteNumber",
-					"doc": null,
-					"__type": "Int",
-					"uid": 417,
 					"type": "F_Int",
 					"isArray": false,
 					"canBeNull": true,
@@ -2603,11 +2529,11 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "button",
+					"identifier": "asset",
 					"doc": null,
-					"__type": "LocalEnum.ObjectEnum",
-					"uid": 505,
-					"type": "F_Enum(37)",
+					"__type": "String",
+					"uid": 586,
+					"type": "F_String",
 					"isArray": false,
 					"canBeNull": true,
 					"arrayMinLength": null,
@@ -2640,90 +2566,16 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "noSprite",
+					"identifier": "points",
 					"doc": null,
-					"__type": "Bool",
-					"uid": 506,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
+					"__type": "Array<Point>",
+					"uid": 588,
+					"type": "F_Point",
+					"isArray": true,
+					"canBeNull": true,
 					"arrayMinLength": null,
 					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "levelEnd",
-					"doc": null,
-					"__type": "Bool",
-					"uid": 508,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "freeze",
-					"doc": null,
-					"__type": "Bool",
-					"uid": 527,
-					"type": "F_Bool",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "Hidden",
+					"editorDisplayMode": "PointPath",
 					"editorDisplayScale": 1,
 					"editorDisplayPos": "Above",
 					"editorLinkStyle": "StraightArrow",
@@ -3266,17 +3118,13 @@
 		}
 	], "enums": [
 		{ "identifier": "TileEnum", "uid": 3, "values": [{ "id": "Solid", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ObjectEnum", "uid": 37, "values": [
+		{ "identifier": "Buttons", "uid": 37, "values": [
 			{ "id": "Left", "tileRect": null, "color": 12470831 },
 			{ "id": "Right", "tileRect": null, "color": 14120515 },
 			{ "id": "Up", "tileRect": null, "color": 15389866 },
 			{ "id": "Down", "tileRect": null, "color": 14984818 },
-			{ "id": "A", "tileRect": null, "color": 7552569 },
-			{ "id": "B", "tileRect": null, "color": 4073265 },
-			{ "id": "Crank", "tileRect": null, "color": 16690740 }
-		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ConveyorDirection", "uid": 77, "values": [ { "id": "Left", "tileRect": null, "color": 16711870 }, { "id": "Right", "tileRect": null, "color": 1376511 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "ElevatorOrientation", "uid": 208, "values": [ { "id": "Horizontal", "tileRect": null, "color": 16711680 }, { "id": "Vertical", "tileRect": null, "color": 1535 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
+			{ "id": "A", "tileRect": null, "color": 7552569 }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }
 	], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "HintCrank",
@@ -3487,7 +3335,7 @@
 							"height": 24,
 							"defUid": 19,
 							"px": [48,304],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "chipSet", "__type": "Array<LocalEnum.Buttons>", "__value": [ "Left", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Left"]
 							}, {
@@ -4394,7 +4242,7 @@
 							"__worldY": 1600
 						},
 						{
-							"__identifier": "ButtonPickup",
+							"__identifier": "Chip",
 							"__grid": [4,5],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -4405,7 +4253,7 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [144,176],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.Buttons", "__value": "Down", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Down"]
 							}] }],
@@ -4426,17 +4274,10 @@
 							"px": [400,112],
 							"fieldInstances": [
 								{ "__identifier": "text", "__type": "String", "__value": null, "__tile": null, "defUid": 205, "realEditorValues": [] },
-								{ "__identifier": "save", "__type": "Bool", "__value": true, "__tile": null, "defUid": 411, "realEditorValues": [{
-									"id": "V_Bool",
-									"params": [ true ]
-								}] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": 1, "__tile": null, "defUid": 412, "realEditorValues": [{ "id": "V_Int", "params": [1] }] },
-								{ "__identifier": "spriteNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 417, "realEditorValues": [] },
 								{ "__identifier": "flip", "__type": "Bool", "__value": false, "__tile": null, "defUid": 432, "realEditorValues": [] },
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": null, "__tile": null, "defUid": 505, "realEditorValues": [] },
-								{ "__identifier": "noSprite", "__type": "Bool", "__value": false, "__tile": null, "defUid": 506, "realEditorValues": [] },
-								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
-								{ "__identifier": "freeze", "__type": "Bool", "__value": false, "__tile": null, "defUid": 527, "realEditorValues": [] }
+								{ "__identifier": "asset", "__type": "String", "__value": null, "__tile": null, "defUid": 586, "realEditorValues": [] },
+								{ "__identifier": "points", "__type": "Array<Point>", "__value": [], "__tile": null, "defUid": 588, "realEditorValues": [] }
 							],
 							"__worldX": 8272,
 							"__worldY": 1520
@@ -4453,7 +4294,7 @@
 							"height": 24,
 							"defUid": 19,
 							"px": [80,112],
-							"fieldInstances": [{ "__identifier": "blueprints", "__type": "Array<LocalEnum.ObjectEnum>", "__value": [ "Left", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "chipSet", "__type": "Array<LocalEnum.Buttons>", "__value": [ "Left", "Right", "A" ], "__tile": null, "defUid": 40, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["Left"]
 							}, {
@@ -4753,7 +4594,7 @@
 							"__worldY": 1760
 						},
 						{
-							"__identifier": "ButtonPickup",
+							"__identifier": "Chip",
 							"__grid": [1,3],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -4764,7 +4605,7 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [48,112],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.Buttons", "__value": "Right", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Right"]
 							}] }],
@@ -4772,7 +4613,7 @@
 							"__worldY": 1776
 						},
 						{
-							"__identifier": "ButtonPickup",
+							"__identifier": "Chip",
 							"__grid": [4,4],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -4783,7 +4624,7 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [144,144],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.Buttons", "__value": "A", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["A"]
 							}] }],
@@ -5105,7 +4946,7 @@
 							"__worldY": 1792
 						},
 						{
-							"__identifier": "ButtonPickup",
+							"__identifier": "Chip",
 							"__grid": [3,2],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -5116,7 +4957,7 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [112,80],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.Buttons", "__value": "Up", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Up"]
 							}] }],
@@ -5124,7 +4965,7 @@
 							"__worldY": 1744
 						},
 						{
-							"__identifier": "ButtonPickup",
+							"__identifier": "Chip",
 							"__grid": [1,2],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
@@ -5135,7 +4976,7 @@
 							"height": 28,
 							"defUid": 21,
 							"px": [48,80],
-							"fieldInstances": [{ "__identifier": "blueprint", "__type": "LocalEnum.ObjectEnum", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "button", "__type": "LocalEnum.Buttons", "__value": "Left", "__tile": null, "defUid": 38, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["Left"]
 							}] }],
@@ -5443,14 +5284,10 @@
 										"{\"bleepVoice\":\"BOT_HIGH\",\"bleepCount\":6,\"bleepDuration\":1}\\nI'm a high-pitched robot!\\n{\"bleepCount\":2,\"bleepDuration\":3}\\nYoo-hoo!!"
 									]
 								}] },
-								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 412, "realEditorValues": [] },
-								{ "__identifier": "spriteNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 417, "realEditorValues": [] },
 								{ "__identifier": "flip", "__type": "Bool", "__value": false, "__tile": null, "defUid": 432, "realEditorValues": [] },
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": null, "__tile": null, "defUid": 505, "realEditorValues": [] },
-								{ "__identifier": "noSprite", "__type": "Bool", "__value": false, "__tile": null, "defUid": 506, "realEditorValues": [] },
-								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
-								{ "__identifier": "freeze", "__type": "Bool", "__value": false, "__tile": null, "defUid": 527, "realEditorValues": [] }
+								{ "__identifier": "asset", "__type": "String", "__value": null, "__tile": null, "defUid": 586, "realEditorValues": [] },
+								{ "__identifier": "points", "__type": "Array<Point>", "__value": [], "__tile": null, "defUid": 588, "realEditorValues": [] }
 							],
 							"__worldX": 7184,
 							"__worldY": 1584
@@ -5472,14 +5309,10 @@
 									"id": "V_String",
 									"params": ["I'm a standard robot.\\nNothing special about me!!!"]
 								}] },
-								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 412, "realEditorValues": [] },
-								{ "__identifier": "spriteNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 417, "realEditorValues": [] },
 								{ "__identifier": "flip", "__type": "Bool", "__value": false, "__tile": null, "defUid": 432, "realEditorValues": [] },
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": null, "__tile": null, "defUid": 505, "realEditorValues": [] },
-								{ "__identifier": "noSprite", "__type": "Bool", "__value": false, "__tile": null, "defUid": 506, "realEditorValues": [] },
-								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
-								{ "__identifier": "freeze", "__type": "Bool", "__value": false, "__tile": null, "defUid": 527, "realEditorValues": [] }
+								{ "__identifier": "asset", "__type": "String", "__value": null, "__tile": null, "defUid": 586, "realEditorValues": [] },
+								{ "__identifier": "points", "__type": "Array<Point>", "__value": [], "__tile": null, "defUid": 588, "realEditorValues": [] }
 							],
 							"__worldX": 7088,
 							"__worldY": 1584
@@ -5497,20 +5330,16 @@
 							"defUid": 204,
 							"px": [80,176],
 							"fieldInstances": [
-								{ "__identifier": "text", "__type": "String", "__value": "{\"bleepVoice\":\"BOT_LOW\",\"bleepCount\":6,\"bleepDuration\":1}\nI'm a low-pitched robot.\n{\"bleepDuration\":4,\"bleepCount\":4}\nI... love... video... games!", "__tile": null, "defUid": 205, "realEditorValues": [{
+								{ "__identifier": "text", "__type": "String", "__value": "{\"bleepVoice\":\"BOT_LOW\",\"bleepCount\":6,\"bleepDuration\":1}\nI'm a low-pitched robot.\n{\"bleepDuration\":4,\"bleepCount\":4}\nI... love... video... games!\n{\"bleepCount\":6,\"bleepDuration\":1}\nIf you keep talking to me, I'll clear the level for you.\n3...\n2...\n1...\n0.5...............................\n{\"worldComplete\": true}\n(jk) Level Clear!!", "__tile": null, "defUid": 205, "realEditorValues": [{
 									"id": "V_String",
 									"params": [
-										"{\"bleepVoice\":\"BOT_LOW\",\"bleepCount\":6,\"bleepDuration\":1}\\nI'm a low-pitched robot.\\n{\"bleepDuration\":4,\"bleepCount\":4}\\nI... love... video... games!"
+										"{\"bleepVoice\":\"BOT_LOW\",\"bleepCount\":6,\"bleepDuration\":1}\\nI'm a low-pitched robot.\\n{\"bleepDuration\":4,\"bleepCount\":4}\\nI... love... video... games!\\n{\"bleepCount\":6,\"bleepDuration\":1}\\nIf you keep talking to me, I'll clear the level for you.\\n3...\\n2...\\n1...\\n0.5...............................\\n{\"worldComplete\": true}\\n(jk) Level Clear!!"
 									]
 								}] },
-								{ "__identifier": "save", "__type": "Bool", "__value": false, "__tile": null, "defUid": 411, "realEditorValues": [] },
 								{ "__identifier": "saveNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 412, "realEditorValues": [] },
-								{ "__identifier": "spriteNumber", "__type": "Int", "__value": null, "__tile": null, "defUid": 417, "realEditorValues": [] },
 								{ "__identifier": "flip", "__type": "Bool", "__value": false, "__tile": null, "defUid": 432, "realEditorValues": [] },
-								{ "__identifier": "button", "__type": "LocalEnum.ObjectEnum", "__value": null, "__tile": null, "defUid": 505, "realEditorValues": [] },
-								{ "__identifier": "noSprite", "__type": "Bool", "__value": false, "__tile": null, "defUid": 506, "realEditorValues": [] },
-								{ "__identifier": "levelEnd", "__type": "Bool", "__value": false, "__tile": null, "defUid": 508, "realEditorValues": [] },
-								{ "__identifier": "freeze", "__type": "Bool", "__value": false, "__tile": null, "defUid": 527, "realEditorValues": [] }
+								{ "__identifier": "asset", "__type": "String", "__value": null, "__tile": null, "defUid": 586, "realEditorValues": [] },
+								{ "__identifier": "points", "__type": "Array<Point>", "__value": [], "__tile": null, "defUid": 588, "realEditorValues": [] }
 							],
 							"__worldX": 6992,
 							"__worldY": 1584

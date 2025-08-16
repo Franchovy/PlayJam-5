@@ -4,8 +4,8 @@ local gfx <const> = pd.graphics
 
 -- Constants / Assets
 
-local imageSpriteRobot <const> = gfx.imagetable.new(assets.imageTables.player)
-local imageTitle <const> = gfx.image.new(assets.images.menu.title)
+local imageSpriteRobot <const> = assert(gfx.imagetable.new(assets.imageTables.player))
+local imageTitle <const> = assert(gfx.image.new(assets.images.menu.title))
 local imageButtonAStart <const> = assert(gfx.image.new(assets.images.menu.buttonAStart))
 local imageButtonAContinue <const> = assert(gfx.image.new(assets.images.menu.buttonAContinue))
 local imageButtonBLevelSelect <const> = assert(gfx.image.new(assets.images.menu.buttonBLevelSelect))
@@ -16,9 +16,6 @@ local spButton = assert(sound.sampleplayer.new(assets.sounds.menuSelect))
 local spriteRobot
 local sceneManager
 local isFirstTimePlay
-
-local timerTitleAnimation
-local blinkerPressStart
 
 -- Level Selection
 
@@ -77,8 +74,6 @@ function Menu:enter(previous)
       end
     end
   end
-
-  print("Collectibles: " .. self.collectiblesCount)
 end
 
 function Menu:draw()

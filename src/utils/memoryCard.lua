@@ -63,7 +63,7 @@ function MemoryCard.getLastPlayed()
     return nil
   end
 
-  return data.lastPlayed
+  return _.parseWorldAlias(data.lastPlayed)
 end
 
 function MemoryCard.setLevelCompletion(area, world, data)
@@ -150,7 +150,7 @@ function MemoryCard.setAbilities(data)
     fileData.abilities[k] = v
   end
 
-  saveData(fileData.abilities, SAVE_FILE.GameData)
+  saveData(fileData, SAVE_FILE.GameData)
 end
 
 -- User Preferences
@@ -207,6 +207,17 @@ function _.buildWorldAlias(area, world)
   return area .. "/" .. world
 end
 
-function _.buildProgressSaveFilePath(area, world)
-  return SAVE_FILE.LevelSave .. "_" .. area .. "_" .. world
+function _.parseWorldAlias(alias)
+  -- Split alias by "/" character
+  local result = {}
+
+  for part in string.gmatch(alias, "[^/]+") do
+    table.insert(result, part)
+  end
+
+  return table.unpack(result)
+end
+
+function _.buildProgressSaveFilePath(area, world, includeExtension)
+  return SAVE_FILE.LevelSave .. "_" .. area .. "_" .. world .. (includeExtension and ".json" or "")
 end

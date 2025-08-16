@@ -7,9 +7,6 @@ Game = Class("Game", Room)
 local sceneManager
 local systemMenu <const> = pd.getSystemMenu()
 
-local spCheckpointRevert <const> = sound.sampleplayer.new("assets/sfx/checkpoint-revert")
-local spWarpAction <const> = playdate.sound.sampleplayer.new(assets.sounds.warpAction)
-
 local worldName
 local areaName
 
@@ -60,7 +57,10 @@ function Game.loadWorld(area, world)
 
         if dataProgress.rescuedSprites then
             local spriteRescueCounter = SpriteRescueCounter.getInstance()
+
             spriteRescueCounter:loadRescuedSprites(dataProgress.rescuedSprites)
+
+            spriteRescueCounter:setPositionsSpriteCounter()
         end
     end
 
@@ -76,6 +76,10 @@ end
 
 function Game.getLevelName()
     return currentLevelName
+end
+
+function Game.getLevelBounds()
+    return LDtk.get_rect(currentLevelName)
 end
 
 -- Private Methods
@@ -127,16 +131,13 @@ function Game:enter(previous, data)
 
     local levelData = LDtk.get_custom_data(currentLevelName) or {}
 
-    -- Initial Load - only run once per world
+    -- Set Save count & GUI
 
-    if data.isInitialLoad then
-        -- Set up GUI
+    local spriteRescueCounter = SpriteRescueCounter.getInstance()
+    if #spriteRescueCounter:getRescuedSprites() == 0 and levelData.saveCount then
+        spriteRescueCounter:setRescueSpriteCount(levelData.saveCount)
 
-        local spriteRescueCounter = SpriteRescueCounter.getInstance()
-
-        -- Set Save count
-
-        spriteRescueCounter:setRescueSpriteCount(levelData.saveCount or botsToRescueCountDefault)
+        spriteRescueCounter:setPositionsSpriteCounter()
     end
 
     -- Add Parallax if required
@@ -183,7 +184,34 @@ function Game:enter(previous, data)
 
             MemoryCard.setShouldEnableMusic(shouldEnableMusic)
         end)
+
+        -- Cheats
+
+        self.guiCheatUnlock = GUICheatUnlock()
+
+        -- Crank unlock cheat
+
+        self.guiCheatUnlock:addCheat(
+            { pd.kButtonDown, pd.kButtonDown, pd.kButtonUp, pd.kButtonLeft, pd.kButtonRight, pd.kButtonLeft, pd
+                .kButtonRight, pd.kButtonB, pd.kButtonB, pd.kButtonA, pd.kButtonA },
+            function() Player.getInstance():unlockCrank() end
+        )
+        self.guiCheatUnlock:addCheat(
+            { pd.kButtonLeft, pd.kButtonRight, pd.kButtonRight, pd.kButtonLeft, pd
+                .kButtonUp, pd.kButtonDown, pd.kButtonUp, pd.kButtonA, pd.kButtonA },
+            function() print("Alt cheat") end
+        )
+
+        -- Set world not complete
+
+        self.isWorldComplete = false
+
+        -- Perma-power enabled/disabled
+
+        GUIChipSet.getInstance():setPermaActive(not levelData.power)
     end
+
+    self.guiCheatUnlock:add()
 
     -- Load level --
 
@@ -260,6 +288,10 @@ function Game:leave(next, ...)
             self.timerEndSceneTransition = nil
         end
 
+        -- Remove active cheats
+
+        self.guiCheatUnlock:clearAll()
+
         -- Clear ability panel
 
         GUIChipSet.getInstance():remove()
@@ -276,7 +308,7 @@ function Game:leave(next, ...)
 
         -- Clear rescued sprites
 
-        SpriteRescueCounter.destroy()
+        SpriteRescueCounter.getInstance():reset()
 
         -- Remove system/PD menu items
 
@@ -303,12 +335,18 @@ end
 -- Event-based methods
 
 function Game:levelComplete(data)
+    if self.isWorldComplete then
+        Player.getInstance():freeze()
+
+        return
+    end
+
     local direction = data.direction
     local coordinates = data.coordinates
 
     Player.getInstance():freeze()
 
-    spriteTransition:startTransition(direction, function()
+    spriteTransition:startTransitionLevelChange(direction, function()
         -- Load next level
 
         local nextLevel, nextLevelBounds = LDtk.getNeighborLevelForPos(currentLevelName, direction, coordinates)
@@ -320,7 +358,7 @@ function Game:levelComplete(data)
     end)
 end
 
-function Game:botRescued(bot, botNumber, levelEnd)
+function Game:botRescued(bot, botNumber)
     local spriteRescueCounter = SpriteRescueCounter.getInstance()
     spriteRescueCounter:setSpriteRescued(botNumber, bot.fields.spriteNumber)
 
@@ -328,32 +366,71 @@ function Game:botRescued(bot, botNumber, levelEnd)
     local rescuedSprites = spriteRescueCounter:getRescuedSprites()
     MemoryCard.setLevelCompletion(areaName, worldName, { rescuedSprites = rescuedSprites })
 
-    if spriteRescueCounter:isAllSpritesRescued() and levelEnd then
-        self:levelEnd()
+    if spriteRescueCounter:isAllSpritesRescued() then
+        self:worldComplete()
     end
 end
 
-function Game:levelEnd()
-    -- Add on-screen text
+function Game:worldComplete()
+    if self.isWorldComplete then
+        return
+    end
 
-    spriteGUILevelComplete:add()
+    self.isWorldComplete = true
 
-    -- Set player state to game end
+    -- Freeze Player
 
-    Player.getInstance():setLevelEndReady()
+    Player.getInstance():freeze()
+
+    -- Clear out checkpoint handling
+
+    Checkpoint.clearAll()
+
+    -- Fade out music
+
+    FilePlayer:fadeOut(spriteTransition:getDelayFadeOutWorldComplete())
 
     -- Set level complete in data
 
-    local saveData = { complete = true, currentLevel = LEVEL_NAME_INITIAL }
-    MemoryCard.setLevelCompletion(areaName, worldName, saveData)
+    spriteTransition:startTransitionWorldComplete(function()
+        -- Update level progress
 
-    -- Remove progress file
-    MemoryCard.clearLevelCheckpoint(areaName, worldName)
+        local saveData = { complete = true, currentLevel = LEVEL_NAME_INITIAL }
+        MemoryCard.setLevelCompletion(areaName, worldName, saveData)
+
+        -- Remove progress file
+        MemoryCard.clearLevelCheckpoint(areaName, worldName)
+
+        -- Get next level to play
+
+        local nextArea, nextWorld = ReadFile.getNextWorld(worldName, areaName)
+
+        if nextArea and nextWorld then
+            -- Clear Player Instance
+
+            Player.destroy()
+
+            -- Load next level
+
+            sceneManager.scenes.currentGame = Game()
+
+            Game.loadWorld(nextArea, nextWorld)
+
+            sceneManager:enter(sceneManager.scenes.currentGame, { isInitialLoad = true })
+        end
+    end)
 end
 
-function Game:updateBlueprints()
+function Game:updateChipSet(data)
     local abilityPanel = GUIChipSet.getInstance()
-    abilityPanel:updateBlueprints()
+
+    if type(data) == "string" then
+        -- Add single chip
+        abilityPanel:addChip(data)
+    else
+        -- Update entire table
+        abilityPanel:updateChipSet(data.chipSet, data.isActive)
+    end
 end
 
 function Game:checkpointIncrement()
@@ -365,27 +442,17 @@ function Game:savePointSet()
 
     MemoryCard.saveLevelCheckpoint(areaName, worldName, levelData)
 
-    MemoryCard.setLevelCompletion(areaName, worldName, { currentLevel = currentLevelName })
+    local spriteRescueCounter = SpriteRescueCounter.getInstance()
+    local rescuedSprites = spriteRescueCounter:getRescuedSprites()
+    MemoryCard.setLevelCompletion(areaName, worldName,
+        { currentLevel = currentLevelName, rescuedSprites = rescuedSprites })
 
     Checkpoint.clearAllPrevious()
 end
 
 function Game:checkpointRevert()
-    if not SpriteRescueCounter.getInstance():isAllSpritesRescued() then
-        -- SFX
-
-        spWarpAction:play(1)
-        spCheckpointRevert:play(1)
-
-        -- Revert checkpoint
-        Checkpoint.goToPrevious()
-    elseif not self.timerEndSceneTransition then
-        -- If all bots have been rescued, then finish the level.
-
-        self.timerEndSceneTransition = playdate.timer.performAfterDelay(3000, function()
-            sceneManager:enter(sceneManager.scenes.levelSelect)
-        end)
-    end
+    -- Revert checkpoint
+    Checkpoint.goToPrevious()
 end
 
 function Game:hideOrShowGui(shouldHide)
