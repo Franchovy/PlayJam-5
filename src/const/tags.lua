@@ -1,11 +1,12 @@
 TAGS = {
     Player = 1,
-    Door = 2,
-    Ability = 3,
-    Ladder = 4,
-    Wall = 5,
-    Box = 6,
-    ConveyorBelt = 7,
-    DrillableBlock = 8,
-    Elevator = 9
+    Chip = 2,
+    Wall = 3,
+    DrillableBlock = 4,
+    Elevator = 5,
+    Dialog = 6,
+    SavePoint = 7,
+    Powerwall = 8,
+    ElevatorTrack = 9,
+    Collectible = 10
 }

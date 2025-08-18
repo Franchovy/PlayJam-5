@@ -1,4 +1,6 @@
+import "libs/playdate"
 import "libs/ldtk"
 import "libs/roomy-playdate"
 import "libs/animatedSprite"
-import "libs/superfileplayer"
+import "libs/pdDialog"
+import "libs/tanukCodeSequence"

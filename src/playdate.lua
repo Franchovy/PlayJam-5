@@ -1,6 +1,0 @@
-import "CoreLibs/object"
-import "CoreLibs/ui"
-import "CoreLibs/easing"
-import "CoreLibs/sprites"
-import "CoreLibs/timer"
-import "CoreLibs/animation"

@@ -2,150 +2,144 @@ local pd <const> = playdate
 local sound <const> = pd.sound
 local gfx <const> = pd.graphics
 
-local spButton = sound.sampleplayer.new("assets/sfx/ButtonSelect")
+-- Constants / Assets
 
-class("Menu").extends(Room)
+local imageSpriteRobot <const> = assert(gfx.imagetable.new(assets.imageTables.player))
+local imageTitle <const> = assert(gfx.image.new(assets.images.menu.title))
+local imageButtonAStart <const> = assert(gfx.image.new(assets.images.menu.buttonAStart))
+local imageButtonAContinue <const> = assert(gfx.image.new(assets.images.menu.buttonAContinue))
+local imageButtonBLevelSelect <const> = assert(gfx.image.new(assets.images.menu.buttonBLevelSelect))
+local spButton = assert(sound.sampleplayer.new(assets.sounds.menuSelect))
 
-local imageSpriteTitle = gfx.image.new("assets/images/title"):invertedImage()
-local spriteTitle
-local imageSpriteRobot = gfx.imagetable.new("assets/images/boseki")
+-- Local Variables
+
 local spriteRobot
-local spritePressStart
 local sceneManager
-local fileplayer
+local isFirstTimePlay
 
-local timerTitleAnimation
-local blinkerPressStart
+-- Level Selection
 
-function Menu:enter(previous, inFileplayer)
+Menu = Class("Menu", Room)
+
+function Menu:enter(previous)
   -- Set sceneManager reference
   sceneManager = self.manager
 
-  -- fileplayer input
-  if inFileplayer then
-    fileplayer = inFileplayer
+  -- Set font
+
+  local font = gfx.font.new(assets.fonts.menu.small)
+  gfx.setFont(font)
+
+  -- Set Music
+
+  local shouldEnableMusic = MemoryCard.getShouldEnableMusic()
+
+  if not FilePlayer.isPlaying() and shouldEnableMusic then
+    FilePlayer.play(assets.music.menu)
   end
 
-  -- Draw background sprites
+  isFirstTimePlay = MemoryCard.getLastPlayed() == nil
 
-  spriteTitle = gfx.sprite.new(imageSpriteTitle)
-  spriteTitle:add()
-  spriteTitle:moveTo(200, 70)
+  -- Draw player sprite
 
   spriteRobot = AnimatedSprite.new(imageSpriteRobot)
-  spriteRobot:addState("placeholder-name", 5, 6, { tickStep = 2 }).asDefault()
+  spriteRobot:addState("placeholder-name", 9, 12, { tickStep = 2 }).asDefault()
   spriteRobot:add()
-  spriteRobot:moveTo(200, 130)
+  spriteRobot:moveTo(200, 160)
   spriteRobot:playAnimation()
-
-  spritePressStart = gfx.sprite.spriteWithText("PRESS A TO START", 280, 70)
-  spritePressStart:setImage(spritePressStart:getImage():invertedImage())
-
-  spritePressStart:add()
-  spritePressStart:moveTo(200, 180)
 
   -- Reset draw offset
 
   gfx.setDrawOffset(0, 0)
 
-  -- Music
+  -- Get collectibles and validate them
 
-  if not fileplayer then
-    fileplayer = assert(pd.sound.fileplayer.new("assets/music/03_Factory"))
+  local collectibles = MemoryCard.getCollectibles()
+  self.collectiblesCount = 0
+
+  if collectibles then
+    -- Validate collectibles against images
+    local imagetableCollectibles = gfx.imagetable.new(assets.imageTables.collectibles)
+
+    for k, v in pairs(collectibles) do
+      local image = imagetableCollectibles[k]
+      local imageHash = image:getImageHash()
+
+      if imageHash ~= v then
+        -- Clear invalid collectibles
+
+        collectibles[k] = nil
+      else
+        self.collectiblesCount += 1
+      end
+    end
   end
-
-  fileplayer:play()
-
-  -- Little fancy animation(s)
-
-  local animationOffset = 10
-  local showDelay = 15
-  local hideDelay = 5
-  local loopDelay = 2000
-
-  timerTitleAnimation = playdate.timer.new(loopDelay, function()
-    spriteTitle:remove()
-
-    -- Title animation
-
-    playdate.timer.performAfterDelay(hideDelay, function()
-      if not timerTitleAnimation then return end -- escape if scene has exited
-
-      spriteTitle:moveBy(-animationOffset, animationOffset)
-      spriteTitle:add()
-
-      playdate.timer.performAfterDelay(showDelay, function()
-        spriteTitle:remove()
-
-        playdate.timer.performAfterDelay(hideDelay, function()
-          if not timerTitleAnimation then return end -- escape if scene has exited
-
-          spriteTitle:moveBy(animationOffset * 2, -animationOffset * 2)
-          spriteTitle:add()
-
-          playdate.timer.performAfterDelay(showDelay, function()
-            spriteTitle:remove()
-
-            playdate.timer.performAfterDelay(hideDelay, function()
-              if not timerTitleAnimation then return end -- escape if scene has exited
-
-              spriteTitle:moveBy(-animationOffset, animationOffset)
-              spriteTitle:add()
-            end)
-          end)
-        end)
-      end)
-    end)
-  end)
-
-  timerTitleAnimation.repeats = true
-
-  -- Press start button blinker
-
-  blinkerPressStart = gfx.animation.blinker.new(1200, 80, true)
-  blinkerPressStart:startLoop()
 end
 
-local blinkerWasActive = false
+function Menu:draw()
+  -- Draw Title Image
+  imageTitle:drawAnchored(200, 20, 0.5, 0)
 
-function Menu:update()
-  -- Update "Press start" sprite if blinker has toggled.
-  if blinkerWasActive ~= blinkerPressStart.on then
-    -- Keep track of previous state
-    blinkerWasActive = blinkerPressStart.on
+  -- Draw Button Images
+  if isFirstTimePlay then
+    imageButtonAStart:drawAnchored(30, 216, 0, 1)
+  else
+    imageButtonAContinue:drawAnchored(30, 216, 0, 1)
+    imageButtonBLevelSelect:drawAnchored(370, 216, 1, 1)
+  end
 
-    if blinkerWasActive then
-      spritePressStart:add()
-    else
-      spritePressStart:remove()
-    end
+  -- Draw collectibles count
+  if self.collectiblesCount and self.collectiblesCount > 0 then
+    gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
+    gfx.drawTextAligned("Collectibles: " .. self.collectiblesCount, 4, 4, kTextAlignment.left)
+    gfx.setImageDrawMode(gfx.kDrawModeCopy)
   end
 end
 
 function Menu:leave(next, ...)
   -- destroy entities and cleanup resources
 
-  spriteTitle:remove()
   spriteRobot:remove()
-  spritePressStart:remove()
 
   -- Music
 
   if next.super.className == "Game" then
-    fileplayer:stop()
+    FilePlayer.stop()
   end
-
-  -- Menu animation timer
-
-  timerTitleAnimation:remove()
-  blinkerPressStart:remove()
-
-  timerTitleAnimation = nil
 end
 
 function Menu:AButtonDown()
-  spButton:play(1)
+  local area, world = MemoryCard.getLastPlayed()
 
-  sceneManager.scenes.currentGame = Game(0)
-  sceneManager:enter(sceneManager.scenes.currentGame)
+  if area and world then
+    -- Check if level file exists (useful while game is WIP)
+    local worldFileExists = ReadFile.worldFileExists(area, world)
+
+    if not worldFileExists then
+      -- If doesn't exist, reset the last played.
+
+      area, world = nil, nil
+    end
+  end
+
+  if not (area and world) then
+    -- Start with first level
+
+    area = ReadFile.getAreaName(1)
+    world = ReadFile.getWorldName(1, 1)
+  end
+
+  if area and world then
+    spButton:play(1)
+
+    sceneManager.scenes.currentGame = Game()
+
+    Game.loadWorld(area, world)
+
+    sceneManager:enter(sceneManager.scenes.currentGame, { isInitialLoad = true })
+  end
+end
+
+function Menu:BButtonDown()
+  sceneManager:enter(sceneManager.scenes.levelSelect)
 end

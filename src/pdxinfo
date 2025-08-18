@@ -1,7 +1,7 @@
 name=Discontrolled
-author=TeamNameHere
+author=Spilaskopa
 description=Find your buttons in... Discontrolled!
 bundleID=io.franchovy.discontrolled
-version=0.0.1
-buildNumber=1
-imagePath=assets
+version=0.1.4a1
+buildNumber=30
+imagePath=assets/images/launch

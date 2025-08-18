@@ -1,52 +1,97 @@
 import "const"
+import "debug"
 import "assets"
 import "libs"
-import "playdate"
 import "extensions"
 import "rooms"
+import "utils"
 import "sprites"
 
--- Playdate config
+local gfx <const> = playdate.graphics
+local timer <const> = playdate.timer
+local frameTimer <const> = playdate.frameTimer
 
-local fontDefault = playdate.graphics.font.new("assets/fonts/m42.TTF-7")
-playdate.graphics.setFont(fontDefault)
+local imageLogo <const> = assert(gfx.image.new(assets.images.logo))
 
-playdate.graphics.setBackgroundColor(0)
-playdate.graphics.clear(0)
-
--- Set up Scene Manager (Roomy)
-
-local manager = Manager()
-manager:hook()
-
--- Pre-load levels data
-
-LDtk.load(assets.levels.test)
-
--- Open Menu (& save reference)
-
-manager.scenes = {
-  menu = Menu()
-}
-
-manager:enter(manager.scenes.menu)
-
+local showLogo = true
 local last_time = 0
+
+local manager
 
 local function updateDeltaTime()
   local current_time = playdate.getCurrentTimeMilliseconds();
+
   _G.delta_time = (current_time - last_time) / 100;
+
   last_time = current_time;
 end
 
-function playdate.update()
-  updateDeltaTime();
+local function init()
+  -- Playdate config
 
-  -- Update sprites
-  playdate.graphics.sprite.update()
-  playdate.timer.updateTimers()
-  playdate.graphics.animation.blinker.updateAll()
+  local fontDefault = gfx.font.new(assets.fonts.dialog)
+  gfx.setFont(fontDefault)
+
+  pdDialogue.setup({
+    font = fontDefault
+  })
+
+  gfx.setBackgroundColor(0)
+  gfx.clear(0)
+
+  -- DEBUG: - Memory Clear
+
+  -- MemoryCard.clearAll()
+
+  -- Read file paths
+
+  ReadFile.initialize()
+
+  -- Set up Scene Manager (Roomy)
+
+  manager = Manager()
+
+  manager:hook()
+
+  -- Open Menu (& save reference)
+
+  manager.scenes = {
+    menu = Menu(),
+    levelSelect = LevelSelect()
+  }
+
+  manager:enter(manager.scenes.menu)
+
+  -- Hide logo
+
+  showLogo = false
+end
+
+function playdate.update()
+  timer.updateTimers()
+  frameTimer.updateTimers()
+
+  if showLogo then
+    imageLogo:drawAnchored(200, 120, 0.5, 0.5)
+    return
+  end
+
+  updateDeltaTime()
+
+  -- Safeguard against large delta_times (happens when loading)
+  if _G.delta_time < 1 then
+    -- Update sprites
+    gfx.sprite.update()
+  end
+
+  gfx.animation.blinker.updateAll()
 
   -- Update Scenes using Scene Manager
   manager:emit(EVENTS.Update)
+
+  manager:emit(EVENTS.Draw)
+
+  Camera.update()
 end
+
+playdate.timer.performAfterDelay(1000, init)

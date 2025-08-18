@@ -1,3 +1,8 @@
 import "extensions/ldtk"
 import "extensions/roomy-playdate"
 import "extensions/fileplayer"
+import "extensions/playdate"
+import "extensions/animatedSprite"
+import "extensions/math"
+import "extensions/table"
+import "extensions/pdDialog"
