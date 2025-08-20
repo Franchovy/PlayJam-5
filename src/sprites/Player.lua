@@ -544,6 +544,43 @@ function Player:updateActivations()
             end
         end
 
+        if tag == TAGS.AutoElevator then
+            local key
+            local direction = otherSprite:getDirection()
+
+            -- Elevators are automatic: do not require button input. Always auto-select
+            -- movement direction based on player's position relative to the elevator.
+            if direction == ORIENTATION.Horizontal then
+                -- Move towards the player's side: if player is left of elevator, go Right, else Left.
+                if self:centerX() < otherSprite:centerX() then
+                    key = KEYNAMES.Right
+                else
+                    key = KEYNAMES.Left
+                end
+            elseif direction == ORIENTATION.Vertical then
+                -- If player is above the elevator, move Down; otherwise move Up.
+                if self:centerY() <= otherSprite:centerY() then
+                    key = KEYNAMES.Down
+                else
+                    key = KEYNAMES.Up
+                end
+            end
+
+            if self:didJumpStart() then
+                -- Disable collisions with elevator for this frame to avoid
+                -- jump / moving into elevator collision glitch.
+                otherSprite:disableCollisionsForFrame()
+            else
+                -- Otherwise, activate elevator (set self as child)
+                otherSprite:activateDown(self, key)
+
+                if key or (not self.isActivatingElevator and otherSprite:hasMovedRemaining()) then
+                    -- If activation happened or elevator is still moving with player
+                    self.isActivatingElevator = otherSprite
+                end
+            end
+        end
+
         ::continue::
     end
 
